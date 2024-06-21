@@ -1,0 +1,18 @@
+syntax = 'proto3';
+
+package grpc;
+option go_package = "/grpc";
+
+import "google/protobuf/empty.proto";
+
+service TN {
+  rpc CreateCallBack(RequestCreateCallback) returns (google.protobuf.Empty);
+}
+message CallBack {
+  string Name = 1;
+  string Date = 2;
+  string Number = 3;
+}
+message RequestCreateCallback {
+  CallBack callback = 1;
+}
