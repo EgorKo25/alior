@@ -11,7 +11,6 @@ import (
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
-	emptypb "google.golang.org/protobuf/types/known/emptypb"
 )
 
 // This is a compile-time assertion to ensure that this generated file
@@ -22,7 +21,7 @@ const _ = grpc.SupportPackageIsVersion7
 const (
 	Auth_CheckUserPassword_FullMethodName = "/grpc.Auth/CheckUserPassword"
 	Auth_CreateUser_FullMethodName        = "/grpc.Auth/CreateUser"
-	Auth_CreateCallBack_FullMethodName    = "/grpc.Auth/CreateCallBack"
+	Auth_GetUserByID_FullMethodName       = "/grpc.Auth/GetUserByID"
 )
 
 // AuthClient is the client API for Auth service.
@@ -31,7 +30,7 @@ const (
 type AuthClient interface {
 	CheckUserPassword(ctx context.Context, in *CheckRequest, opts ...grpc.CallOption) (*CheckResponse, error)
 	CreateUser(ctx context.Context, in *CreateUserRequest, opts ...grpc.CallOption) (*CreateUserResponse, error)
-	CreateCallBack(ctx context.Context, in *RequestCreateCallback, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	GetUserByID(ctx context.Context, in *GetUserRequest, opts ...grpc.CallOption) (*GetUserResponse, error)
 }
 
 type authClient struct {
@@ -60,9 +59,9 @@ func (c *authClient) CreateUser(ctx context.Context, in *CreateUserRequest, opts
 	return out, nil
 }
 
-func (c *authClient) CreateCallBack(ctx context.Context, in *RequestCreateCallback, opts ...grpc.CallOption) (*emptypb.Empty, error) {
-	out := new(emptypb.Empty)
-	err := c.cc.Invoke(ctx, Auth_CreateCallBack_FullMethodName, in, out, opts...)
+func (c *authClient) GetUserByID(ctx context.Context, in *GetUserRequest, opts ...grpc.CallOption) (*GetUserResponse, error) {
+	out := new(GetUserResponse)
+	err := c.cc.Invoke(ctx, Auth_GetUserByID_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -75,7 +74,7 @@ func (c *authClient) CreateCallBack(ctx context.Context, in *RequestCreateCallba
 type AuthServer interface {
 	CheckUserPassword(context.Context, *CheckRequest) (*CheckResponse, error)
 	CreateUser(context.Context, *CreateUserRequest) (*CreateUserResponse, error)
-	CreateCallBack(context.Context, *RequestCreateCallback) (*emptypb.Empty, error)
+	GetUserByID(context.Context, *GetUserRequest) (*GetUserResponse, error)
 	mustEmbedUnimplementedAuthServer()
 }
 
@@ -89,8 +88,8 @@ func (UnimplementedAuthServer) CheckUserPassword(context.Context, *CheckRequest)
 func (UnimplementedAuthServer) CreateUser(context.Context, *CreateUserRequest) (*CreateUserResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateUser not implemented")
 }
-func (UnimplementedAuthServer) CreateCallBack(context.Context, *RequestCreateCallback) (*emptypb.Empty, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method CreateCallBack not implemented")
+func (UnimplementedAuthServer) GetUserByID(context.Context, *GetUserRequest) (*GetUserResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetUserByID not implemented")
 }
 func (UnimplementedAuthServer) mustEmbedUnimplementedAuthServer() {}
 
@@ -141,20 +140,20 @@ func _Auth_CreateUser_Handler(srv interface{}, ctx context.Context, dec func(int
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Auth_CreateCallBack_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(RequestCreateCallback)
+func _Auth_GetUserByID_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetUserRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(AuthServer).CreateCallBack(ctx, in)
+		return srv.(AuthServer).GetUserByID(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: Auth_CreateCallBack_FullMethodName,
+		FullMethod: Auth_GetUserByID_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(AuthServer).CreateCallBack(ctx, req.(*RequestCreateCallback))
+		return srv.(AuthServer).GetUserByID(ctx, req.(*GetUserRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -175,8 +174,8 @@ var Auth_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _Auth_CreateUser_Handler,
 		},
 		{
-			MethodName: "CreateCallBack",
-			Handler:    _Auth_CreateCallBack_Handler,
+			MethodName: "GetUserByID",
+			Handler:    _Auth_GetUserByID_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
