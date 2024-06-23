@@ -13,7 +13,7 @@ class TNService(tn_pb2_grpc.TNServicer):
 
     def CreateCallBack(self, request, context):
         callback_data = request.callback
-        callback_create = CallBackCreate(name=callback_data.name, date=callback_data.date, number=callback_data.number)
+        callback_create = CallBackCreate(name=callback_data.Name, date=callback_data.Date, number=callback_data.Number)
         with self.db_session() as db:
             repository = CallBackRepository(db)
             repository.create_callback(callback_create)

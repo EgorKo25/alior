@@ -25,4 +25,5 @@ RUN chmod +x ./compile_proto.sh
 RUN sh compile_proto.sh
 
 
-CMD ["python", "main.py"]
+RUN chmod +x ./entrypoint.sh
+ENTRYPOINT ["sh", "entrypoint.sh"]
