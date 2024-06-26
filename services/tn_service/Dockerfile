@@ -21,9 +21,5 @@ ENV PYTHONDONTWRITEBYTECODE 1
 COPY . /tn_service
 WORKDIR /tn_service
 
-RUN chmod +x ./compile_proto.sh
-RUN sh compile_proto.sh
-
-
 RUN chmod +x ./entrypoint.sh
 ENTRYPOINT ["sh", "entrypoint.sh"]
