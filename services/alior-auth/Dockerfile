@@ -1,17 +1,17 @@
 FROM golang:latest
 LABEL authors="alior-team"
 
-RUN mkdir -p /app/config
-RUN mkdir -p /app/migration
-RUN mkdir -p /app/src
+RUN mkdir -p /alior-digital/config
+RUN mkdir -p /alior-digital/migration
+RUN mkdir -p /alior-digital/src
 
-COPY config/* /app/config/
-COPY migrations/* /app/migration/
-COPY src/* /app/src/
-COPY main.go /app/
-COPY go.mod /app/
+COPY config/* /alior-digital/config/
+COPY migrations/* /alior-digital/migration/
+COPY src/* /alior-digital/src/
+COPY main.go /alior-digital/
+COPY go.mod /alior-digital/
 
-WORKDIR /app
+WORKDIR /alior-digital
 
 RUN go mod tidy
 RUN go build -o start.auth main.go
