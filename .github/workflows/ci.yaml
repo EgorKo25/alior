@@ -35,7 +35,7 @@ jobs:
             ${{ runner.os }}-go-
 
       - name: Change directory to project root
-        run: cd alior-auth
+        run: cd service/alior-auth
 
       - name: Install dependencies
         run: go mod tidy
