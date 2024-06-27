@@ -39,7 +39,7 @@ jobs:
         working-directory: ./services/alior-auth
 
       - name: Change directory for test
-        run: cd service/alior-auth
+        run: cd ./service/alior-auth
 
       - name: Pre-build the project
         run: go build -o /dev/null ./...
