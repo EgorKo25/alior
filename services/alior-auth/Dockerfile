@@ -1,19 +1,22 @@
-FROM golang:latest
+# Используем официальный минимальный образ Golang
+FROM golang:1.20-alpine
+
 LABEL authors="alior-team"
 
-RUN mkdir -p /alior-digital/config
-RUN mkdir -p /alior-digital/migration
-RUN mkdir -p /alior-digital/src
+WORKDIR /app
 
-COPY config/* /alior-digital/config/
-COPY migrations/* /alior-digital/migration/
-COPY src/* /alior-digital/src/
-COPY main.go /alior-digital/
-COPY go.mod /alior-digital/
+COPY go.mod go.sum ./
 
-WORKDIR /alior-digital
+RUN go mod download
 
-RUN go mod tidy
+COPY . .
+
 RUN go build -o start.auth main.go
+
+RUN addgroup -S appgroup && adduser -S appuser -G appgroup
+
+RUN chown -R appuser:appgroup /app
+
+USER appuser
 
 CMD ["./start.auth"]
