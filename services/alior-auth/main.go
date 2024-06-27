@@ -4,9 +4,9 @@ import (
 	"context"
 	"log"
 
-	"alior-digital/src/database"
+	"alior-auth/src/database"
 
-	_ "alior-digital/migrations"
+	_ "alior-auth/migrations"
 
 	"github.com/jackc/pgx/v5/pgxpool"
 )
