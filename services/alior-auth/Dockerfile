@@ -1,4 +1,3 @@
-# Используем официальный минимальный образ Golang
 FROM golang:1.20-alpine
 
 LABEL authors="alior-team"
