@@ -12,6 +12,28 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
+    services:
+      postgres:
+        image: postgres:13
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        env:
+          POSTGRES_DB: auth
+          POSTGRES_USER: auth
+          POSTGRES_PASSWORD: aliorAuth
+
+    env:
+      DB_HOST: localhost
+      DB_PORT: 5432
+      DB_DATABASE: auth
+      DB_USER: auth
+      DB_PASSWORD: aliorAuth
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
@@ -33,6 +55,13 @@ jobs:
           key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
           restore-keys: |
             ${{ runner.os }}-go-
+
+      - name: Wait for PostgreSQL to be ready
+        run: |
+          until pg_isready -h ${{ env.DB_HOST }} -p ${{ env.DB_PORT }} -U ${{ env.DB_USER }}; do
+            echo "Waiting for PostgreSQL to be ready..."
+            sleep 5
+          done
 
       - name: Install dependencies
         run: go mod tidy
@@ -64,4 +93,5 @@ jobs:
         working-directory: ./services/alior-auth
 
       - name: Run Docker container
-        run: docker run --rm alior-auth
+        run: docker run --rm --env-file .env alior-auth
+        working-directory: ./services/alior-auth
