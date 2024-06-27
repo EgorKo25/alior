@@ -1,6 +1,8 @@
-from app.core.models import Base, CallBackModel, SessionLocal
 from sqlalchemy.orm import Session
-from .schemas import CallBackSchema
+
+from app.core.models.callback_model import CallBackModel
+from app.core.schemas.callback_schema import CallBackSchema
+
 
 class CallBackRepository:
     def __init__(self, db_session: Session):
