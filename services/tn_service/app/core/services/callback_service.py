@@ -31,22 +31,19 @@ class CallbackService:
                 Number=callback.number
             )
 
-    def update_callback(self, request, context):
-        callback_data = CallBackSchema(
-            name=request.callback.Name,
-            date=request.callback.Date,
-            number=request.callback.Number
-        )
+    def get_all_callbacks(self, request, context):
         with self.db_session() as db:
             repository = CallBackRepository(db)
-            callback = repository.update_callback(request.id, callback_data)
-            if callback is None:
-                context.abort(grpc.StatusCode.NOT_FOUND, "Callback not found")
-            return tn_pb2.CallBack(
-                Name=callback.name,
-                Date=callback.date,
-                Number=callback.number
-            )
+            callbacks = repository.get_all_callbacks(request.Number)
+            if callbacks is None:
+                context.abort(grpc.StatusCode.NOT_FOUND, "Callbacks not found")
+            for callback in callbacks:
+                tn_callback = tn_pb2.CallBack(
+                    Name=callback.name,
+                    Date=callback.date,
+                    Number=callback.number
+                )
+                yield tn_callback
 
     def delete_callback(self, request, context):
         with self.db_session() as db:

@@ -16,8 +16,8 @@ class TNService(tn_pb2_grpc.TNServicer):
     def GetCallBack(self, request, context):
         return self.callback_service.get_callback(request, context)
 
-    def UpdateCallBack(self, request, context):
-        return self.callback_service.update_callback(request, context)
+    def GetAllCallBacks(self, request, context):
+        return self.callback_service.get_all_callbacks(request, context)
 
     def DeleteCallBack(self, request, context):
         return self.callback_service.delete_callback(request, context)

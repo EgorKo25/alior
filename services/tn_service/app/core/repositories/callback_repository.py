@@ -18,15 +18,8 @@ class CallBackRepository:
     def get_callback(self, callback_id: int):
         return self.db_session.query(CallBackModel).get(callback_id)
 
-    def update_callback(self, callback_id: int, callback_update: CallBackSchema):
-        callback_db = self.db_session.query(CallBackModel).get(callback_id)
-        if callback_db:
-            callback_db.name = callback_update.name
-            callback_db.date = callback_update.date
-            callback_db.number = callback_update.number
-            self.db_session.commit()
-            self.db_session.refresh(callback_db)
-        return callback_db
+    def get_all_callbacks(self, number: str):
+        return self.db_session.query(CallBackModel).filter_by(number=number).all()
 
     def delete_callback(self, callback_id: int):
         callback_db = self.db_session.query(CallBackModel).get(callback_id)
