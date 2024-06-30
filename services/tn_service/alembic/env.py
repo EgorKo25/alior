@@ -6,9 +6,11 @@ from alembic import context
 
 from app.core.models.callback_model import Base
 
+from app.config.config import config as conf
+
 config = context.config
 
-config.set_main_option('sqlalchemy.url', 'postgresql://user:password@postgres:5432/db')
+config.set_main_option('sqlalchemy.url', conf['database']['url'])
 
 fileConfig(config.config_file_name)
 
