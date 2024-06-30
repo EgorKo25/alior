@@ -2,3 +2,6 @@ __pycache__/
 *.py[cod]
 *.so
 venv/
+.flake8
+.isort.cfg
+alembic/versions/*.pyc
