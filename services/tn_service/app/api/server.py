@@ -4,6 +4,8 @@ from app.api.proto import tn_pb2_grpc
 from app.core.services.callback_service import CallbackService
 from app.utils.database import SessionLocal
 
+from app.config.config import config
+
 
 class TNService(tn_pb2_grpc.TNServicer):
 
@@ -26,6 +28,6 @@ class TNService(tn_pb2_grpc.TNServicer):
 async def serve():
     server = grpc.aio.server()
     tn_pb2_grpc.add_TNServicer_to_server(TNService(SessionLocal), server)
-    server.add_insecure_port('[::]:50051')
+    server.add_insecure_port(f"[::]:{config['app']['port']}")
     await server.start()
     await server.wait_for_termination()

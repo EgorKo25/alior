@@ -8,8 +8,8 @@ import "google/protobuf/empty.proto";
 service TN {
   rpc CreateCallBack(RequestCreateCallback) returns (google.protobuf.Empty);
   rpc GetCallBack(RequestGetCallBack) returns (CallBack);
-  rpc UpdateCallBack(RequestUpdateCallBack) returns (CallBack);
-  rpc DeleteCallBack(RequestDeleteCallBack) returns (ResponseDeleteCallBack);
+  rpc GetAllCallBacks(RequestGetAllCallBacks) returns (stream CallBack);
+  rpc DeleteCallBack(RequestDeleteCallBack) returns (google.protobuf.Empty);
 }
 
 message CallBack {
@@ -26,15 +26,15 @@ message RequestGetCallBack {
   int32 id = 1;
 }
 
+message RequestGetAllCallBacks {
+  string Number = 1;
+}
+
 message RequestUpdateCallBack {
   int32 id = 1;
   CallBack callback = 2;
 }
 
 message RequestDeleteCallBack {
-  int32 id = 1;
-}
-
-message ResponseDeleteCallBack {
   int32 id = 1;
 }
