@@ -58,7 +58,7 @@ jobs:
 
       - name: Wait for PostgreSQL to be ready
         run: |
-          until pg_isready -р localhost -p ${{ env.DB_PORT }} -U ${{ env.DB_USER }}; do
+          until pg_isready -h localhost -p ${{ env.DB_PORT }} -U ${{ env.DB_USER }}; do
             echo "Waiting for PostgreSQL to be ready..."
             sleep 5
           done
