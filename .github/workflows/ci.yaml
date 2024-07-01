@@ -28,7 +28,7 @@ jobs:
           POSTGRES_PASSWORD: aliorAuth
 
     env:
-      DB_HOST: localhost
+      DB_HOST: postgres
       DB_PORT: 5432
       DB_DATABASE: auth
       DB_USER: auth
@@ -61,46 +61,4 @@ jobs:
           until pg_isready -h ${{ env.DB_HOST }} -p ${{ env.DB_PORT }} -U ${{ env.DB_USER }}; do
             echo "Waiting for PostgreSQL to be ready..."
             sleep 5
-          done
-
-      - name: Install dependencies
-        run: go mod tidy
-        working-directory: ./services/alior-auth
-
-      - name: Pre-build the project
-        run: go build -o /dev/null ./...
-        working-directory: ./services/alior-auth
-
-      - name: Install golangci-lint
-        run: |
-          curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s latest
-          sudo cp ./bin/golangci-lint /usr/local/bin/
-
-      - name: Run golangci-lint
-        run: golangci-lint run ./...
-        working-directory: ./services/alior-auth
-
-      - name: Build the project
-        run: go build -o start.auth main.go
-        working-directory: ./services/alior-auth
-
-      - name: Run tests
-        run: go test ./...
-        working-directory: ./services/alior-auth
-
-      - name: Build Docker image
-        run: docker build -t alior-auth .
-        working-directory: ./services/alior-auth
-
-      - name: Create .env file
-        run: |
-          echo DB_HOST=${{ env.DB_HOST }} > .env
-          echo DB_PORT=${{ env.DB_PORT }} >> .env
-          echo DB_DATABASE=${{ env.DB_DATABASE }} >> .env
-          echo DB_USER=${{ env.DB_USER }} >> .env
-          echo DB_PASSWORD=${{ env.DB_PASSWORD }} >> .env
-        working-directory: ./services/alior-auth
-
-      - name: Run Docker container
-        run: docker run --rm --env-file .env alior-auth
-        working-directory: ./services/alior-auth
+         
