@@ -28,7 +28,7 @@ jobs:
           POSTGRES_PASSWORD: aliorAuth
 
     env:
-      DB_HOST: postgres
+      DB_HOST: authdb
       DB_PORT: 5432
       DB_DATABASE: auth
       DB_USER: auth

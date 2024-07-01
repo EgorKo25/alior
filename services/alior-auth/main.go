@@ -13,7 +13,7 @@ import (
 
 func main() {
 	ctx := context.Background()
-	pool, err := pgxpool.New(ctx, "postgres://auth:aliorAuth@postgres:5432/auth?sslmode=disable")
+	pool, err := pgxpool.New(ctx, "postgres://auth:aliorAuth@authdb:5432/auth?sslmode=disable")
 	if err != nil {
 		log.Fatal(err)
 	}
