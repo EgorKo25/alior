@@ -92,6 +92,15 @@ jobs:
         run: docker build -t alior-auth .
         working-directory: ./services/alior-auth
 
+      - name: Create .env file
+        run: |
+          echo DB_HOST=${{ env.DB_HOST }} > .env
+          echo DB_PORT=${{ env.DB_PORT }} >> .env
+          echo DB_DATABASE=${{ env.DB_DATABASE }} >> .env
+          echo DB_USER=${{ env.DB_USER }} >> .env
+          echo DB_PASSWORD=${{ env.DB_PASSWORD }} >> .env
+        working-directory: ./services/alior-auth
+
       - name: Run Docker container
         run: docker run --rm --env-file .env alior-auth
         working-directory: ./services/alior-auth
