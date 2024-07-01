@@ -104,4 +104,6 @@ jobs:
 
       - name: Run Docker container
         run: docker run --rm --env-file .env alior-auth
+        env:
+          DB_HOST: postgres
         working-directory: ./services/alior-auth
