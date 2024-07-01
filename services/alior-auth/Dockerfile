@@ -18,4 +18,5 @@ RUN chown -R appuser:appgroup /app
 
 USER appuser
 
-CMD ["./start.auth"]
+# Используем переменные окружения для передачи флага dbhost
+CMD ["sh", "-c", "./start.auth -dbhost ${DB_HOST}"]

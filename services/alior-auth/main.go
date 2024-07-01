@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"flag"
 	"log"
 
 	"alior-auth/src/database"
@@ -12,8 +13,14 @@ import (
 )
 
 func main() {
+	var dbhost string
+	flag.StringVar(&dbhost,
+		"dbhost",
+		"localhost",
+		"")
+	flag.Parse()
 	ctx := context.Background()
-	pool, err := pgxpool.New(ctx, "postgres://auth:aliorAuth@postgres:5432/auth?sslmode=disable")
+	pool, err := pgxpool.New(ctx, "postgres://auth:aliorAuth@"+dbhost+":5432/auth?sslmode=disable")
 	if err != nil {
 		log.Fatal(err)
 	}
