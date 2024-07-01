@@ -26,6 +26,7 @@ jobs:
           POSTGRES_DB: auth
           POSTGRES_USER: auth
           POSTGRES_PASSWORD: aliorAuth
+          POSTGRES_HOST_AUTH_METHOD: trust
 
     env:
       DB_HOST: postgres
