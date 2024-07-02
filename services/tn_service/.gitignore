@@ -5,3 +5,4 @@ venv/
 .flake8
 .isort.cfg
 alembic/versions/*.pyc
+.idea/
