@@ -1,0 +1,110 @@
+name: CI Pipeline for Develop Branch
+
+on:
+  push:
+    branches:
+      - develop
+  pull_request:
+    branches:
+      - develop
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:13
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U auth"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        env:
+          POSTGRES_DB: auth
+          POSTGRES_USER: auth
+          POSTGRES_PASSWORD: aliorAuth
+          POSTGRES_HOST_AUTH_METHOD: trust
+
+    env:
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_DATABASE: auth
+      DB_USER: auth
+      DB_PASSWORD: aliorAuth
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Go
+        uses: actions/setup-go@v3
+        with:
+          go-version: '1.22.4'
+
+      - name: Display Go version
+        run: go version
+
+      - name: Set up dependencies cache
+        uses: actions/cache@v2
+        with:
+          path: |
+            ~/.cache/go-build
+            /go/pkg/mod
+          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+          restore-keys: |
+            ${{ runner.os }}-go-
+
+      - name: Wait for PostgreSQL to be ready
+        run: |
+          until pg_isready -h localhost -p 5432 -U auth; do
+            echo "Waiting for PostgreSQL to be ready..."
+            sleep 10
+          done
+          echo "PostgreSQL is ready"
+
+      - name: Install dependencies
+        run: go mod tidy
+        working-directory: ./services/alior-auth
+
+      - name: Pre-build the project
+        run: go build -o /dev/null ./...
+        working-directory: ./services/alior-auth
+
+      - name: Install golangci-lint
+        run: |
+          curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s latest
+          sudo cp ./bin/golangci-lint /usr/local/bin/
+
+      - name: Run golangci-lint
+        run: golangci-lint run ./...
+        working-directory: ./services/alior-auth
+
+      - name: Build the project
+        run: go build -o start.auth main.go
+        working-directory: ./services/alior-auth
+
+      - name: Run tests
+        run: go test ./...
+        working-directory: ./services/alior-auth
+
+      - name: Build Docker image
+        run: docker build -t alior-auth .
+        working-directory: ./services/alior-auth
+
+      - name: Create .env file
+        run: |
+          echo DB_HOST=${{ env.DB_HOST }} > .env
+          echo DB_PORT=${{ env.DB_PORT }} >> .env
+          echo DB_DATABASE=${{ env.DB_DATABASE }} >> .env
+          echo DB_USER=${{ env.DB_USER }} >> .env
+          echo DB_PASSWORD=${{ env.DB_PASSWORD }} >> .env
+        working-directory: ./services/alior-auth
+
+      - name: Run Docker container
+        run: docker run --rm --env-file .env alior-auth
+        env:
+          DB_HOST: postgres
+        working-directory: ./services/alior-auth
