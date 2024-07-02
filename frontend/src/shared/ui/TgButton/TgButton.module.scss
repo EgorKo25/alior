@@ -1,0 +1,36 @@
+.button {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	box-sizing: border-box;
+	min-width: 100px;
+	min-height: 100px;
+	text-align: center;
+	background-color: #D9D9D9;
+	border-radius: 50px;
+	cursor: pointer;
+	position: relative;
+	border:none;
+
+}
+
+.tg_icon_foundation {
+	fill: #000;
+}
+
+.button:hover {
+	background-color: #00C7F3;
+}
+
+
+.button:hover .tg_icon{
+	fill: #fff;
+}
+
+.button:active {
+	background-color: #00C7F3;
+}
+
+.button:active .tg_icon{
+	fill: #fff;
+}

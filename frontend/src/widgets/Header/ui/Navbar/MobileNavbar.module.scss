@@ -1,0 +1,18 @@
+.container {
+	background-color: transparent;
+    border-radius: 0px;
+    display: flex;
+    width: 212px;
+    align-items: center;
+}
+
+
+
+.list {
+	display: flex;
+    flex-direction: column;
+	gap: 16px;
+	width: 100%;
+	align-items: center;
+}
+
