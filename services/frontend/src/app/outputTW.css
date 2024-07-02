@@ -596,20 +596,8 @@ video {
   resize: both;
 }
 
-@media (min-width: 640px) {
-  .sm\:flex {
-    display: flex;
-  }
-}
-
 @media (min-width: 768px) {
   .md\:flex {
-    display: flex;
-  }
-}
-
-@media (min-width: 1024px) {
-  .lg\:flex {
     display: flex;
   }
 }
