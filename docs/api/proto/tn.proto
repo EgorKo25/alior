@@ -30,11 +30,6 @@ message RequestGetAllCallBacks {
   string Number = 1;
 }
 
-message RequestUpdateCallBack {
-  int32 id = 1;
-  CallBack callback = 2;
-}
-
 message RequestDeleteCallBack {
   int32 id = 1;
 }
