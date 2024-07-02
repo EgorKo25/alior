@@ -4,12 +4,12 @@ import (
 	"context"
 	"errors"
 
-	"alior-digital/src/types"
+	"alior-auth/src/types"
 
 	"github.com/jackc/pgx/v5/pgxpool"
 	"golang.org/x/crypto/bcrypt"
 
-	_ "alior-digital/migrations"
+	_ "alior-auth/migrations"
 )
 
 func NewDB(ctx context.Context, connString string) (*DB, error) {

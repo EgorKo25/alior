@@ -5,9 +5,9 @@ import (
 	"fmt"
 	"net"
 
-	api "alior-digital/api/proto/grpc"
-	"alior-digital/src/config"
-	"alior-digital/src/types"
+	api "alior-auth/api/proto/grpc"
+	"alior-auth/src/config"
+	"alior-auth/src/types"
 
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
