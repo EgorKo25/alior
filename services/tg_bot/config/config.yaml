@@ -1,1 +1,6 @@
-token: '6853105885:AAE0JA44brPTqd5iPQ5f2GN0L-jNQYi8E2A'
+bot:
+  token: '6853105885:AAE0JA44brPTqd5iPQ5f2GN0L-jNQYi8E2A'
+
+grpc_client:
+  address: 'localhost'
+  port: 50051
