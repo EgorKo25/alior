@@ -1,4 +1,4 @@
-syntax = 'proto3';
+syntax = "proto3";
 
 package grpc;
 option go_package = "/grpc";
@@ -7,12 +7,29 @@ import "google/protobuf/empty.proto";
 
 service TN {
   rpc CreateCallBack(RequestCreateCallback) returns (google.protobuf.Empty);
+  rpc GetCallBack(RequestGetCallBack) returns (CallBack);
+  rpc GetAllCallBacks(RequestGetAllCallBacks) returns (stream CallBack);
+  rpc DeleteCallBack(RequestDeleteCallBack) returns (google.protobuf.Empty);
 }
+
 message CallBack {
   string Name = 1;
   string Date = 2;
   string Number = 3;
 }
+
 message RequestCreateCallback {
   CallBack callback = 1;
+}
+
+message RequestGetCallBack {
+  int32 id = 1;
+}
+
+message RequestGetAllCallBacks {
+  string Number = 1;
+}
+
+message RequestDeleteCallBack {
+  int32 id = 1;
 }
