@@ -5,6 +5,7 @@ import clsx from "clsx";
 import { IconBars } from "src/shared/ui/IconBars";
 import { IconCross } from "src/shared/ui/IconCross";
 import { MainButton } from "src/shared/ui/MainButton";
+
 export const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
@@ -26,7 +27,9 @@ export const Header = () => {
 
   return (
     <header className={`` + clsx(styles.header)}>
-      <div className={clsx(styles.heading_logo)}>Alior</div>
+      <div className={clsx(styles.heading_logo)}>
+        <img src="/images/logo.svg" alt="Логотип" />
+      </div>
       <div className="hidden md:flex">
         <Navbar isMobile={false} />
       </div>

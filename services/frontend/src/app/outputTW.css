@@ -446,6 +446,26 @@ video {
   display: none;
 }
 
+@font-face {
+  font-family: "Rubik";
+
+  src: url("/fonts/Rubik/Rubik-VariableFont_wght.ttf") format("truetype");
+
+  font-weight: 300 700;
+
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "Caveat";
+
+  src: url("/fonts/Caveat/Caveat-VariableFont_wght.ttf") format("truetype");
+
+  font-weight: 400;
+
+  font-style: normal;
+}
+
 *, ::before, ::after {
   --tw-border-spacing-x: 0;
   --tw-border-spacing-y: 0;
@@ -592,8 +612,16 @@ video {
   display: none;
 }
 
+.cursor-pointer {
+  cursor: pointer;
+}
+
 .resize {
   resize: both;
+}
+
+* {
+  font-family: "Rubik", sans-serif;
 }
 
 @media (min-width: 768px) {

@@ -3,5 +3,9 @@ import { router } from "./Router";
 import "./outputTW.css";
 
 export const App = () => {
-  return <RouterProvider router={router} />;
+  return (
+    <>
+      <RouterProvider router={router} />
+    </>
+  );
 };
