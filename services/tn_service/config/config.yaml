@@ -1,0 +1,5 @@
+app:
+  port: 50051
+
+database:
+  url: "postgresql://user:password@postgres:5432/db"
