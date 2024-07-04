@@ -32,7 +32,7 @@ class CallbackRepository:
                    'items': items}
         return response
 
-    def delete_callback(self, callback_id: int):
+    def delete_callback_by_id(self, callback_id: int):
         callback_db = self.db_session.query(CallbackModel).get(callback_id)
         if callback_db:
             self.db_session.delete(callback_db)
@@ -40,3 +40,10 @@ class CallbackRepository:
             return callback_id
         return None
 
+    def delete_callback_by_number(self, number: str):
+        callback_db = self.db_session.query(CallbackModel).filter_by(number=number).first()
+        if callback_db:
+            self.db_session.delete(callback_db)
+            self.db_session.commit()
+            return number
+        return None

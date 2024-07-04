@@ -10,7 +10,8 @@ service TN {
   rpc GetCallback(RequestGetCallback) returns (Callback);
   rpc GetAllCallbacks(google.protobuf.Empty) returns (ResponseGetAllCallbacks);
   rpc GetCallbacksPaginated(RequestGetCallbacksPaginated) returns (ResponseGetCallbacksPaginated);
-  rpc DeleteCallback(RequestDeleteCallback) returns (google.protobuf.Empty);
+  rpc DeleteCallbackById(RequestDeleteCallbackById) returns (google.protobuf.Empty);
+  rpc DeleteCallbackByNumber(RequestDeleteCallbackByNumber) returns (google.protobuf.Empty);
 }
 
 message Callback {
@@ -49,6 +50,10 @@ message ResponseGetCallbacksPaginated {
 
 
 // DeleteCallback
-message RequestDeleteCallback {
+message RequestDeleteCallbackById {
   int32 id = 1;
+}
+
+message RequestDeleteCallbackByNumber {
+  string Number = 1;
 }

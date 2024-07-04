@@ -18,6 +18,6 @@ class GRPCClient:
         request = Empty()
         return self.stub.GetCallbacksQuantity(request)
 
-    def delete_callback(self, id: int):
-        request = tn_pb2.RequestDeleteCallback(id=id)
-        return self.stub.DeleteCallback(request)
+    def delete_callback_by_number(self, number: str):
+        request = tn_pb2.RequestDeleteCallbackByNumber(Number=number)
+        return self.stub.DeleteCallbackByNumber(request)

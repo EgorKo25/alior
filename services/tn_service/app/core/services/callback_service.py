@@ -79,10 +79,18 @@ class CallbackService:
             )
             return tn_callback
 
-    def delete_callback(self, request, context):
+    def delete_callback_by_id(self, request, context):
         with self.db_session() as db:
             repository = CallbackRepository(db)
-            deleted_id = repository.delete_callback(request.id)
+            deleted_id = repository.delete_callback_by_id(request.id)
             if deleted_id is None:
                 context.abort(grpc.StatusCode.NOT_FOUND, "Callback not found")
-            return tn_pb2.ResponseDeleteCallback(id=deleted_id)
+            return empty_pb2.Empty()
+
+    def delete_callback_by_number(self, request, context):
+        with self.db_session() as db:
+            repository = CallbackRepository(db)
+            deleted_number = repository.delete_callback_by_number(request.Number)
+            if deleted_number is None:
+                context.abort(grpc.StatusCode.NOT_FOUND, "Callback not found")
+            return empty_pb2.Empty()
