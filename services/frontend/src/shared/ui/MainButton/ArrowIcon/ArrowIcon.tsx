@@ -1,5 +1,7 @@
+import styles from "../MainButton.module.scss";
 export const ArrowIcon: React.FC<{ color: string }> = ({ color }) => (
   <svg
+    className={styles.arrow_icon}
     width="24"
     height="24"
     viewBox="0 0 24 24"

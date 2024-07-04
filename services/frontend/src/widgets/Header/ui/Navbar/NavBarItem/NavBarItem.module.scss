@@ -1,82 +1,106 @@
-
-
 .decoration_container {
-	height: 24px;
-    width: 24px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+  height: 24px;
+  width: 24px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .decoration {
   display: block;
-  background-color: #A2A2A2;
+  background-color: #a2a2a2;
   width: 10px;
   height: 10px;
   border-radius: 50px;
-  transition: all 0.2s ease; /* Добавляем плавный переход */
-  background-size: cover; /* Убедитесь, что SVG покрывает весь элемент */
-  background-image: none; /* Изначально изображение не установлено */
+  transition: all 0.2s ease;
+  background-size: cover;
+  background-image: none;
 }
 
 .decoration_active {
   background-color: transparent;
-  width: 24px; /* Новый размер, соответствующий SVG */
+  width: 24px;
   height: 24px;
-  border-radius: 0; /* Убираем закругление, чтобы стало квадратом */
-  transition: all 0.3s ease; /* Добавляем плавный переход */
+  border-radius: 0;
+  transition: all 0.3s ease;
 }
 
 .decoration_active_chair {
-	background-image: url('../../images/chair.svg');
+  background-image: url("../../images/chair.svg");
 }
 
-  .decoration_active_services {
-	background-image: url('../../images/services.svg');
+.decoration_active_services {
+  background-image: url("../../images/services.svg");
 }
 
-  .decoration_active_play {
-	background-image: url('../../images/play.svg');
+.decoration_active_play {
+  background-image: url("../../images/play.svg");
 }
 
 .list__item:hover .decoration {
   background-color: transparent;
-  width: 24px; /* Новый размер, соответствующий SVG */
+  width: 24px;
   height: 24px;
-  border-radius: 0; /* Убираем закругление, чтобы стало квадратом */
-  transition: all 0.3s ease; /* Добавляем плавный переход */
+  border-radius: 0;
+  transition: all 0.3s ease;
 }
 
-/* Устанавливаем изображения для hover состояния каждого элемента списка */
-.list__item:nth-child(1):hover .decoration { background-image: url('../../images/chair.svg'); }
-.list__item:nth-child(2):hover .decoration { background-image: url('../../images/services.svg'); }
-.list__item:nth-child(3):hover .decoration { background-image: url('../../images/play.svg'); }
-
-
+.list__item:nth-child(1):hover .decoration {
+  background-image: url("../../images/chair.svg");
+}
+.list__item:nth-child(2):hover .decoration {
+  background-image: url("../../images/services.svg");
+}
+.list__item:nth-child(3):hover .decoration {
+  background-image: url("../../images/play.svg");
+}
 
 .list__item {
-	display: flex;
-	align-items: center;
-    list-style-type: none;
-    flex-direction: row;
-    gap: 10px;
-	padding: 12px 18px 12px 14px;
-	cursor: pointer;
+  display: flex;
+  align-items: center;
+  list-style-type: none;
+  flex-direction: row;
+  gap: 10px;
+  padding: 12px 18px 12px 14px;
+  cursor: pointer;
+}
+
+@media (width < 768px) {
+  .list__item {
+    padding: 7px 13px 7px 9px;
+    transition: padding 0.3s linear;
+  }
+
+  .decoration_container {
+    height: 18px;
+    width: 18px;
+  }
+
+  .list__item:hover .decoration {
+    width: 18px;
+    height: 18px;
+  }
+
+  .decoration_active {
+    width: 18px;
+    height: 18px;
+  }
 }
 
 .link {
-	color: #A2A2A2;;
-	text-decoration: none;
+  color: #a2a2a2;
+  text-decoration: none;
+  font-size: clamp(0.875rem, 0.7321rem + 0.2976vw, 1rem);
 }
 
 .link_active {
-	color: #000;
+  color: #000;
 }
 
-.list__item:hover .link  {
-	color: #000;
+.list__item:hover .link {
+  color: #000;
 }
 
 .list__item .link:active {
-	color: #000;
+  color: #000;
 }

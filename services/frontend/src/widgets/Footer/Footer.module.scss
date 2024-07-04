@@ -64,7 +64,7 @@
   border: #ff537a;
 }
 
-@media (320px <= width <= 768px) {
+@media (width <= 640px) {
   .footer_decoration_paragraph {
     top: 51%;
   }

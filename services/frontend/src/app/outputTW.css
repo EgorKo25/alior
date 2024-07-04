@@ -624,8 +624,8 @@ video {
   font-family: "Rubik", sans-serif;
 }
 
-@media (min-width: 768px) {
-  .md\:flex {
+@media (min-width: 640px) {
+  .sm\:flex {
     display: flex;
   }
 }
