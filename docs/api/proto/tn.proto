@@ -6,37 +6,48 @@ option go_package = "/grpc";
 import "google/protobuf/empty.proto";
 
 service TN {
-  rpc CreateCallBack(RequestCreateCallback) returns (google.protobuf.Empty);
-  rpc GetCallBack(RequestGetCallBack) returns (CallBack);
-  rpc GetAllCallBacks(google.protobuf.Empty) returns (stream CallBack);
-  rpc GetCallBacksQuantity(google.protobuf.Empty) returns (ResponseGetCallBacksQuantity);
-  rpc GetCallBacksPaginated(RequestGetCallBacksPaginated) returns (stream CallBack);
-  rpc DeleteCallBack(RequestDeleteCallBack) returns (google.protobuf.Empty);
+  rpc CreateCallback(RequestCreateCallback) returns (google.protobuf.Empty);
+  rpc GetCallback(RequestGetCallback) returns (Callback);
+  rpc GetAllCallbacks(google.protobuf.Empty) returns (ResponseGetAllCallbacks);
+  rpc GetCallbacksPaginated(RequestGetCallbacksPaginated) returns (ResponseGetCallbacksPaginated);
+  rpc DeleteCallback(RequestDeleteCallback) returns (google.protobuf.Empty);
 }
 
-message CallBack {
+message Callback {
   string Name = 1;
   string Date = 2;
   string Number = 3;
 }
 
+// CreateCallBack
 message RequestCreateCallback {
-  CallBack callback = 1;
+  Callback callback = 1;
 }
 
-message RequestGetCallBack {
+// GetCallback
+message RequestGetCallback {
   int32 id = 1;
 }
 
-message RequestGetCallBacksPaginated {
+// GetAllCallbacks
+message ResponseGetAllCallbacks {
+  int32 total_items = 1;
+  repeated Callback callbacks = 2;
+}
+
+
+// GetCallbacksPaginated
+message RequestGetCallbacksPaginated {
   int32 limit = 1;
   int32 offset = 2;
 }
 
-message ResponseGetCallBacksQuantity {
-  int32 quantity = 1;
+message ResponseGetCallbacksPaginated {
+  repeated Callback callbacks = 1;
 }
 
-message RequestDeleteCallBack {
+
+// DeleteCallback
+message RequestDeleteCallback {
   int32 id = 1;
 }
