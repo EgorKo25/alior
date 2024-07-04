@@ -18,7 +18,7 @@ export const TgButton = ({
       type={type}
       onClick={onClick}
     >
-      <TgIcon />
+      <TgIcon color="#000" size={48} />
     </button>
   );
 };

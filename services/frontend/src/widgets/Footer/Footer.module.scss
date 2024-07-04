@@ -1,0 +1,74 @@
+.footer {
+  margin-block-start: 90px;
+  border-radius: 60px 60px 0px 0px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-color: #000;
+  color: #fff;
+  padding-block-start: 8%;
+  padding-block-end: 7%;
+}
+
+.footer_heading_container {
+  display: flex;
+  position: relative;
+  justify-content: center;
+}
+
+.footer_heading {
+  line-height: 592.5px;
+  font-size: 45vw;
+}
+
+.footer_decoration_paragraph {
+  position: absolute;
+  font-size: 8vw;
+  color: #ff537a;
+  line-height: 100%;
+  top: clamp(51%, 53%, 70%);
+  font-family: "Caveat", sans-serif;
+}
+
+.bottom_footer_container {
+  display: flex;
+  width: 92%;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.policy_container {
+  display: flex;
+  gap: 48px;
+  font-weight: 300;
+}
+
+.policy_button_container {
+  display: flex;
+  gap: 48px;
+}
+
+.policy_button {
+  height: 40px;
+  width: 40px;
+  border-radius: 32px;
+  border: 1px solid #fff;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+}
+
+.policy_button:hover {
+  background-color: rgba(255, 83, 122, 30%);
+  border: #ff537a;
+}
+
+@media (width <= 640px) {
+  .footer_decoration_paragraph {
+    top: 51%;
+  }
+  .policy_container {
+    font-size: 12px;
+  }
+}

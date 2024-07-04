@@ -5,20 +5,19 @@ import clsx from "clsx";
 import { IconBars } from "src/shared/ui/IconBars";
 import { IconCross } from "src/shared/ui/IconCross";
 import { MainButton } from "src/shared/ui/MainButton";
+
 export const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const handleResize = () => {
-    if (window.innerWidth > 768 && isMenuOpen) {
+    if (window.innerWidth > 640 && isMenuOpen) {
       setIsMenuOpen(false);
     }
   };
 
-  // Подписываемся на событие изменения размера окна
   useEffect(() => {
     window.addEventListener("resize", handleResize);
 
-    // Отписываемся от события при размонтировании компонента
     return () => {
       window.removeEventListener("resize", handleResize);
     };
@@ -26,11 +25,13 @@ export const Header = () => {
 
   return (
     <header className={`` + clsx(styles.header)}>
-      <div className={clsx(styles.heading_logo)}>Alior</div>
-      <div className="hidden md:flex">
+      <div className={clsx(styles.heading_logo)}>
+        <img src="/images/logo.svg" alt="Alior" />
+      </div>
+      <div className="hidden sm:flex">
         <Navbar isMobile={false} />
       </div>
-      <div className="hidden md:flex">
+      <div className="hidden sm:flex">
         <MainButton
           className={clsx(styles.button_black_type)}
           title="На консультацию"
