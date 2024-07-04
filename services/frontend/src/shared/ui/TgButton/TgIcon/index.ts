@@ -1,0 +1,1 @@
+export { TgIcon } from "./TgIcon";

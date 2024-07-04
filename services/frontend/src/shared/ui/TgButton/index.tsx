@@ -1,0 +1,1 @@
+export { TgButton } from './TgButton';

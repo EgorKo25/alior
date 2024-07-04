@@ -1,7 +1,7 @@
 __pycache__/
 *.py[cod]
 *.so
-services/tn_service/venv/
+venv/
 .flake8
 .isort.cfg
 alembic/versions/*.pyc
