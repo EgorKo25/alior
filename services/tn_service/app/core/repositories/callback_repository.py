@@ -18,8 +18,14 @@ class CallBackRepository:
     def get_callback(self, callback_id: int):
         return self.db_session.query(CallBackModel).get(callback_id)
 
-    def get_all_callbacks(self, number: str):
-        return self.db_session.query(CallBackModel).filter_by(number=number).all()
+    def get_callbacks_paginated(self, limit: int, offset: int):
+        return self.db_session.query(CallBackModel).offset(offset).limit(limit).all()
+
+    def get_all_callbacks(self):
+        return self.db_session.query(CallBackModel).all()
+
+    def get_callbacks_quantity(self):
+        return self.db_session.query(CallBackModel).count()
 
     def delete_callback(self, callback_id: int):
         callback_db = self.db_session.query(CallBackModel).get(callback_id)
@@ -28,3 +34,4 @@ class CallBackRepository:
             self.db_session.commit()
             return callback_id
         return None
+

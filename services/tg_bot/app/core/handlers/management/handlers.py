@@ -1,50 +1,104 @@
 from aiogram import Dispatcher, types
+from aiogram.filters import Command
+from aiogram.types.inline_keyboard_button import InlineKeyboardButton
+from aiogram.types.inline_keyboard_markup import InlineKeyboardMarkup
 from app.api.grpc_client import GRPCClient
-from app.api.proto import tn_pb2
 
 grpc_client = GRPCClient()
 
+
 def register_handlers_management(dp: Dispatcher):
-    @dp.message_handler(commands=["get_callback"])
-    async def get_callback_command(message: types.Message):
+    @dp.message(Command("delete_callback"))
+    async def delete_callback_command(message: types.Message, command: Command):
         try:
-            callback_id = int(message.get_args())
-            response = grpc_client.get_callback(callback_id)
-            await message.answer(f"Callback: Name: {response.Name}, Date: {response.Date}, Number: {response.Number}")
-        except Exception as e:
-            await message.answer(f"Ашыбка: {str(e)}")
-
-    @dp.message_handler(commands=["create_callback"])
-    async def create_callback_command(message: types.Message):
-        try:
-            data = message.get_args().split(',')
-            if len(data) != 3:
-                raise ValueError("Пример для тупых: /create_callback <Имя блять>,<дата блять>,<номер нахуй>")
-
-            callback = tn_pb2.CallBack(Name=data[0], Date=data[1], Number=data[2])
-            grpc_client.create_callback(callback)
-            await message.answer("Создано на кайфе")
-        except Exception as e:
-            await message.answer(f"Error: {str(e)}")
-
-    @dp.message_handler(commands=["delete_callback"])
-    async def delete_callback_command(message: types.Message):
-        try:
-            callback_id = int(message.get_args())
+            callback_id = int(command.args)
             grpc_client.delete_callback(callback_id)
             await message.answer("Убрал его из твоей жизни")
         except Exception as e:
             await message.answer(f"Error: {str(e)}")
 
-    @dp.message_handler(commands=["get_all_callbacks"])
-    async def get_all_callbacks_command(message: types.Message):
+    @dp.message(Command("get_callbacks_paginated"))
+    async def get_callback_command(message: types.Message, command: Command, limit=1):
         try:
-            number = message.get_args()
-            responses = grpc_client.get_all_callbacks(number)
-            callbacks = [f"Имя: {callback.Name}, Дата: {callback.Date}, Номер: {callback.Number}" for callback in responses]
-            if callbacks:
-                await message.answer("\n\n".join(callbacks))
+            args = command.args.split()
+            offset = int(args[0])
+            callbacks_quantity = grpc_client.get_callbacks_quantity().quantity
+            responses = list(grpc_client.get_callbacks_paginated(limit, offset))
+            if responses:
+                callback = responses[0]
+                text = f"Имя: {callback.Name}\n Дата: {callback.Date}\n Номер: {callback.Number}\n"
+
+                keyboard_buttons = []
+                if offset > 0:
+                    keyboard_buttons.append(
+                        InlineKeyboardButton(text="⬅️ Предыдущий", callback_data=f"prev_{offset - limit}"))
+                if offset < callbacks_quantity - 1:
+                    keyboard_buttons.append(
+                        InlineKeyboardButton(text="➡️ Следующий", callback_data=f"next_{offset + limit}"))
+                keyboard_buttons.append(InlineKeyboardButton(text="🗑️ Удалить", callback_data=f"delete"))
+
+                keyboard = InlineKeyboardMarkup(inline_keyboard=[keyboard_buttons])
+
+                await message.answer(text, reply_markup=keyboard)
             else:
                 await message.answer("Нету таких.")
         except Exception as e:
             await message.answer(f"Error: {str(e)}")
+
+    @dp.callback_query(lambda c: c.data and c.data.startswith('prev'))
+    async def process_prev_callback(callback_query: types.CallbackQuery, limit=1):
+        _, offset = callback_query.data.split('_')
+        offset = int(offset)
+
+        callbacks_quantity = grpc_client.get_callbacks_quantity().quantity
+        responses = list(grpc_client.get_callbacks_paginated(limit, offset))
+
+        if responses:
+            callback = responses[0]
+            text = f"Имя: {callback.Name}\n Дата: {callback.Date}\n Номер: {callback.Number}\n"
+
+            keyboard_buttons = []
+            if offset > 0:
+                keyboard_buttons.append(
+                    InlineKeyboardButton(text="⬅️ Предыдущий", callback_data=f"prev_{offset - limit}"))
+            if offset < callbacks_quantity - 1:
+                keyboard_buttons.append(
+                    InlineKeyboardButton(text="➡️ Следующий", callback_data=f"next_{offset + limit}"))
+            keyboard_buttons.append(InlineKeyboardButton(text="🗑️ Удалить", callback_data=f"delete"))
+
+            keyboard = InlineKeyboardMarkup(inline_keyboard=[keyboard_buttons])
+
+        await callback_query.message.edit_text(text, reply_markup=keyboard)
+
+    @dp.callback_query(lambda c: c.data and c.data.startswith('next'))
+    async def process_next_callback(callback_query: types.CallbackQuery, limit=1):
+        _, offset = callback_query.data.split('_')
+        offset = int(offset)
+
+        callbacks_quantity = grpc_client.get_callbacks_quantity().quantity
+        responses = list(grpc_client.get_callbacks_paginated(limit, offset))
+
+        if responses:
+            callback = responses[0]
+            text = f"Имя: {callback.Name}\n Дата: {callback.Date}\n Номер: {callback.Number}\n"
+
+            keyboard_buttons = []
+            if offset > 0:
+                keyboard_buttons.append(
+                    InlineKeyboardButton(text="⬅️ Предыдущий", callback_data=f"prev_{offset - limit}"))
+            if offset < callbacks_quantity - 1:
+                keyboard_buttons.append(
+                    InlineKeyboardButton(text="➡️ Следующий", callback_data=f"next_{offset + limit}"))
+            keyboard_buttons.append(InlineKeyboardButton(text="🗑️ Удалить", callback_data=f"delete"))
+
+            keyboard = InlineKeyboardMarkup(inline_keyboard=[keyboard_buttons])
+
+            await callback_query.message.edit_text(text, reply_markup=keyboard)
+
+    @dp.callback_query(lambda c: c.data and c.data.startswith('delete'))
+    async def process_delete_callback(callback_query: types.CallbackQuery):
+        _, callback_id = callback_query.data.split('_')
+        callback_id = int(callback_id)
+        grpc_client.delete_callback(callback_id)
+        await callback_query.answer("Удалено")
+        await callback_query.message.delete()

@@ -34,8 +34,8 @@ class CallbackService:
     def get_all_callbacks(self, request, context):
         with self.db_session() as db:
             repository = CallBackRepository(db)
-            callbacks = repository.get_all_callbacks(request.Number)
-            if callbacks is None:
+            callbacks = repository.get_all_callbacks()
+            if not callbacks:
                 context.abort(grpc.StatusCode.NOT_FOUND, "Callbacks not found")
             for callback in callbacks:
                 tn_callback = tn_pb2.CallBack(
@@ -44,6 +44,26 @@ class CallbackService:
                     Number=callback.number
                 )
                 yield tn_callback
+
+    def get_callbacks_paginated(self, request, context):
+        with self.db_session() as db:
+            repository = CallBackRepository(db)
+            callbacks = repository.get_callbacks_paginated(request.limit, request.offset)
+            if not callbacks:
+                context.abort(grpc.StatusCode.NOT_FOUND, "Callbacks not found")
+            for callback in callbacks:
+                tn_callback = tn_pb2.CallBack(
+                    Name=callback.name,
+                    Date=callback.date,
+                    Number=callback.number
+                )
+                yield tn_callback
+
+    def get_callbacks_quantity(self, request, context):
+        with self.db_session() as db:
+            repository = CallBackRepository(db)
+            callbacks_quantity = repository.get_callbacks_quantity()
+            return tn_pb2.ResponseGetCallBacksQuantity(quantity=callbacks_quantity)
 
     def delete_callback(self, request, context):
         with self.db_session() as db:
