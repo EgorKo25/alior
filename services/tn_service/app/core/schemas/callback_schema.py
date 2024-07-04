@@ -1,7 +1,7 @@
 from pydantic import BaseModel
 
 
-class CallBackSchema(BaseModel):
+class CallbackSchema(BaseModel):
     name: str
     date: str
     number: str

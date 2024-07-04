@@ -12,22 +12,19 @@ class TNService(tn_pb2_grpc.TNServicer):
     def __init__(self, db_session):
         self.callback_service = CallbackService(db_session)
 
-    def CreateCallBack(self, request, context):
+    def CreateCallback(self, request, context):
         return self.callback_service.create_callback(request, context)
 
-    def GetCallBack(self, request, context):
+    def GetCallback(self, request, context):
         return self.callback_service.get_callback(request, context)
 
-    def GetAllCallBacks(self, request, context):
+    def GetAllCallbacks(self, request, context):
         return self.callback_service.get_all_callbacks(request, context)
 
-    def GetCallBacksPaginated(self, request, context):
+    def GetCallbacksPaginated(self, request, context):
         return self.callback_service.get_callbacks_paginated(request, context)
 
-    def GetCallBacksQuantity(self, request, context):
-        return self.callback_service.get_callbacks_quantity(request, context)
-
-    def DeleteCallBack(self, request, context):
+    def DeleteCallback(self, request, context):
         return self.callback_service.delete_callback(request, context)
 
 

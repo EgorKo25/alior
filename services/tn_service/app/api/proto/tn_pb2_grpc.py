@@ -40,34 +40,29 @@ class TNStub(object):
         Args:
             channel: A grpc.Channel.
         """
-        self.CreateCallBack = channel.unary_unary(
-                '/grpc.TN/CreateCallBack',
+        self.CreateCallback = channel.unary_unary(
+                '/grpc.TN/CreateCallback',
                 request_serializer=tn__pb2.RequestCreateCallback.SerializeToString,
                 response_deserializer=google_dot_protobuf_dot_empty__pb2.Empty.FromString,
                 _registered_method=True)
-        self.GetCallBack = channel.unary_unary(
-                '/grpc.TN/GetCallBack',
-                request_serializer=tn__pb2.RequestGetCallBack.SerializeToString,
-                response_deserializer=tn__pb2.CallBack.FromString,
+        self.GetCallback = channel.unary_unary(
+                '/grpc.TN/GetCallback',
+                request_serializer=tn__pb2.RequestGetCallback.SerializeToString,
+                response_deserializer=tn__pb2.Callback.FromString,
                 _registered_method=True)
-        self.GetAllCallBacks = channel.unary_stream(
-                '/grpc.TN/GetAllCallBacks',
+        self.GetAllCallbacks = channel.unary_unary(
+                '/grpc.TN/GetAllCallbacks',
                 request_serializer=google_dot_protobuf_dot_empty__pb2.Empty.SerializeToString,
-                response_deserializer=tn__pb2.CallBack.FromString,
+                response_deserializer=tn__pb2.ResponseGetAllCallbacks.FromString,
                 _registered_method=True)
-        self.GetCallBacksQuantity = channel.unary_unary(
-                '/grpc.TN/GetCallBacksQuantity',
-                request_serializer=google_dot_protobuf_dot_empty__pb2.Empty.SerializeToString,
-                response_deserializer=tn__pb2.ResponseGetCallBacksQuantity.FromString,
+        self.GetCallbacksPaginated = channel.unary_unary(
+                '/grpc.TN/GetCallbacksPaginated',
+                request_serializer=tn__pb2.RequestGetCallbacksPaginated.SerializeToString,
+                response_deserializer=tn__pb2.ResponseGetCallbacksPaginated.FromString,
                 _registered_method=True)
-        self.GetCallBacksPaginated = channel.unary_stream(
-                '/grpc.TN/GetCallBacksPaginated',
-                request_serializer=tn__pb2.RequestGetCallBacksPaginated.SerializeToString,
-                response_deserializer=tn__pb2.CallBack.FromString,
-                _registered_method=True)
-        self.DeleteCallBack = channel.unary_unary(
-                '/grpc.TN/DeleteCallBack',
-                request_serializer=tn__pb2.RequestDeleteCallBack.SerializeToString,
+        self.DeleteCallback = channel.unary_unary(
+                '/grpc.TN/DeleteCallback',
+                request_serializer=tn__pb2.RequestDeleteCallback.SerializeToString,
                 response_deserializer=google_dot_protobuf_dot_empty__pb2.Empty.FromString,
                 _registered_method=True)
 
@@ -75,37 +70,31 @@ class TNStub(object):
 class TNServicer(object):
     """Missing associated documentation comment in .proto file."""
 
-    def CreateCallBack(self, request, context):
+    def CreateCallback(self, request, context):
         """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
-    def GetCallBack(self, request, context):
+    def GetCallback(self, request, context):
         """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
-    def GetAllCallBacks(self, request, context):
+    def GetAllCallbacks(self, request, context):
         """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
-    def GetCallBacksQuantity(self, request, context):
+    def GetCallbacksPaginated(self, request, context):
         """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
-    def GetCallBacksPaginated(self, request, context):
-        """Missing associated documentation comment in .proto file."""
-        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
-        context.set_details('Method not implemented!')
-        raise NotImplementedError('Method not implemented!')
-
-    def DeleteCallBack(self, request, context):
+    def DeleteCallback(self, request, context):
         """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
@@ -114,34 +103,29 @@ class TNServicer(object):
 
 def add_TNServicer_to_server(servicer, server):
     rpc_method_handlers = {
-            'CreateCallBack': grpc.unary_unary_rpc_method_handler(
-                    servicer.CreateCallBack,
+            'CreateCallback': grpc.unary_unary_rpc_method_handler(
+                    servicer.CreateCallback,
                     request_deserializer=tn__pb2.RequestCreateCallback.FromString,
                     response_serializer=google_dot_protobuf_dot_empty__pb2.Empty.SerializeToString,
             ),
-            'GetCallBack': grpc.unary_unary_rpc_method_handler(
-                    servicer.GetCallBack,
-                    request_deserializer=tn__pb2.RequestGetCallBack.FromString,
-                    response_serializer=tn__pb2.CallBack.SerializeToString,
+            'GetCallback': grpc.unary_unary_rpc_method_handler(
+                    servicer.GetCallback,
+                    request_deserializer=tn__pb2.RequestGetCallback.FromString,
+                    response_serializer=tn__pb2.Callback.SerializeToString,
             ),
-            'GetAllCallBacks': grpc.unary_stream_rpc_method_handler(
-                    servicer.GetAllCallBacks,
+            'GetAllCallbacks': grpc.unary_unary_rpc_method_handler(
+                    servicer.GetAllCallbacks,
                     request_deserializer=google_dot_protobuf_dot_empty__pb2.Empty.FromString,
-                    response_serializer=tn__pb2.CallBack.SerializeToString,
+                    response_serializer=tn__pb2.ResponseGetAllCallbacks.SerializeToString,
             ),
-            'GetCallBacksQuantity': grpc.unary_unary_rpc_method_handler(
-                    servicer.GetCallBacksQuantity,
-                    request_deserializer=google_dot_protobuf_dot_empty__pb2.Empty.FromString,
-                    response_serializer=tn__pb2.ResponseGetCallBacksQuantity.SerializeToString,
+            'GetCallbacksPaginated': grpc.unary_unary_rpc_method_handler(
+                    servicer.GetCallbacksPaginated,
+                    request_deserializer=tn__pb2.RequestGetCallbacksPaginated.FromString,
+                    response_serializer=tn__pb2.ResponseGetCallbacksPaginated.SerializeToString,
             ),
-            'GetCallBacksPaginated': grpc.unary_stream_rpc_method_handler(
-                    servicer.GetCallBacksPaginated,
-                    request_deserializer=tn__pb2.RequestGetCallBacksPaginated.FromString,
-                    response_serializer=tn__pb2.CallBack.SerializeToString,
-            ),
-            'DeleteCallBack': grpc.unary_unary_rpc_method_handler(
-                    servicer.DeleteCallBack,
-                    request_deserializer=tn__pb2.RequestDeleteCallBack.FromString,
+            'DeleteCallback': grpc.unary_unary_rpc_method_handler(
+                    servicer.DeleteCallback,
+                    request_deserializer=tn__pb2.RequestDeleteCallback.FromString,
                     response_serializer=google_dot_protobuf_dot_empty__pb2.Empty.SerializeToString,
             ),
     }
@@ -156,7 +140,7 @@ class TN(object):
     """Missing associated documentation comment in .proto file."""
 
     @staticmethod
-    def CreateCallBack(request,
+    def CreateCallback(request,
             target,
             options=(),
             channel_credentials=None,
@@ -169,7 +153,7 @@ class TN(object):
         return grpc.experimental.unary_unary(
             request,
             target,
-            '/grpc.TN/CreateCallBack',
+            '/grpc.TN/CreateCallback',
             tn__pb2.RequestCreateCallback.SerializeToString,
             google_dot_protobuf_dot_empty__pb2.Empty.FromString,
             options,
@@ -183,7 +167,7 @@ class TN(object):
             _registered_method=True)
 
     @staticmethod
-    def GetCallBack(request,
+    def GetCallback(request,
             target,
             options=(),
             channel_credentials=None,
@@ -196,9 +180,9 @@ class TN(object):
         return grpc.experimental.unary_unary(
             request,
             target,
-            '/grpc.TN/GetCallBack',
-            tn__pb2.RequestGetCallBack.SerializeToString,
-            tn__pb2.CallBack.FromString,
+            '/grpc.TN/GetCallback',
+            tn__pb2.RequestGetCallback.SerializeToString,
+            tn__pb2.Callback.FromString,
             options,
             channel_credentials,
             insecure,
@@ -210,7 +194,7 @@ class TN(object):
             _registered_method=True)
 
     @staticmethod
-    def GetAllCallBacks(request,
+    def GetAllCallbacks(request,
             target,
             options=(),
             channel_credentials=None,
@@ -220,12 +204,12 @@ class TN(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_stream(
+        return grpc.experimental.unary_unary(
             request,
             target,
-            '/grpc.TN/GetAllCallBacks',
+            '/grpc.TN/GetAllCallbacks',
             google_dot_protobuf_dot_empty__pb2.Empty.SerializeToString,
-            tn__pb2.CallBack.FromString,
+            tn__pb2.ResponseGetAllCallbacks.FromString,
             options,
             channel_credentials,
             insecure,
@@ -237,7 +221,7 @@ class TN(object):
             _registered_method=True)
 
     @staticmethod
-    def GetCallBacksQuantity(request,
+    def GetCallbacksPaginated(request,
             target,
             options=(),
             channel_credentials=None,
@@ -250,9 +234,9 @@ class TN(object):
         return grpc.experimental.unary_unary(
             request,
             target,
-            '/grpc.TN/GetCallBacksQuantity',
-            google_dot_protobuf_dot_empty__pb2.Empty.SerializeToString,
-            tn__pb2.ResponseGetCallBacksQuantity.FromString,
+            '/grpc.TN/GetCallbacksPaginated',
+            tn__pb2.RequestGetCallbacksPaginated.SerializeToString,
+            tn__pb2.ResponseGetCallbacksPaginated.FromString,
             options,
             channel_credentials,
             insecure,
@@ -264,34 +248,7 @@ class TN(object):
             _registered_method=True)
 
     @staticmethod
-    def GetCallBacksPaginated(request,
-            target,
-            options=(),
-            channel_credentials=None,
-            call_credentials=None,
-            insecure=False,
-            compression=None,
-            wait_for_ready=None,
-            timeout=None,
-            metadata=None):
-        return grpc.experimental.unary_stream(
-            request,
-            target,
-            '/grpc.TN/GetCallBacksPaginated',
-            tn__pb2.RequestGetCallBacksPaginated.SerializeToString,
-            tn__pb2.CallBack.FromString,
-            options,
-            channel_credentials,
-            insecure,
-            call_credentials,
-            compression,
-            wait_for_ready,
-            timeout,
-            metadata,
-            _registered_method=True)
-
-    @staticmethod
-    def DeleteCallBack(request,
+    def DeleteCallback(request,
             target,
             options=(),
             channel_credentials=None,
@@ -304,8 +261,8 @@ class TN(object):
         return grpc.experimental.unary_unary(
             request,
             target,
-            '/grpc.TN/DeleteCallBack',
-            tn__pb2.RequestDeleteCallBack.SerializeToString,
+            '/grpc.TN/DeleteCallback',
+            tn__pb2.RequestDeleteCallback.SerializeToString,
             google_dot_protobuf_dot_empty__pb2.Empty.FromString,
             options,
             channel_credentials,
