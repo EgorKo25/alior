@@ -58,7 +58,7 @@ class CallbackService:
     def get_callbacks_paginated(self, request, context):
         with self.db_session() as db:
             repository = CallbackRepository(db)
-            response = repository.get_callbacks_paginated(request.limit, request.offset)
+            response = repository.get_callbacks_paginated(request.limit if request.limit else 1, request.offset)
             if not response:
                 context.abort(grpc.StatusCode.NOT_FOUND, "Callbacks not found")
 
