@@ -10,6 +10,7 @@
   line-height: 23.7px;
   position: relative;
   border: 1px solid #000000;
+  font-weight: 500;
 }
 
 .circle {
@@ -21,12 +22,13 @@
   position: absolute;
   opacity: 1;
   transform: translateX(0);
+  margin-left: 5px;
 }
 
 .arrow {
   display: flex;
   position: absolute;
-  left: 16px;
+  left: 8%;
   opacity: 0;
   transition: opacity 0.1s linear;
   justify-content: center;
@@ -60,7 +62,6 @@
 .title {
   transform: translateX(0px);
   animation: textReturning 0.5s linear forwards;
-  font-family: "Rubik, sans-serif";
   font-weight: 500;
   font-size: clamp(1.125rem, 0.9821rem + 0.2976vw, 1.25rem);
   line-height: 23.7px;
@@ -126,6 +127,9 @@
 @media (width < 768px) {
   .button {
     padding: 10px 14px 10px 18px;
+  }
+  .title {
+    font-size: 14px;
   }
   .circle_container {
     width: 16px;

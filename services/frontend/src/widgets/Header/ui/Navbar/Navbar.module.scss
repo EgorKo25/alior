@@ -35,15 +35,15 @@
 }
 
 .decoration_active_chair {
-  background-image: url("../../images/chair.svg");
+  background-image: url("/images/chair.svg");
 }
 
 .decoration_active_services {
-  background-image: url("../../images/services.svg");
+  background-image: url("/images/services.svg");
 }
 
 .decoration_active_play {
-  background-image: url("../../images/play.svg");
+  background-image: url("/images/play.svg");
 }
 
 .list__item:hover .decoration {
@@ -55,13 +55,13 @@
 }
 
 .list__item:nth-child(1):hover .decoration {
-  background-image: url("../../images/chair.svg");
+  background-image: url("/images/chair.svg");
 }
 .list__item:nth-child(2):hover .decoration {
-  background-image: url("../../images/services.svg");
+  background-image: url("/images/services.svg");
 }
 .list__item:nth-child(3):hover .decoration {
-  background-image: url("../../images/play.svg");
+  background-image: url("/images/play.svg");
 }
 
 .list {
