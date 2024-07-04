@@ -11,13 +11,13 @@ class GRPCClient:
         self.stub = tn_pb2_grpc.TNStub(self.channel)
 
     def get_callbacks_paginated(self, limit: int, offset: int):
-        request = tn_pb2.RequestGetCallBacksPaginated(limit=limit, offset=offset)
-        return self.stub.GetCallBacksPaginated(request)
+        request = tn_pb2.RequestGetCallbacksPaginated(limit=limit, offset=offset)
+        return self.stub.GetCallbacksPaginated(request)
 
     def get_callbacks_quantity(self):
         request = Empty()
-        return self.stub.GetCallBacksQuantity(request)
+        return self.stub.GetCallbacksQuantity(request)
 
     def delete_callback(self, id: int):
-        request = tn_pb2.RequestDeleteCallBack(id=id)
-        return self.stub.DeleteCallBack(request)
+        request = tn_pb2.RequestDeleteCallback(id=id)
+        return self.stub.DeleteCallback(request)

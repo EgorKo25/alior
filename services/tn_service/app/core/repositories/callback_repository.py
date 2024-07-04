@@ -19,7 +19,11 @@ class CallbackRepository:
         return self.db_session.query(CallbackModel).get(callback_id)
 
     def get_callbacks_paginated(self, limit: int, offset: int):
-        return self.db_session.query(CallbackModel).offset(offset).limit(limit).all()
+        total_items = self.db_session.query(CallbackModel).count()
+        items = self.db_session.query(CallbackModel).offset(offset).limit(limit).all()
+        response = {'total_items': total_items,
+                    'items': items}
+        return response
 
     def get_all_callbacks(self):
         total_items = self.db_session.query(CallbackModel).count()

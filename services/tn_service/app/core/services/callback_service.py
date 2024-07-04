@@ -64,17 +64,20 @@ class CallbackService:
 
             callbacks = [
                 {
-                    'Name': callback.name,
-                    'Date': callback.date,
-                    'Number': callback.number
+                    'Name': item.name,
+                    'Date': item.date,
+                    'Number': item.number
                 }
-                for callback in response
+                for item in response['items']
             ]
 
             items = [tn_pb2.Callback(**callback) for callback in callbacks]
 
-            response = tn_pb2.ResponseGetCallbacksPaginated(callbacks=items)
-            return response
+            tn_callback = tn_pb2.ResponseGetAllCallbacks(
+                total_items=response['total_items'],
+                callbacks=items
+            )
+            return tn_callback
 
     def delete_callback(self, request, context):
         with self.db_session() as db:

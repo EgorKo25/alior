@@ -1,3 +1,5 @@
+from pprint import pprint
+
 from aiogram import Dispatcher, types
 from aiogram.filters import Command
 from aiogram.types.inline_keyboard_button import InlineKeyboardButton
@@ -20,19 +22,24 @@ def register_handlers_management(dp: Dispatcher):
     @dp.message(Command("get_callbacks_paginated"))
     async def get_callback_command(message: types.Message, command: Command, limit=1):
         try:
-            args = command.args.split()
-            offset = int(args[0])
-            callbacks_quantity = grpc_client.get_callbacks_quantity().quantity
-            responses = list(grpc_client.get_callbacks_paginated(limit, offset))
-            if responses:
-                callback = responses[0]
+            args = command.args.split() if command.args else []
+
+            if len(args) == 1:
+                offset = int(args[0])
+            else:
+                raise AttributeError("Слышь праститутка доку почитай и делай нормальные аргументы")
+
+            response = grpc_client.get_callbacks_paginated(limit, offset)
+
+            if response:
+                callback = response.callbacks[0]
                 text = f"Имя: {callback.Name}\n Дата: {callback.Date}\n Номер: {callback.Number}\n"
 
                 keyboard_buttons = []
                 if offset > 0:
                     keyboard_buttons.append(
                         InlineKeyboardButton(text="⬅️ Предыдущий", callback_data=f"prev_{offset - limit}"))
-                if offset < callbacks_quantity - 1:
+                if offset < response.total_items - 1:
                     keyboard_buttons.append(
                         InlineKeyboardButton(text="➡️ Следующий", callback_data=f"next_{offset + limit}"))
                 keyboard_buttons.append(InlineKeyboardButton(text="🗑️ Удалить", callback_data=f"delete"))
@@ -50,18 +57,17 @@ def register_handlers_management(dp: Dispatcher):
         _, offset = callback_query.data.split('_')
         offset = int(offset)
 
-        callbacks_quantity = grpc_client.get_callbacks_quantity().quantity
-        responses = list(grpc_client.get_callbacks_paginated(limit, offset))
+        response = grpc_client.get_callbacks_paginated(limit, offset)
 
-        if responses:
-            callback = responses[0]
+        if response:
+            callback = response.callbacks[0]
             text = f"Имя: {callback.Name}\n Дата: {callback.Date}\n Номер: {callback.Number}\n"
 
             keyboard_buttons = []
             if offset > 0:
                 keyboard_buttons.append(
                     InlineKeyboardButton(text="⬅️ Предыдущий", callback_data=f"prev_{offset - limit}"))
-            if offset < callbacks_quantity - 1:
+            if offset < response.total_items - 1:
                 keyboard_buttons.append(
                     InlineKeyboardButton(text="➡️ Следующий", callback_data=f"next_{offset + limit}"))
             keyboard_buttons.append(InlineKeyboardButton(text="🗑️ Удалить", callback_data=f"delete"))
@@ -75,18 +81,17 @@ def register_handlers_management(dp: Dispatcher):
         _, offset = callback_query.data.split('_')
         offset = int(offset)
 
-        callbacks_quantity = grpc_client.get_callbacks_quantity().quantity
-        responses = list(grpc_client.get_callbacks_paginated(limit, offset))
+        response = grpc_client.get_callbacks_paginated(limit, offset)
 
-        if responses:
-            callback = responses[0]
+        if response:
+            callback = response.callbacks[0]
             text = f"Имя: {callback.Name}\n Дата: {callback.Date}\n Номер: {callback.Number}\n"
 
             keyboard_buttons = []
             if offset > 0:
                 keyboard_buttons.append(
                     InlineKeyboardButton(text="⬅️ Предыдущий", callback_data=f"prev_{offset - limit}"))
-            if offset < callbacks_quantity - 1:
+            if offset < response.total_items - 1:
                 keyboard_buttons.append(
                     InlineKeyboardButton(text="➡️ Следующий", callback_data=f"next_{offset + limit}"))
             keyboard_buttons.append(InlineKeyboardButton(text="🗑️ Удалить", callback_data=f"delete"))
