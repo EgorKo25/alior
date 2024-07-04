@@ -3,10 +3,10 @@ name: CI Pipeline for Develop Branch
 on:
   push:
     branches:
-      - develop
+      - main
   pull_request:
     branches:
-      - develop
+      - main
 
 jobs:
   build:
