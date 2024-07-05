@@ -18,16 +18,6 @@
   align-items: center;
 }
 
-.heading_logo {
-  font-size: 32px;
-  font-weight: 700;
-  line-height: 39.14px;
-}
-
-.menuIcon {
-  display: none;
-}
-
 .hidden {
   display: none;
 }
@@ -37,15 +27,12 @@
     width: clamp(0px, 95%, 730px);
     transition: width 0.3s linear;
   }
-}
-
-@media (min-width: 640px) {
-  .menuIcon {
-    display: none;
+  .heading_logo {
+    max-width: 95px;
   }
 }
 
-@media (width < 640px) {
+@media (width < 1024px) {
   .navigation {
     display: none;
   }
@@ -58,7 +45,7 @@
   .menu {
     display: none;
     position: absolute;
-    top: 10%;
+    top: 94px;
     left: 0;
     right: 0;
     background-color: #fff;

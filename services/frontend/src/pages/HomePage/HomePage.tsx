@@ -1,12 +1,9 @@
-import { Footer } from "src/widgets/Footer";
-import { Header } from "src/widgets/Header";
+import { Services } from "./ui/Services";
 
 export const HomePage = () => {
   return (
     <>
-      <Header />
-      <section></section>
-      <Footer />
+      <Services />
     </>
   );
 };

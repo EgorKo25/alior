@@ -1,18 +1,20 @@
 .container {
-	background-color: transparent;
-    border-radius: 0px;
-    display: flex;
-    width: 212px;
-    align-items: center;
+  background-color: transparent;
+  border-radius: 0px;
+  display: flex;
+  width: 212px;
+  align-items: center;
 }
 
-
+.link {
+  color: #000;
+  text-decoration: none;
+}
 
 .list {
-	display: flex;
-    flex-direction: column;
-	gap: 16px;
-	width: 100%;
-	align-items: center;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 100%;
+  align-items: center;
 }
-

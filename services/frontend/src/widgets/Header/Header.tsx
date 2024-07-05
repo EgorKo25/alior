@@ -24,23 +24,25 @@ export const Header = () => {
   }, [isMenuOpen]);
 
   return (
-    <header className={`` + clsx(styles.header)}>
-      <div className={clsx(styles.heading_logo)}>
+    <header
+      className={clsx(styles.header) + ` sm:justify-normal  lg:justify-between`}
+    >
+      <div className={clsx(styles.heading_logo) + ``}>
         <img src="/images/logo.svg" alt="Alior" />
       </div>
-      <div className="hidden sm:flex">
+      <div className="hidden lg:flex">
         <Navbar isMobile={false} />
       </div>
-      <div className="hidden sm:flex">
+      <div className="hidden sm:flex sm:ml-auto lg:ml-0">
         <MainButton
-          className={clsx(styles.button_black_type)}
+          className={` btn-accent ${isMenuOpen ? " hidden" : ""}`}
           title="На консультацию"
           type="submit"
-          textColor="#fff"
+          circleClassName=" circle-hover-accent"
         />
       </div>
       <div
-        className={clsx(styles.menuIcon, { [styles.hidden]: !isMenuOpen })}
+        className={clsx(styles.menuIcon) + ` sm:ml-16 lg:hidden `}
         onClick={() => setIsMenuOpen(!isMenuOpen)}
       >
         {isMenuOpen ? (
@@ -55,10 +57,10 @@ export const Header = () => {
         <div className={styles.menu}>
           <Navbar isMobile={true} />
           <MainButton
-            className={clsx(styles.button_black_type)}
+            className={` btn-accent`}
             title="Консультация"
             type="submit"
-            textColor="#fff"
+            circleClassName=" circle-hover-accent"
           />
         </div>
       )}

@@ -1,0 +1,1 @@
+export { ServiceCardsData } from "./appData";

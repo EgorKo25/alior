@@ -8,7 +8,6 @@
 
 .decoration {
   display: block;
-  background-color: #a2a2a2;
   width: 10px;
   height: 10px;
   border-radius: 50px;
@@ -46,13 +45,13 @@
 }
 
 .list__item:nth-child(1):hover .decoration {
-  background-image: url("../../images/chair.svg");
+  background-image: url("/images/chair.svg");
 }
 .list__item:nth-child(2):hover .decoration {
-  background-image: url("../../images/services.svg");
+  background-image: url("/images/services.svg");
 }
 .list__item:nth-child(3):hover .decoration {
-  background-image: url("../../images/play.svg");
+  background-image: url("/images/play.svg");
 }
 
 .list__item {
@@ -88,19 +87,6 @@
 }
 
 .link {
-  color: #a2a2a2;
   text-decoration: none;
   font-size: clamp(0.875rem, 0.7321rem + 0.2976vw, 1rem);
-}
-
-.link_active {
-  color: #000;
-}
-
-.list__item:hover .link {
-  color: #000;
-}
-
-.list__item .link:active {
-  color: #000;
 }
