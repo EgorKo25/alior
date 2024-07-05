@@ -3,19 +3,13 @@ import styles from "./MainButton.module.scss";
 import { CircleIcon } from "./CircleIcon";
 import { ArrowIcon } from "./ArrowIcon";
 
-export const MainButton = ({
-  title,
-  onClick,
-  type,
-  className,
-  textColor,
-}: {
+export const MainButton: React.FC<{
   title: string;
   onClick?: () => void;
   type?: React.ButtonHTMLAttributes<HTMLButtonElement>["type"];
   className?: string;
-  textColor: string;
-}) => {
+  circleClassName: string;
+}> = ({ title, onClick, type, className, circleClassName }) => {
   return (
     <button
       onClick={onClick}
@@ -23,12 +17,10 @@ export const MainButton = ({
       type={type}
     >
       <div className={styles.arrow}>
-        <ArrowIcon color={textColor} />
+        <ArrowIcon />
       </div>
-      <span className={styles.title} style={{ color: textColor }}>
-        {title}
-      </span>
-      <CircleIcon color={textColor} />
+      <span className={styles.title}>{title}</span>
+      <CircleIcon className={" " + circleClassName} />
     </button>
   );
 };

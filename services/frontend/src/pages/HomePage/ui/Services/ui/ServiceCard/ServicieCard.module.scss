@@ -12,7 +12,7 @@
 .card_active {
   color: #6b3900;
   background-color: #ffb661;
-  transition: all 0.3s ease;
+  transition: all 0.5s ease;
 }
 
 .card_title {
@@ -27,8 +27,6 @@
 
 .button {
   font-size: 18px;
-  border-color: #6b3900;
-  background-color: #6b3900;
   width: max-content;
   opacity: 0;
   transition: opacity 0.3s ease;

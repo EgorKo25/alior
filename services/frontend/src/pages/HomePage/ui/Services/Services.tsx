@@ -47,9 +47,9 @@ export const Services = () => {
           <div className={styles.parallelogram}></div>
         </div>
         <MainButton
-          className={styles.button}
+          className={styles.button + ` btn-transpanent-accent`}
           title="Уже знаю, что хочу"
-          textColor="#FF537A"
+          circleClassName=" circle-transpanent-accent"
         />
       </div>
     </div>

@@ -9,8 +9,9 @@
   cursor: pointer;
   line-height: 23.7px;
   position: relative;
-  border: 1px solid #000000;
+  border: 1px solid;
   font-weight: 500;
+  gap: 10px;
 }
 
 .circle {
@@ -18,17 +19,17 @@
   width: 10px;
   height: 10px;
   border-radius: 50px;
-  transition: opacity 0.1s ease-in;
+  transition: opacity 0.2s ease-in, background-color 0.1s;
   position: absolute;
   opacity: 1;
   transform: translateX(0);
-  margin-left: 5px;
 }
 
 .arrow {
   display: flex;
   position: absolute;
-  left: 8%;
+  //left: 8%;
+  margin-right: 25%;
   opacity: 0;
   transition: opacity 0.1s linear;
   justify-content: center;
@@ -127,24 +128,5 @@
 @media (width < 768px) {
   .button {
     padding: 10px 14px 10px 18px;
-  }
-  .title {
-    font-size: 14px;
-  }
-  .circle_container {
-    width: 16px;
-    height: 16px;
-  }
-  .arrow_container {
-    width: 16px;
-    height: 16px;
-  }
-  .arrow_icon {
-    width: 18px;
-    height: 18px;
-  }
-  .circle {
-    width: 8px;
-    height: 8px;
   }
 }

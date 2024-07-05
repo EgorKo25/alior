@@ -2,9 +2,6 @@ import { useState, useEffect } from "react";
 import { NavBarItem } from "./NavBarItem";
 import styles from "./Navbar.module.scss";
 import mobileStyles from "./MobileNavbar.module.scss";
-//import chairImage from "@/public/chair.svg";
-//import servicesImage from "@/public/services.svg";
-//import playImage from "@/public/play.svg";
 
 const menuItems = ["О нас", "Услуги", "Кейсы"];
 const backgroundImages = [
@@ -31,9 +28,10 @@ export const Navbar = ({ isMobile }: { isMobile?: boolean }) => {
     setActiveIndex(index);
   };
 
-  const containerStyle = isMobile ? mobileStyles.container : styles.container;
+  const containerStyle = isMobile
+    ? mobileStyles.container
+    : styles.container + " bg-accent";
   const listStyle = isMobile ? mobileStyles.list : styles.list;
-
   return (
     <div className={containerStyle}>
       <ul className={listStyle}>

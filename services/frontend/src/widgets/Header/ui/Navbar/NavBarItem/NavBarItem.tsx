@@ -14,8 +14,8 @@ interface NavigationItemProps {
 export const NavBarItem: React.FC<NavigationItemProps> = ({
   item,
   index,
-  isActive,
   activeIndex,
+  isActive,
   onItemClicked,
 }) => {
   const activeDecorationClass = (index: number) => {
@@ -38,6 +38,8 @@ export const NavBarItem: React.FC<NavigationItemProps> = ({
       <div className={styles.decoration_container}>
         <div
           className={clsx(styles.decoration, {
+            " bg-black sm:bg-black md:bg-black lg:bg-white": !isActive,
+            " bg-transparent sm:fill-black md:fill-black": isActive,
             [styles.decoration_active]: index === activeIndex,
             [activeDecorationClass(index)]: index === activeIndex,
           })}
@@ -45,7 +47,9 @@ export const NavBarItem: React.FC<NavigationItemProps> = ({
       </div>
       <Link
         to="/"
-        className={clsx(styles.link, { [styles.link_active]: isActive })}
+        className={
+          clsx(styles.link) + " sm:text-black md:text-black lg:text-white"
+        }
       >
         {item}
       </Link>
