@@ -608,7 +608,7 @@ video {
   }
 }
 
-.btn-accent {
+.btn-accent-white {
   --tw-border-opacity: 1;
   border-color: rgb(255 83 122 / var(--tw-border-opacity));
   --tw-bg-opacity: 1;
@@ -619,7 +619,7 @@ video {
   color: rgb(255 255 255 / var(--tw-text-opacity));
 }
 
-.btn-accent:hover {
+.btn-accent-white:hover {
   --tw-border-opacity: 1;
   border-color: rgb(255 83 122 / var(--tw-border-opacity));
   --tw-bg-opacity: 1;
@@ -630,7 +630,7 @@ video {
   color: rgb(255 83 122 / var(--tw-text-opacity));
 }
 
-.btn-transpanent-accent {
+.btn-white-accent {
   --tw-border-opacity: 1;
   border-color: rgb(255 83 122 / var(--tw-border-opacity));
   background-color: rgba(0,0,0,0);
@@ -640,7 +640,7 @@ video {
   color: rgb(255 83 122 / var(--tw-text-opacity));
 }
 
-.btn-transpanent-accent:hover {
+.btn-white-accent:hover {
   --tw-bg-opacity: 1;
   background-color: rgb(255 83 122 / var(--tw-bg-opacity));
   fill: rgb(255, 255, 255);
@@ -649,7 +649,7 @@ video {
   color: rgb(255 255 255 / var(--tw-text-opacity));
 }
 
-.btn-dark-orange {
+.btn-orange-white {
   --tw-border-opacity: 1;
   border-color: rgb(107 57 0 / var(--tw-border-opacity));
   --tw-bg-opacity: 1;
@@ -660,9 +660,9 @@ video {
   color: rgb(255 255 255 / var(--tw-text-opacity));
 }
 
-.btn-dark-orange:hover {
+.btn-orange-white:hover {
   --tw-border-opacity: 1;
-  border-color: rgb(255 255 255 / var(--tw-border-opacity));
+  border-color: rgb(107 57 0 / var(--tw-border-opacity));
   --tw-bg-opacity: 1;
   background-color: rgb(255 255 255 / var(--tw-bg-opacity));
   fill: rgb(107, 57, 0);
@@ -671,42 +671,170 @@ video {
   color: rgb(107 57 0 / var(--tw-text-opacity));
 }
 
-.circle-hover-accent {
+.btn-blue-white {
+  --tw-border-opacity: 1;
+  border-color: rgb(0 17 102 / var(--tw-border-opacity));
+  --tw-bg-opacity: 1;
+  background-color: rgb(0 17 102 / var(--tw-bg-opacity));
+  fill: rgb(255, 255, 255);
+  stroke: rgb(255, 255, 255);
+  --tw-text-opacity: 1;
+  color: rgb(255 255 255 / var(--tw-text-opacity));
+}
+
+.btn-blue-white:hover {
+  --tw-border-opacity: 1;
+  border-color: rgb(0 17 102 / var(--tw-border-opacity));
   --tw-bg-opacity: 1;
   background-color: rgb(255 255 255 / var(--tw-bg-opacity));
+  fill: rgb(0, 17, 102);
+  stroke: rgb(0, 17, 102);
+  --tw-text-opacity: 1;
+  color: rgb(0 17 102 / var(--tw-text-opacity));
 }
 
-.circle-hover-accent:hover {
+.btn-black-white {
+  --tw-border-opacity: 1;
+  border-color: rgb(255 255 255 / var(--tw-border-opacity));
   --tw-bg-opacity: 1;
-  background-color: rgb(255 83 122 / var(--tw-bg-opacity));
+  background-color: rgb(0 0 0 / var(--tw-bg-opacity));
+  fill: rgb(255, 255, 255);
+  stroke: rgb(255, 255, 255);
+  --tw-text-opacity: 1;
+  color: rgb(255 255 255 / var(--tw-text-opacity));
 }
 
-.circle-transpanent-accent {
-  --tw-bg-opacity: 1;
-  background-color: rgb(255 83 122 / var(--tw-bg-opacity));
-}
-
-.circle-transpanent-accent:hover {
+.btn-black-white:hover {
+  --tw-border-opacity: 1;
+  border-color: rgb(0 0 0 / var(--tw-border-opacity));
   --tw-bg-opacity: 1;
   background-color: rgb(255 255 255 / var(--tw-bg-opacity));
+  fill: rgb(0, 0, 0);
+  stroke: rgb(0, 0, 0);
+  --tw-text-opacity: 1;
+  color: rgb(0 0 0 / var(--tw-text-opacity));
 }
 
-.circle-dark-orange {
+.btn-white-black {
+  --tw-border-opacity: 1;
+  border-color: rgb(0 0 0 / var(--tw-border-opacity));
   --tw-bg-opacity: 1;
   background-color: rgb(255 255 255 / var(--tw-bg-opacity));
+  fill: rgb(0, 0, 0);
+  stroke: rgb(0, 0, 0);
+  --tw-text-opacity: 1;
+  color: rgb(0 0 0 / var(--tw-text-opacity));
 }
 
-.circle-dark-orange:hover {
+.btn-white-black:hover {
+  --tw-border-opacity: 1;
+  border-color: rgb(0 0 0 / var(--tw-border-opacity));
   --tw-bg-opacity: 1;
-  background-color: rgb(107 57 0 / var(--tw-bg-opacity));
+  background-color: rgb(0 0 0 / var(--tw-bg-opacity));
+  fill: rgb(255, 255, 255);
+  stroke: rgb(255, 255, 255);
+  --tw-text-opacity: 1;
+  color: rgb(255 255 255 / var(--tw-text-opacity));
+}
+
+.mx-auto {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.-ml-6 {
+  margin-left: -1.5rem;
+}
+
+.ml-4 {
+  margin-left: 1rem;
+}
+
+.inline-block {
+  display: inline-block;
+}
+
+.flex {
+  display: flex;
 }
 
 .hidden {
   display: none;
 }
 
+.h-12 {
+  height: 3rem;
+}
+
+.h-2 {
+  height: 0.5rem;
+}
+
+.h-2\.5 {
+  height: 0.625rem;
+}
+
+.w-2 {
+  width: 0.5rem;
+}
+
+.w-2\.5 {
+  width: 0.625rem;
+}
+
+.translate-x-0 {
+  --tw-translate-x: 0px;
+  transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
+}
+
+@keyframes textReturning {
+  0% {
+    transform: translateX(27px);
+  }
+
+  50% {
+    transform: translateX(-3px);
+  }
+
+  100% {
+    transform: translateX(0px);
+  }
+}
+
+.animate-textBackwards {
+  animation: textReturning 0.3s linear forwards;
+}
+
+.cursor-pointer {
+  cursor: pointer;
+}
+
 .resize {
   resize: both;
+}
+
+.items-center {
+  align-items: center;
+}
+
+.justify-center {
+  justify-content: center;
+}
+
+.gap-2 {
+  gap: 0.5rem;
+}
+
+.rounded-\[32px\] {
+  border-radius: 32px;
+}
+
+.rounded-full {
+  border-radius: 9999px;
+}
+
+.border {
+  border-width: 1px;
 }
 
 .bg-accent {
@@ -732,8 +860,128 @@ video {
   fill: rgb(0, 0, 0);
 }
 
+.px-3 {
+  padding-left: 0.75rem;
+  padding-right: 0.75rem;
+}
+
+.px-3\.5 {
+  padding-left: 0.875rem;
+  padding-right: 0.875rem;
+}
+
+.py-2 {
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+}
+
+.text-center {
+  text-align: center;
+}
+
+.font-medium {
+  font-weight: 500;
+}
+
+.leading-6 {
+  line-height: 1.5rem;
+}
+
+.opacity-0 {
+  opacity: 0;
+}
+
+.opacity-100 {
+  opacity: 1;
+}
+
+.transition {
+  transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, -webkit-backdrop-filter;
+  transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter;
+  transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter, -webkit-backdrop-filter;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 150ms;
+}
+
+.transition-all {
+  transition-property: all;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 150ms;
+}
+
 * {
   font-family: "Rubik", sans-serif;
+}
+
+@keyframes textMoving {
+  0% {
+    transform: translateX(0px);
+  }
+
+  50% {
+    transform: translateX(30px);
+  }
+
+  100% {
+    transform: translateX(27px);
+  }
+}
+
+.group:hover .group-hover\:animate-textForwards {
+  animation: textMoving 0.3s linear normal forwards;
+}
+
+.group:hover .group-hover\:opacity-0 {
+  opacity: 0;
+}
+
+.group:hover .group-hover\:opacity-100 {
+  opacity: 1;
+}
+
+.group.btn-accent-white .group-\[\.btn-accent-white\]\:bg-white {
+  --tw-bg-opacity: 1;
+  background-color: rgb(255 255 255 / var(--tw-bg-opacity));
+}
+
+.group.btn-white-accent .group-\[\.btn-white-accent\]\:bg-accent {
+  --tw-bg-opacity: 1;
+  background-color: rgb(255 83 122 / var(--tw-bg-opacity));
+}
+
+.group.btn-white-black .group-\[\.btn-white-black\]\:bg-black {
+  --tw-bg-opacity: 1;
+  background-color: rgb(0 0 0 / var(--tw-bg-opacity));
+}
+
+.group.btn-accent-white .group-\[\.btn-accent-white\]\:hover\:bg-accent:hover {
+  --tw-bg-opacity: 1;
+  background-color: rgb(255 83 122 / var(--tw-bg-opacity));
+}
+
+.group.btn-black-white .group-\[\.btn-black-white\]\:hover\:bg-black:hover {
+  --tw-bg-opacity: 1;
+  background-color: rgb(0 0 0 / var(--tw-bg-opacity));
+}
+
+.group.btn-blue-white .group-\[\.btn-blue-white\]\:hover\:bg-blue-900:hover {
+  --tw-bg-opacity: 1;
+  background-color: rgb(0 17 102 / var(--tw-bg-opacity));
+}
+
+.group.btn-orange-white .group-\[\.btn-orange-white\]\:hover\:bg-orange-900:hover {
+  --tw-bg-opacity: 1;
+  background-color: rgb(107 57 0 / var(--tw-bg-opacity));
+}
+
+.group.btn-white-accent .group-\[\.btn-white-accent\]\:hover\:bg-white:hover {
+  --tw-bg-opacity: 1;
+  background-color: rgb(255 255 255 / var(--tw-bg-opacity));
+}
+
+.group.btn-white-black .group-\[\.btn-white-black\]\:hover\:bg-white:hover {
+  --tw-bg-opacity: 1;
+  background-color: rgb(255 255 255 / var(--tw-bg-opacity));
 }
 
 @media (min-width: 640px) {
@@ -776,6 +1024,16 @@ video {
 
   .md\:fill-black {
     fill: rgb(0, 0, 0);
+  }
+
+  .md\:px-5 {
+    padding-left: 1.25rem;
+    padding-right: 1.25rem;
+  }
+
+  .md\:py-3 {
+    padding-top: 0.75rem;
+    padding-bottom: 0.75rem;
   }
 
   .md\:text-black {

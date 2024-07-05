@@ -16,11 +16,27 @@ export default {
       },
       accent: "rgb(255, 83, 122)",
     },
-    extend: {},
+    keyframes: {
+      textMoving: {
+        "0%": { transform: "translateX(0px)" },
+        "50%": { transform: "translateX(30px)" },
+        "100%": { transform: "translateX(27px)" },
+      },
+      textReturning: {
+        "0%": { transform: "translateX(27px)" },
+        "50%": { transform: "translateX(-3px)" },
+        "100%": { transform: "translateX(0px)" },
+      },
+    },
+    animation: {
+      textForwards: "textMoving 0.3s linear normal forwards",
+      textBackwards: "textReturning 0.3s linear forwards",
+    },
     fontFamily: {
       rubik: '"Rubik", sans-serif',
       caveat: '"Caveat", sans-serif',
     },
+    extend: {},
   },
 
   plugins: [],

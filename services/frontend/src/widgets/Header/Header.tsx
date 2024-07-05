@@ -38,7 +38,7 @@ export const Header = () => {
           className={` btn-accent ${isMenuOpen ? " hidden" : ""}`}
           title="На консультацию"
           type="submit"
-          circleClassName=" circle-hover-accent"
+          colorSchema=" btn-accent-white"
         />
       </div>
       <div
@@ -60,7 +60,7 @@ export const Header = () => {
             className={` btn-accent`}
             title="Консультация"
             type="submit"
-            circleClassName=" circle-hover-accent"
+            colorSchema=" btn-accent-white"
           />
         </div>
       )}
