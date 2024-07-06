@@ -8,6 +8,6 @@ export const CircleIcon = () => (
       group-[.btn-blue-white]:hover:bg-blue-900
       group-[.btn-black-white]:hover:bg-black
       group-[.btn-white-black]:bg-black group-[.btn-white-black]:hover:bg-white`}
-    style={{ transition: "opacity 0.3s" }}
+    style={{ transition: "opacity 0.3s, background-color 0.3s" }}
   ></div>
 );

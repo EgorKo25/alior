@@ -5,8 +5,16 @@ import clsx from "clsx";
 export const Footer = () => {
   return (
     <footer className={clsx(styles.footer)}>
-      <div className={clsx(styles.footer_heading_container)}>
-        <h2 className={clsx(styles.footer_heading)}>Alior</h2>
+      <div
+        className={clsx(
+          styles.footer_heading_container + ` mb-8 sm:mb-12 lg:mb-16`
+        )}
+      >
+        <h2
+          className={clsx(styles.footer_heading) + ` font-bold leading-[1.1]`}
+        >
+          Alior
+        </h2>
         <p className={clsx(styles.footer_decoration_paragraph)}>
           От вас идея — от нас реализация!
         </p>
