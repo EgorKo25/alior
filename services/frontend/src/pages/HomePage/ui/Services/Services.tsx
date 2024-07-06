@@ -47,9 +47,34 @@ export const Services = () => {
           <div className={styles.parallelogram}></div>
         </div>
         <MainButton
-          className={styles.button + ` btn-transpanent-accent`}
+          className={styles.button}
           title="Уже знаю, что хочу"
-          circleClassName=" circle-transpanent-accent"
+          colorSchema={" btn-accent-white"}
+        />
+        <MainButton
+          className={styles.button}
+          title="Уже знаю, что хочу"
+          colorSchema={" btn-white-accent"}
+        />
+        <MainButton
+          className={styles.button}
+          title="Уже знаю, что хочу"
+          colorSchema={" btn-orange-white"}
+        />
+        <MainButton
+          className={styles.button}
+          title="Уже знаю, что хочу"
+          colorSchema={" btn-blue-white"}
+        />
+        <MainButton
+          className={styles.button}
+          title="Уже знаю, что хочу"
+          colorSchema={" btn-black-white"}
+        />
+        <MainButton
+          className={styles.button}
+          title="Уже знаю, что хочу"
+          colorSchema={" btn-white-black"}
         />
       </div>
     </div>

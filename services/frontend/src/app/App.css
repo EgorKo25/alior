@@ -1,0 +1,46 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  @font-face {
+    font-family: "Rubik";
+    src: url("/fonts/Rubik/Rubik-VariableFont_wght.ttf") format("truetype");
+    font-weight: 300 700;
+    font-style: normal;
+  }
+  @font-face {
+    font-family: "Caveat";
+    src: url("/fonts/Caveat/Caveat-VariableFont_wght.ttf") format("truetype");
+    font-weight: 400;
+    font-style: normal;
+  }
+}
+
+@layer components {
+  .btn-accent-white {
+    @apply bg-accent border-accent text-white stroke-white fill-white hover:bg-white hover:fill-accent hover:stroke-accent hover:text-accent hover:border-accent;
+  }
+  .btn-white-accent {
+    @apply bg-transparent text-accent stroke-accent fill-accent border-accent hover:bg-accent hover:text-white hover:fill-white hover:stroke-white;
+  }
+  .btn-orange-white {
+    @apply bg-orange-900 border-orange-900 text-white stroke-white fill-white hover:bg-white hover:border-orange-900 hover:text-orange-900 hover:fill-orange-900 hover:stroke-orange-900;
+  }
+
+  .btn-blue-white {
+    @apply bg-blue-900 border-blue-900 text-white stroke-white fill-white hover:bg-white hover:border-blue-900 hover:text-blue-900 hover:fill-blue-900 hover:stroke-blue-900;
+  }
+
+  .btn-black-white {
+    @apply bg-black border-white text-white stroke-white fill-white hover:bg-white hover:border-black hover:text-black hover:fill-black hover:stroke-black;
+  }
+
+  .btn-white-black {
+    @apply bg-white border-black text-black stroke-black fill-black hover:bg-black hover:border-black hover:text-white hover:fill-white hover:stroke-white;
+  }
+}
+
+* {
+  @apply font-rubik;
+}

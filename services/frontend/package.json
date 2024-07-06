@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
-    "tailwind": "tailwindcss -i ./src/app/App.scss -o ./src/app/outputTW.css --watch",
+    "tailwind": "tailwindcss -i ./src/app/App.css -o ./src/app/outputTW.css --watch",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview"
   },

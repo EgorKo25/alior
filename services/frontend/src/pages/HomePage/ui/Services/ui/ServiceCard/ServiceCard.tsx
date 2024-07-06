@@ -22,8 +22,8 @@ export const ServiceCard = ({
       </p>
       {isActive && (
         <MainButton
-          circleClassName=" circle-dark-orange"
-          className={styles.button + ` btn-dark-orange`}
+          colorSchema=" btn-orange-white"
+          className={styles.button}
           title="Мне это надо"
         />
       )}
