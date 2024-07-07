@@ -39,6 +39,78 @@
   .btn-white-black {
     @apply bg-white border-black text-black stroke-black fill-black hover:bg-black hover:border-black hover:text-white hover:fill-white hover:stroke-white;
   }
+
+  .clamp-h2 {
+    font-size: clamp(2.5rem, 2.0714rem + 2.1429vw, 4rem);
+  }
+
+  .clamp-span {
+    font-size: clamp(4rem, 3.4286rem + 2.8571vw, 6rem);
+  }
+
+  .thesis_container_mobile {
+    display: grid;
+    width: 100%;
+    gap: 32px;
+    grid-template-columns: repeat(3, auto);
+    grid-template-rows: repeat(7, auto);
+    grid-auto-flow: row;
+    grid-template-areas:
+      ". item1 item1"
+      "item2 item2 ."
+      ". item3 item3"
+      "item4 item4 ."
+      ". item5 item5"
+      "item6 item6 ."
+      "item7 item7 item7";
+  }
+  .thesis_container_middle {
+    display: grid;
+    width: 100%;
+    gap: 32px;
+    grid-template-columns: repeat(6, 13%);
+    grid-template-rows: repeat(4, auto);
+    grid-auto-flow: row;
+    grid-template-areas:
+      "item1 item1 item1 item2  item2 item2"
+      "item5 item5 item5 item4 item4 ."
+      "item6 item6 item6 . item3 item3"
+      "item7 item7 item7 item7 item7 item7";
+  }
+
+  .thesis_container_large {
+    display: grid;
+    width: 100%;
+    gap: 16px;
+    grid-template-columns: repeat(4, minmax(224px, 600px));
+    grid-template-rows: repeat(3, auto);
+    grid-auto-flow: row;
+    grid-template-areas:
+      "item1 . item2 item2"
+      "item5 . item4 item3"
+      "item6 . item7 item7";
+  }
+  .item1 {
+    grid-area: item1;
+  }
+  .item2 {
+    grid-area: item2;
+  }
+  .item3 {
+    grid-area: item3;
+  }
+  .item4 {
+    grid-area: item4;
+  }
+  .item5 {
+    grid-area: item5;
+  }
+  .item6 {
+    grid-area: item6;
+  }
+  .item7 {
+    grid-area: item7;
+  }
 }
 
 * {

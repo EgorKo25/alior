@@ -1,0 +1,1 @@
+export { ServicesIcon } from "./ServicesIcon";

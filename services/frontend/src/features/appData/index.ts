@@ -1,1 +1,1 @@
-export { ServiceCardsData } from "./appData";
+export { ServiceCardsData, FeaturesThesesData } from "./appData";
