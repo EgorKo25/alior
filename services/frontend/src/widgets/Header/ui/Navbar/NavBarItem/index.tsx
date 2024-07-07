@@ -1,1 +1,0 @@
-export { NavBarItem } from "./NavBarItem";

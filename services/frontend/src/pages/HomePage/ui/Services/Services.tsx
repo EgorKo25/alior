@@ -28,7 +28,7 @@ export const Services = () => {
   }, []);
 
   return (
-    <div className={styles.service_container}>
+    <section id="services" className={styles.service_container}>
       <div className={styles.service_cards_container}>
         {[0, 1, 2].map((index) => (
           <ServiceCard
@@ -77,6 +77,6 @@ export const Services = () => {
           colorSchema={" btn-white-black"}
         />
       </div>
-    </div>
+    </section>
   );
 };

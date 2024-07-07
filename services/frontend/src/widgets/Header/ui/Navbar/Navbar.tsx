@@ -1,13 +1,13 @@
 import { useState, useEffect } from "react";
-import { NavBarItem } from "./NavBarItem";
+
 import styles from "./Navbar.module.scss";
 import mobileStyles from "./MobileNavbar.module.scss";
+import { NavbarItem } from "./ui/NavbarItem";
 
-const menuItems = ["О нас", "Услуги", "Кейсы"];
-const backgroundImages = [
-  `url(chair.svg)`,
-  `url(services.svg)`,
-  `url(play.svg)`,
+const menuItems = [
+  { name: "О нас", sectionId: "features" },
+  { name: "Услуги", sectionId: "services" },
+  { name: "Кейсы", sectionId: "cases" },
 ];
 
 export const Navbar = ({ isMobile }: { isMobile?: boolean }) => {
@@ -26,6 +26,8 @@ export const Navbar = ({ isMobile }: { isMobile?: boolean }) => {
 
   const handleItemClick = (index: number) => {
     setActiveIndex(index);
+    const section = document.getElementById(menuItems[index].sectionId);
+    section?.scrollIntoView({ behavior: "smooth" });
   };
 
   const containerStyle = isMobile
@@ -36,14 +38,13 @@ export const Navbar = ({ isMobile }: { isMobile?: boolean }) => {
     <div className={containerStyle}>
       <ul className={listStyle}>
         {menuItems.map((item, index) => (
-          <NavBarItem
-            key={item}
-            item={item}
+          <NavbarItem
+            key={item.sectionId}
+            item={item.name}
             index={index}
             activeIndex={activeIndex}
             isActive={index === activeIndex}
             onItemClicked={handleItemClick}
-            backgroundImage={backgroundImages[index]}
           />
         ))}
       </ul>

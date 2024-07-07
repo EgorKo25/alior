@@ -53,14 +53,27 @@
   transition: all 0.3s ease;
 }
 
-.list__item:nth-child(1):hover .decoration {
-  background-image: url("/images/chair.svg");
+.list__item:hover .icon {
+  background-color: transparent;
+  width: 24px;
+  height: 24px;
+  border-radius: 0;
+  transition: all 0.3s ease;
 }
-.list__item:nth-child(2):hover .decoration {
-  background-image: url("/images/services.svg");
+
+.icon {
+  position: absolute;
+  width: 0;
+  height: 0;
+  transition: all 0.3s ease;
 }
-.list__item:nth-child(3):hover .decoration {
-  background-image: url("/images/play.svg");
+
+.list__item:active .icon {
+  background-color: transparent;
+  width: 24px;
+  height: 24px;
+  border-radius: 0;
+  transition: all 0.3s ease;
 }
 
 .list {

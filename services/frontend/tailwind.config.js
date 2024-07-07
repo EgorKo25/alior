@@ -36,7 +36,35 @@ export default {
       rubik: '"Rubik", sans-serif',
       caveat: '"Caveat", sans-serif',
     },
-    extend: {},
+    extend: {
+      width: {
+        90: "90%",
+        668: "668px",
+        874: "874px",
+      },
+      height: {
+        598: "598px",
+        583: "583px",
+      },
+      padding: {
+        5: "20px",
+        4: "16px",
+      },
+      borderRadius: {
+        20: "20px",
+      },
+      inset: {
+        "7%": "7%",
+        "4%": "4%",
+        "10%": "10%",
+        "17%": "17%",
+      },
+      maxWidth: {
+        375: "375px",
+        728: "728px",
+        944: "944px",
+      },
+    },
   },
 
   plugins: [],
