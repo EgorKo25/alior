@@ -25,5 +25,20 @@ services:
       postgres:
         condition: service_healthy
 
+
+  frontend:
+    build: ./services/frontend
+    volumes:
+      - static_files:/app/production
+
+  nginx:
+    build: ./services/nginx
+    ports:
+      - "80:80"
+    volumes:
+      - static_files:/usr/share/nginx/html
+
+
 volumes:
   pgdata:
+  static_files:
