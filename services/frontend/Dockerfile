@@ -1,5 +1,5 @@
 # frontend/Dockerfile
-FROM node:22-alpine
+FROM node:22-alpine as base
 
 WORKDIR /app
 
@@ -11,5 +11,11 @@ COPY . .
 
 RUN npm run build --silent
 
-RUN rm -rf /app/src /app/public
 
+# nginx/Dockerfile
+FROM nginx:1.25.3-alpine as final
+
+COPY nginx/nginx.conf /etc/nginx/nginx.conf
+COPY --from=base /app/production /usr/share/nginx/html
+
+CMD ["nginx", "-g", "daemon off;"]
