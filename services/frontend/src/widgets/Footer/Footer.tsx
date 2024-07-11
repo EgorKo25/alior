@@ -1,7 +1,9 @@
-import { TgIcon } from "src/shared/ui/TgButton/TgIcon";
 import { QuestionIcon } from "./ui/QuestionIcon";
 import styles from "./Footer.module.scss";
 import clsx from "clsx";
+import { GitIcon } from "./ui/GitIcon";
+import { TgFooterIcon } from "./ui/TgFooterIcon";
+import { LinkedinIcon } from "./ui/LinkedinIcon/LinkedinIcon";
 export const Footer = () => {
   return (
     <footer className={clsx(styles.footer)}>
@@ -25,11 +27,17 @@ export const Footer = () => {
           <h4>Политика обработки данных</h4>
         </div>
         <div className={clsx(styles.policy_button_container)}>
-          <button className={clsx(styles.policy_button)}>
-            <QuestionIcon color="#fff" size={24} />
+          <button className={" flex justify-center items-center size-6"}>
+            <QuestionIcon className=" hover:text-accent" />
           </button>
-          <button className={clsx(styles.policy_button)}>
-            <TgIcon color="#fff" size={24} />
+          <button className={" flex justify-center items-center size-6"}>
+            <LinkedinIcon className={" hover:text-accent"} />
+          </button>
+          <button className={" flex justify-center items-center size-6"}>
+            <GitIcon className={" hover:text-accent"} />
+          </button>
+          <button className={" flex justify-center items-center size-6"}>
+            <TgFooterIcon className={" hover:text-accent"} />
           </button>
         </div>
       </div>

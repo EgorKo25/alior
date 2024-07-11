@@ -6,7 +6,7 @@
   align-content: center;
   margin: 0 auto;
   margin-block-start: 28px;
-  width: clamp(278px, 90%, 1750px);
+  width: clamp(278px, 90%, 2300px);
 }
 
 .small_navigation_contsiner {
@@ -16,6 +16,10 @@
   gap: 2px;
   padding: 0 16px;
   align-items: center;
+}
+
+.logo {
+  opacity: 0;
 }
 
 .hidden {

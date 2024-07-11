@@ -8,7 +8,7 @@ export const Features = () => {
   return (
     <section
       id="features"
-      className={` flex flex-col my-0 mx-auto mt-24 w-90 relative`}
+      className={` flex flex-col my-0 mx-auto mt-24 w-90 relative overflow-hidden`}
     >
       <div
         className={` flex flex-col md:flex-row md:justify-between gap-8 mb-20`}
@@ -23,13 +23,16 @@ export const Features = () => {
             выбирают
           </span>
         </h2>
-        <Message title="Лучше всего за нас скажут наши работы. Но если нужны тезисы, они ниже слайдом" />
+        <Message
+          className=" rounded-bl-none max-w-96 lg:text-base"
+          title="Лучше всего за нас скажут наши работы. Но если нужны тезисы, они ниже слайдом"
+        />
       </div>
       <div
         className={` thesis_container_mobile self-center max-w-375 md:max-w-728 lg:max-w-944 md:thesis_container_middle lg:thesis_container_large relative`}
       >
         <MobileTree
-          className={` absolute -z-10 left-4% -top-52 md:hidden lg:hidden text-accent/50`}
+          className={` absolute -z-10 -left-7% -top-52 md:hidden lg:hidden text-accent/50`}
         />
         <MiddleTree
           className={` absolute -top-32 left-17% hidden lg:hidden md:block -z-10 text-accent/50`}
