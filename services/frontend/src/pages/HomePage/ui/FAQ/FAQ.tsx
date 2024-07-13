@@ -10,9 +10,15 @@ export const FAQ = () => {
       }
     >
       <SendForConsult />
-      <div className={"w-96 h-72 z-10 relative md:self-start md:ml-10"}>
+      <div
+        className={
+          "w-96 h-96 z-10 relative md:self-start md:ml-10 lg:w-431 lg:h-96 2xl:ml-20 2xl:w-540 2xl:h-500"
+        }
+      >
         <img
-          className={"object-cover object-center z-10 absolute top-8"}
+          className={
+            "object-cover object-center z-10 absolute top-36 w-full h-full 2xl:top-48"
+          }
           src="/images/bookworm.svg"
         ></img>
       </div>

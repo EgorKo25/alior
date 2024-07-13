@@ -45,7 +45,7 @@ export const NavbarItem: React.FC<NavigationItemProps> = ({
   ];
   return (
     <li
-      className={clsx(styles.list__item)}
+      className={clsx(styles.list__item) + " 2xl:py-4 2xl:px-5"}
       onClick={() => onItemClicked(index)}
     >
       <div className={clsx(styles.decoration_container)}>
@@ -61,7 +61,8 @@ export const NavbarItem: React.FC<NavigationItemProps> = ({
       <Link
         to={{ pathname: "/", hash: `#${menuItems[index].sectionId}` }}
         className={
-          clsx(styles.link) + " sm:text-black md:text-black lg:text-white"
+          clsx(styles.link) +
+          " sm:text-black md:text-black lg:text-white 2xl:text-xl"
         }
       >
         {item}

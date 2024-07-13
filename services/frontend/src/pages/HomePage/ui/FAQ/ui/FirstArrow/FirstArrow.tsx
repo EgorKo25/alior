@@ -1,7 +1,7 @@
 export const FirstArrow = () => {
   return (
     <svg
-      className={" absolute right-55% top-45% md:w-56 md:h-48"}
+      className={" absolute right-55% top-45% md:w-56 md:h-48 2xl:right-70%"}
       width="182"
       height="175"
       viewBox="0 0 182 175"
