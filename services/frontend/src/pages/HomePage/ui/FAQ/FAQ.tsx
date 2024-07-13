@@ -5,9 +5,9 @@ import { SendForConsult } from "./ui/SendForConsult";
 export const FAQ = () => {
   return (
     <section
-      className={
-        " my-0 mx-auto mt-48 pt-48 flex flex-col items-center justify-center w-full bg-blue-100 pb-10 relative md:pt-14"
-      }
+      className={` my-0 mx-auto mt-48 pt-48 flex flex-col items-center justify-center w-full bg-blue-100 pb-10 relative md:pt-14 
+        before:absolute before:content-[''] before:h-40 before:w-full before:top-1 before:-translate-y-[100%] before:bg-gradient-to-b before:from-transparent before:via-blue-100 before:via-80% before:to-blue-100
+        after:absolute after:content-[''] after:h-40 after:w-full after:bottom-1 after:translate-y-[100%] after:bg-gradient-to-b after:to-transparent after:from-5% after:via-20% after:via-blue-100/90 after:from-blue-100`}
     >
       <SendForConsult />
       <div

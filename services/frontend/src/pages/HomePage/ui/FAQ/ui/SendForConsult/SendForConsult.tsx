@@ -2,7 +2,7 @@ export const SendForConsult = () => {
   return (
     <div
       className={
-        " absolute -top-4% rounded-3xl bg-accent px-5 py-16 w-full flex flex-col gap-6 md:items-center md:pt-6 md:pb-8 md:px-10 md:justify-between md:flex-row md:w-90% lg:gap-0 lg:px-28 xl:pt-8 xl:pb-10 xl:w-4/5 2xl:w-95%"
+        " absolute -top-14 rounded-3xl bg-accent px-5 py-16 w-full flex flex-col gap-6 md:items-center md:pt-6 md:pb-8 md:px-10 md:justify-between md:flex-row md:w-90% lg:gap-0 lg:px-28 xl:pt-8 xl:pb-10 xl:w-4/5 2xl:w-95%"
       }
     >
       <h2

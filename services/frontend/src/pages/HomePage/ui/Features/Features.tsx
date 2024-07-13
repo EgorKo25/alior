@@ -8,7 +8,7 @@ export const Features = () => {
   return (
     <section
       id="features"
-      className={` flex flex-col my-0 mx-auto mt-24 w-90% relative overflow-hidden`}
+      className={` flex flex-col my-0 mx-auto mt-48 w-90% relative overflow-hidden`}
     >
       <div
         className={` flex flex-col md:flex-row md:justify-between gap-8 mb-20`}
