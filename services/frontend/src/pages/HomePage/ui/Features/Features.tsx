@@ -18,7 +18,7 @@ export const Features = () => {
         >
           Почему нас
           <span
-            className={` font-caveat font-normal text-accent clamp-span lg:leading-[0.9] lg:-mt-4`}
+            className={` font-caveat font-normal text-accent clamp-span lg:-mt-4`}
           >
             выбирают
           </span>
@@ -29,7 +29,7 @@ export const Features = () => {
         />
       </div>
       <div
-        className={` thesis_container_mobile self-center max-w-375 md:max-w-728 lg:max-w-944 md:thesis_container_middle lg:thesis_container_large relative`}
+        className={` thesis_container_mobile self-center max-w-335 md:max-w-688 lg:max-w-944 md:thesis_container_middle lg:thesis_container_large relative`}
       >
         <MobileTree
           className={` absolute -z-10 -left-7% -top-52 md:hidden lg:hidden text-accent/50`}
@@ -38,18 +38,21 @@ export const Features = () => {
           className={` absolute -top-32 left-17% hidden lg:hidden md:block -z-10 text-accent/50`}
         />
         <LargeTree
-          className={` absolute -top-36 w-668 h-598 xl:w-874 xl:h-583 xl:left-4% xl:-top-20 hidden left-10% lg:block -z-10 text-accent/50 `}
+          className={` absolute -top-40 w-668 h-598 xl:w-874 xl:h-583 xl:left-4% xl:-top-20 hidden left-10% lg:block -z-10 text-accent/50 `}
         />
-        <Thesis index={0} className={` item1 lg:min-w-72 md:-mt-7`} />
+        <Thesis index={0} className={` item1 lg:min-w-72 md:-mt-7 xl:mt-0`} />
         <Thesis index={1} className={` item2 md:-mt-7 lg:mt-0`} />
         <Thesis index={2} className={` item3 lg:mt-8 md:mt-8 xl:mt-8`} />
         <Thesis
           index={3}
           className={` item4 md:mt-8 md:ml-3 lg:mt-4 xl:ml-5 xl:mt-10`}
         />
-        <Thesis index={4} className={` item5 lg:mt-6 lg:min-w-72 md:mt-11`} />
-        <Thesis index={5} className={` item6 md:mt-28 lg:mt-0`} />
-        <Thesis index={6} className={` item7 sm:mt-2`} />
+        <Thesis
+          index={4}
+          className={` item5 lg:mt-6 lg:min-w-72 md:mt-11 xl:mt-0`}
+        />
+        <Thesis index={5} className={` item6 md:mt-20 lg:mt-0`} />
+        <Thesis index={6} className={` item7 mt-14 md:mt-0`} />
       </div>
       <div
         className={` opacity-0 md:opacity-10 md:left-0 size-44 rounded-full bg-accent absolute bottom-14 left-7% -z-10`}
