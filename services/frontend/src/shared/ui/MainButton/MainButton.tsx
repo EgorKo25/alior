@@ -19,7 +19,7 @@ export const MainButton: React.FC<{
       onClick={onClick}
       className={
         className +
-        ` main-button group h-12 text-center rounded-[32px] cursor-pointer leading-6 border font-medium gap-2  py-3 px-5` +
+        ` main-button group h-12 text-center rounded-[32px] cursor-pointer leading-6 border font-medium gap-2  py-3 px-5 2xl:py-4 2xl:px-6 2xl:h-16 2xl:text-2xl` +
         colorSchema
       }
       type={type}

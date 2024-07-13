@@ -1,0 +1,1 @@
+export { TgFooterIcon } from "./TgFooterIcon";

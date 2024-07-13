@@ -1,6 +1,6 @@
 export const CircleIcon = () => (
   <div
-    className={` circle inline-block w-2.5 h-2.5 rounded-full opacity-100 group-hover:opacity-0 ml-4 
+    className={` circle inline-block w-2.5 h-2.5 rounded-full opacity-100 group-hover:opacity-0 ml-4 2xl:w-3 2xl:h-3
      bg-white 
       group-[.btn-accent-white]:bg-white group-[.btn-accent-white]:hover:bg-accent
       group-[.btn-white-accent]:bg-accent group-[.btn-white-accent]:hover:bg-white

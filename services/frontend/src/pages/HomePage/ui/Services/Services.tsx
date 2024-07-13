@@ -51,7 +51,7 @@ export const Services = () => {
           title="Уже знаю, что хочу"
           colorSchema={" btn-accent-white"}
         />
-        <MainButton
+        {/* <MainButton
           className={styles.button}
           title="Уже знаю, что хочу"
           colorSchema={" btn-white-accent"}
@@ -75,7 +75,7 @@ export const Services = () => {
           className={styles.button}
           title="Уже знаю, что хочу"
           colorSchema={" btn-white-black"}
-        />
+        /> */}
       </div>
     </section>
   );

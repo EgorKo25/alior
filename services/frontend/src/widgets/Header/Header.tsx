@@ -8,6 +8,36 @@ import { MainButton } from "src/shared/ui/MainButton";
 
 export const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  // const [loading, setLoading] = useState(true);
+  // const [isAtTop, setIsAtTop] = useState(true);
+
+  // useEffect(() => {
+  //   if (window.scrollY !== 0) {
+  //     setIsAtTop(false);
+  //   }
+
+  //   const handleScroll = () => {
+  //     if (!loading) {
+  //       setIsAtTop(window.scrollY === 0);
+  //     }
+  //   };
+
+  //   window.addEventListener("scroll", handleScroll);
+
+  //   return () => {
+  //     window.removeEventListener("scroll", handleScroll);
+  //   };
+  // }, [loading]);
+
+  // useEffect(() => {
+  //   if (isAtTop) {
+  //     const timer = setTimeout(() => {
+  //       setLoading(false);
+  //     }, 3000);
+
+  //     return () => clearTimeout(timer);
+  //   }
+  // }, [isAtTop]);
 
   const handleResize = () => {
     if (window.innerWidth > 640 && isMenuOpen) {
@@ -27,8 +57,29 @@ export const Header = () => {
     <header
       className={clsx(styles.header) + ` sm:justify-normal  lg:justify-between`}
     >
-      <div className={clsx(styles.heading_logo) + ``}>
-        <img src="/images/logo.svg" alt="Alior" />
+      {/* {loading && isAtTop && (
+        <div
+          className={clsx(" preloader", {
+            " preloader_logo_visible": loading && isAtTop,
+          })}
+        >
+          <img
+            className={clsx(" ", {
+              " animated_logo_visible": loading && isAtTop,
+            })}
+            src="/images/logo.svg"
+            alt="Alior"
+          />
+        </div>
+      )} */}
+      <div>
+        <img
+          // className={clsx("", {
+          //   [styles.logo]: loading && isAtTop,
+          // })}
+          src="/images/logo.svg"
+          alt="Alior"
+        />
       </div>
       <div className="hidden lg:flex">
         <Navbar isMobile={false} />
