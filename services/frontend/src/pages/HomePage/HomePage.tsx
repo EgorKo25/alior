@@ -1,3 +1,4 @@
+import { Consultation } from "./ui/Consultation";
 import { FAQ } from "./ui/FAQ";
 import { Features } from "./ui/Features";
 import { Hero } from "./ui/Hero";
@@ -10,6 +11,7 @@ export const HomePage = () => {
       <FAQ />
       <Features />
       <Services />
+      <Consultation />
     </>
   );
 };
