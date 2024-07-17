@@ -2,14 +2,14 @@ package main
 
 import (
 	"callback_service/src/config"
+	"callback_service/src/logger"
 	"callback_service/src/migrator"
 	"callback_service/src/repository"
 	"callback_service/src/service"
 	"callback_service/src/transport/amqp"
 	"context"
 	"github.com/jackc/pgx/v5/pgxpool"
-	"log/slog"
-	"os"
+	"go.uber.org/zap"
 )
 
 const (
@@ -25,23 +25,24 @@ func main() {
 	cfg := config.MustLoad()
 
 	// Инициализация logger
-	log := setupLogger(cfg.Env)
+	log := SetupLogger(cfg.Env)
+
 	log.Info("Starting Callback service",
-		slog.String("env", cfg.Env),
-		slog.String("Database url", cfg.Database.Url),
-		slog.String("MsgBroker url", cfg.MsgBroker.Url),
-		slog.Any("cfg", cfg),
+		zap.String("env", cfg.Env),
+		zap.String("Database url", cfg.Database.Url),
+		zap.String("MsgBroker url", cfg.MsgBroker.Url),
+		zap.Any("cfg", cfg),
 	)
 
 	// Иициализация БД
 	pool, err := pgxpool.New(ctx, cfg.Database.Url)
 	if err != nil {
-		log.Error("Failed to connect to database: %v", err)
+		log.Error("failed to connect to database: %v", zap.Error(err))
 	}
 
 	err = database.MigrateDatabase(pool)
 	if err != nil {
-		log.Error("Migrations failed: %v", err)
+		log.Error("migrations failed: %v", zap.Error(err))
 	}
 
 	// Запуск Consumer'a
@@ -49,20 +50,19 @@ func main() {
 	svc := service.NewCallbackService(repo)
 	err = amqp.Consume(ctx, cfg.MsgBroker.Url, "create", svc)
 	if err != nil {
-		log.Error("Failed to start consumer: %v", err)
+		log.Error("failed to start consumer: %v", zap.Error(err))
 	}
 
 }
 
-func setupLogger(env string) *slog.Logger {
-	var log *slog.Logger
+func SetupLogger(env string) *zap.Logger {
+	var log *zap.Logger
 
 	switch env {
 	case envLocal:
-		log = slog.New(slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{Level: slog.LevelDebug}))
+		log = logger.NewDevLogger()
 	case envProd:
-		log = slog.New(slog.NewJSONHandler(os.Stdout, &slog.HandlerOptions{Level: slog.LevelInfo}))
+		log = logger.NewProdLogger()
 	}
-
 	return log
 }
