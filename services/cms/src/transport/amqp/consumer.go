@@ -8,7 +8,6 @@ import (
 	"encoding/json"
 	amqp "github.com/rabbitmq/amqp091-go"
 	"log"
-	"time"
 )
 
 func Consume(ctx context.Context, amqpURL, queueName string, svc *service.CallbackService) error {
@@ -62,7 +61,7 @@ func Consume(ctx context.Context, amqpURL, queueName string, svc *service.Callba
 				continue
 			}
 
-			if err := svc.CreateCallback(ctx, msg.Number, msg.Date.Format(time.RFC3339), msg.Name); err != nil {
+			if err := svc.CreateCallback(ctx, msg.Name, msg.Phone, msg.Type, msg.Idea); err != nil {
 				log.Printf("Failed to create callback: %v", err)
 			}
 

@@ -2,8 +2,6 @@ package repository
 
 import (
 	"context"
-	"time"
-
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
@@ -16,10 +14,11 @@ type CallbackRepository struct {
 }
 
 type Callback struct {
-	ID     int       `db:"id"`
-	Number string    `db:"number"`
-	Date   time.Time `db:"date"`
-	Name   string    `db:"name"`
+	ID    int    `db:"id"`
+	Name  string `db:"name"`
+	Phone string `db:"phone"`
+	Type  string `db:"type"`
+	Idea  string `db:"idea"`
 }
 
 func NewRepository(db *pgxpool.Pool) IRepository {
@@ -28,8 +27,8 @@ func NewRepository(db *pgxpool.Pool) IRepository {
 
 func (r *CallbackRepository) CreateCallback(ctx context.Context, data Callback) error {
 	_, err := r.db.Exec(ctx, `
-        INSERT INTO callbacks (number, date, name) 
-        VALUES ($1, $2, $3)`,
-		data.Number, data.Date, data.Name)
+        INSERT INTO callbacks (name, phone, type, idea) 
+        VALUES ($1, $2, $3, $4)`,
+		data.Name, data.Phone, data.Type, data.Idea)
 	return err
 }

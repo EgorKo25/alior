@@ -3,11 +3,10 @@ package service
 import (
 	"callback_service/src/repository"
 	"context"
-	"time"
 )
 
 type ICallback interface {
-	CreateCallback(ctx context.Context, number string, date string, name string) error
+	CreateCallback(ctx context.Context, name string, phone string, callbackType string, idea string) error
 }
 
 type CallbackService struct {
@@ -18,16 +17,12 @@ func NewCallbackService(repo repository.IRepository) *CallbackService {
 	return &CallbackService{repo: repo}
 }
 
-func (s *CallbackService) CreateCallback(ctx context.Context, number string, date string, name string) error {
-	parsedDate, err := time.Parse(time.RFC3339, date)
-	if err != nil {
-		return err
-	}
-
+func (s *CallbackService) CreateCallback(ctx context.Context, name string, phone string, callbackType string, idea string) error {
 	data := repository.Callback{
-		Number: number,
-		Date:   parsedDate,
-		Name:   name,
+		Phone: phone,
+		Name:  name,
+		Type:  callbackType,
+		Idea:  idea,
 	}
 
 	return s.repo.CreateCallback(ctx, data)
