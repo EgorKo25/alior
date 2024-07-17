@@ -8,7 +8,7 @@ import (
 	"time"
 )
 
-func Produce(amqpURL, queueName string, body string) error {
+func Produce(ctx context.Context, amqpURL, queueName string, body string) error {
 	conn, err := amqp.Dial(amqpURL)
 	if err != nil {
 		return err
@@ -34,10 +34,10 @@ func Produce(amqpURL, queueName string, body string) error {
 		return err
 	}
 
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctxWTO, cancel := context.WithTimeout(ctx, 5*time.Second)
 	defer cancel()
 
-	err = ch.PublishWithContext(ctx,
+	err = ch.PublishWithContext(ctxWTO,
 		"",     // exchange
 		q.Name, // routing key
 		false,  // mandatory

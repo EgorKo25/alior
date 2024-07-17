@@ -11,7 +11,7 @@ import (
 	"time"
 )
 
-func Consume(amqpURL, queueName string, svc *service.CallbackService) error {
+func Consume(ctx context.Context, amqpURL, queueName string, svc *service.CallbackService) error {
 	conn, err := amqp.Dial(amqpURL)
 	if err != nil {
 		return err
@@ -62,13 +62,11 @@ func Consume(amqpURL, queueName string, svc *service.CallbackService) error {
 				continue
 			}
 
-			ctx := context.Background()
-
 			if err := svc.CreateCallback(ctx, msg.Number, msg.Date.Format(time.RFC3339), msg.Name); err != nil {
 				log.Printf("Failed to create callback: %v", err)
 			}
 
-			if err := Produce(amqpURL, "notify", "new callback"); err != nil {
+			if err := Produce(ctx, amqpURL, "notify", "new callback"); err != nil {
 				log.Printf("Failed to send notification: %v", err)
 			}
 		}

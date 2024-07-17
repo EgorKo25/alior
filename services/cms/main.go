@@ -18,6 +18,9 @@ const (
 )
 
 func main() {
+	// Инициализация context
+	ctx := context.Background()
+
 	// Инициализация config
 	cfg := config.MustLoad()
 
@@ -31,7 +34,7 @@ func main() {
 	)
 
 	// Иициализация БД
-	pool, err := pgxpool.New(context.Background(), cfg.Database.Url)
+	pool, err := pgxpool.New(ctx, cfg.Database.Url)
 	if err != nil {
 		log.Error("Failed to connect to database: %v", err)
 	}
@@ -44,7 +47,7 @@ func main() {
 	// Запуск Consumer'a
 	repo := repository.NewRepository(pool)
 	svc := service.NewCallbackService(repo)
-	err = amqp.Consume(cfg.MsgBroker.Url, "create", svc)
+	err = amqp.Consume(ctx, cfg.MsgBroker.Url, "create", svc)
 	if err != nil {
 		log.Error("Failed to start consumer: %v", err)
 	}

@@ -11,10 +11,10 @@ type ICallback interface {
 }
 
 type CallbackService struct {
-	repo repository.Repository
+	repo repository.IRepository
 }
 
-func NewCallbackService(repo repository.Repository) *CallbackService {
+func NewCallbackService(repo repository.IRepository) *CallbackService {
 	return &CallbackService{repo: repo}
 }
 

@@ -11,7 +11,7 @@ type IRepository interface {
 	CreateCallback(ctx context.Context, data Callback) error
 }
 
-type Repository struct {
+type CallbackRepository struct {
 	db *pgxpool.Pool
 }
 
@@ -23,10 +23,10 @@ type Callback struct {
 }
 
 func NewRepository(db *pgxpool.Pool) IRepository {
-	return &Repository{db: db}
+	return &CallbackRepository{db: db}
 }
 
-func (r *Repository) CreateCallback(ctx context.Context, data Callback) error {
+func (r *CallbackRepository) CreateCallback(ctx context.Context, data Callback) error {
 	_, err := r.db.Exec(ctx, `
         INSERT INTO callbacks (number, date, name) 
         VALUES ($1, $2, $3)`,
