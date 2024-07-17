@@ -37,12 +37,12 @@ func main() {
 	// Иициализация БД
 	pool, err := pgxpool.New(ctx, cfg.Database.Url)
 	if err != nil {
-		log.Error("failed to connect to database: %v", zap.Error(err))
+		log.Error("failed to connect to database", zap.Error(err))
 	}
 
 	err = database.MigrateDatabase(pool)
 	if err != nil {
-		log.Error("migrations failed: %v", zap.Error(err))
+		log.Error("migrations failed", zap.Error(err))
 	}
 
 	// Запуск Consumer'a
@@ -50,7 +50,7 @@ func main() {
 	svc := service.NewCallbackService(repo)
 	err = amqp.Consume(ctx, cfg.MsgBroker.Url, "create", svc)
 	if err != nil {
-		log.Error("failed to start consumer: %v", zap.Error(err))
+		log.Error("failed to start consumer", zap.Error(err))
 	}
 
 }

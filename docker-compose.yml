@@ -16,22 +16,20 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
-
-  tn_service:
-    build: ./services/tn_service
-    ports:
-      - "50051:50051"
-    depends_on:
-      postgres:
-        condition: service_healthy
-
+    hostname: postgres
 
   frontend:
     build: ./services/frontend
     ports:
       - "80:80"
 
-
+  cms:
+    build: ./services/cms
+    environment:
+      - CONFIG_FILE=local.yaml
+    depends_on:
+      postgres:
+        condition: service_healthy
 
 volumes:
   pgdata:

@@ -10,4 +10,4 @@ COPY . .
 
 RUN go build -o start.cms main.go
 
-CMD ["sh", "-c", "./start.cms --config=./config/local.yaml"]
+CMD ["sh", "-c", "./start.cms --config=./config/${CONFIG_FILE}"]
