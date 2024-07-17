@@ -9,7 +9,7 @@ import (
 )
 
 func Produce(amqpURL, queueName string, body string) error {
-	conn, err := transport.ConnectToRabbitMQ(amqpURL)
+	conn, err := amqp.Dial(amqpURL)
 	if err != nil {
 		return err
 	}
@@ -19,7 +19,7 @@ func Produce(amqpURL, queueName string, body string) error {
 		}
 	}()
 
-	ch, err := transport.SetupChannel(conn)
+	ch, err := conn.Channel()
 	if err != nil {
 		return err
 	}
@@ -46,7 +46,11 @@ func Produce(amqpURL, queueName string, body string) error {
 			ContentType: "text/plain",
 			Body:        []byte(body),
 		})
-	failOnError(err, "Failed to publish a message")
+	if err != nil {
+		log.Printf("Failed to produce notification")
+	}
+
 	log.Printf(" [x] Sent %s\n", body)
+
 	return nil
 }

@@ -6,18 +6,13 @@ import (
 	"callback_service/src/transport"
 	"context"
 	"encoding/json"
+	amqp "github.com/rabbitmq/amqp091-go"
 	"log"
 	"time"
 )
 
-func failOnError(err error, msg string) {
-	if err != nil {
-		log.Panicf("%s: %s", msg, err)
-	}
-}
-
 func Consume(amqpURL, queueName string, svc *service.CallbackService) error {
-	conn, err := transport.ConnectToRabbitMQ(amqpURL)
+	conn, err := amqp.Dial(amqpURL)
 	if err != nil {
 		return err
 	}
@@ -27,7 +22,7 @@ func Consume(amqpURL, queueName string, svc *service.CallbackService) error {
 		}
 	}()
 
-	ch, err := transport.SetupChannel(conn)
+	ch, err := conn.Channel()
 	if err != nil {
 		return err
 	}
@@ -68,15 +63,13 @@ func Consume(amqpURL, queueName string, svc *service.CallbackService) error {
 			}
 
 			ctx := context.Background()
-			err := svc.CreateCallback(ctx, msg.Number, msg.Date.Format(time.RFC3339), msg.Name)
-			if err != nil {
-				log.Printf("Failed to create callback: %v", err)
-			} else {
-				err = Produce(amqpURL, "notify", "new callback")
 
-				if err != nil {
-					log.Printf("Failed to send notification: %v", err)
-				}
+			if err := svc.CreateCallback(ctx, msg.Number, msg.Date.Format(time.RFC3339), msg.Name); err != nil {
+				log.Printf("Failed to create callback: %v", err)
+			}
+
+			if err := Produce(amqpURL, "notify", "new callback"); err != nil {
+				log.Printf("Failed to send notification: %v", err)
 			}
 		}
 	}()
