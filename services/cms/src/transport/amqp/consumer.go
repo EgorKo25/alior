@@ -1,9 +1,9 @@
 package amqp
 
 import (
-	"callback_service/internal/repository"
-	"callback_service/internal/service"
-	"callback_service/internal/transport"
+	"callback_service/src/repository"
+	"callback_service/src/service"
+	"callback_service/src/transport"
 	"context"
 	"encoding/json"
 	"log"

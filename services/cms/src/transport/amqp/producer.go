@@ -1,7 +1,7 @@
 package amqp
 
 import (
-	"callback_service/internal/transport"
+	"callback_service/src/transport"
 	"context"
 	amqp "github.com/rabbitmq/amqp091-go"
 	"log"

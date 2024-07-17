@@ -1,11 +1,11 @@
 package main
 
 import (
-	database "callback_service/cmd/migrator"
-	"callback_service/internal/config"
-	"callback_service/internal/repository"
-	"callback_service/internal/service"
-	"callback_service/internal/transport/amqp"
+	"callback_service/src/config"
+	"callback_service/src/migrator"
+	"callback_service/src/repository"
+	"callback_service/src/service"
+	"callback_service/src/transport/amqp"
 	"context"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"log/slog"
@@ -29,9 +29,6 @@ func main() {
 		slog.String("MsgBroker url", cfg.MsgBroker.Url),
 		slog.Any("cfg", cfg),
 	)
-	log.Debug("Debug msg")
-	log.Error("Error msg")
-	log.Warn("Warning msg")
 
 	// Иициализация БД
 	pool, err := pgxpool.New(context.Background(), cfg.Database.Url)

@@ -1,10 +1,9 @@
 package service
 
 import (
+	"callback_service/src/repository"
 	"context"
 	"time"
-
-	"callback_service/internal/repository"
 )
 
 type ICallback interface {
