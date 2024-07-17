@@ -6,8 +6,8 @@ COPY go.mod go.sum ./
 
 RUN go mod download
 
-COPY services/cms .
+COPY . .
 
-RUN go build -o start.cms ./cmd/cms/main.go
+RUN go build -o start.cms main.go
 
 CMD ["sh", "-c", "./start.cms --config=./config/local.yaml"]
