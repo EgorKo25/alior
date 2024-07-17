@@ -7,11 +7,11 @@ import (
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
-type Repository interface {
+type IRepository interface {
 	CreateCallback(ctx context.Context, data Callback) error
 }
 
-type repo struct {
+type Repository struct {
 	db *pgxpool.Pool
 }
 
@@ -22,11 +22,11 @@ type Callback struct {
 	Name   string    `db:"name"`
 }
 
-func NewRepository(db *pgxpool.Pool) Repository {
-	return &repo{db: db}
+func NewRepository(db *pgxpool.Pool) IRepository {
+	return &Repository{db: db}
 }
 
-func (r *repo) CreateCallback(ctx context.Context, data Callback) error {
+func (r *Repository) CreateCallback(ctx context.Context, data Callback) error {
 	_, err := r.db.Exec(ctx, `
         INSERT INTO callbacks (number, date, name) 
         VALUES ($1, $2, $3)`,
