@@ -55,7 +55,7 @@ func main() {
 
 }
 
-func SetupLogger(env string) *zap.Logger {
+func SetupLogger(env string) logger.ILogger {
 	var log *zap.Logger
 
 	switch env {
@@ -64,5 +64,6 @@ func SetupLogger(env string) *zap.Logger {
 	case envProd:
 		log = logger.NewProdLogger()
 	}
-	return log
+
+	return logger.NewZapLogger(log)
 }
