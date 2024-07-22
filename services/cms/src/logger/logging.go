@@ -1,15 +1,16 @@
 package logger
 
 import (
+	"fmt"
 	"go.uber.org/zap"
 )
 
 type ILogger interface {
-	Debug(msg string, fields ...zap.Field)
-	Info(msg string, fields ...zap.Field)
-	Warn(msg string, fields ...zap.Field)
-	Error(msg string, fields ...zap.Field)
-	Fatal(msg string, fields ...zap.Field)
+	Debug(msg string, args ...interface{})
+	Info(msg string, args ...interface{})
+	Warn(msg string, args ...interface{})
+	Error(msg string, args ...interface{})
+	Fatal(msg string, args ...interface{})
 }
 
 type Logger struct {
@@ -22,22 +23,34 @@ func NewZapLogger(logger *zap.Logger) ILogger {
 	}
 }
 
-func (l *Logger) Debug(msg string, fields ...zap.Field) {
-	l.logger.Debug(msg, fields...)
+func formatMessage(msg string, args ...interface{}) string {
+	if len(args) > 0 {
+		return fmt.Sprintf(msg, args...)
+	}
+	return msg
 }
 
-func (l *Logger) Info(msg string, fields ...zap.Field) {
-	l.logger.Info(msg, fields...)
+func (l *Logger) Debug(msg string, args ...interface{}) {
+	formattedMsg := formatMessage(msg, args...)
+	l.logger.Debug(formattedMsg)
 }
 
-func (l *Logger) Warn(msg string, fields ...zap.Field) {
-	l.logger.Warn(msg, fields...)
+func (l *Logger) Info(msg string, args ...interface{}) {
+	formattedMsg := formatMessage(msg, args...)
+	l.logger.Info(formattedMsg)
 }
 
-func (l *Logger) Error(msg string, fields ...zap.Field) {
-	l.logger.Error(msg, fields...)
+func (l *Logger) Warn(msg string, args ...interface{}) {
+	formattedMsg := formatMessage(msg, args...)
+	l.logger.Warn(formattedMsg)
 }
 
-func (l *Logger) Fatal(msg string, fields ...zap.Field) {
-	l.logger.Fatal(msg, fields...)
+func (l *Logger) Error(msg string, args ...interface{}) {
+	formattedMsg := formatMessage(msg, args...)
+	l.logger.Error(formattedMsg)
+}
+
+func (l *Logger) Fatal(msg string, args ...interface{}) {
+	formattedMsg := formatMessage(msg, args...)
+	l.logger.Fatal(formattedMsg)
 }

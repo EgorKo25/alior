@@ -30,12 +30,11 @@ func main() {
 	// Инициализация logger
 	log := SetupLogger(cfg.Env)
 
-	log.Info("Starting Callback service",
-		zap.String("env", cfg.Env),
-		zap.String("Database url", cfg.Database.Url),
-		zap.String("MsgBroker url", cfg.MsgBroker.Url),
-		zap.Any("cfg", cfg),
-	)
+	log.Info("Starting Callback service")
+	log.Info("env: ", cfg.Env)
+	log.Info("Database url", cfg.Database.Url)
+	log.Info("MsgBroker url", cfg.MsgBroker.Url)
+	log.Info("cfg", cfg)
 
 	// Иициализация БД
 	pool, err := pgxpool.New(ctx, cfg.Database.Url)
