@@ -39,12 +39,12 @@ func main() {
 	// Иициализация БД
 	pool, err := pgxpool.New(ctx, cfg.Database.Url)
 	if err != nil {
-		log.Error("failed to connect to database", zap.Error(err))
+		log.Error("failed to connect to database", err)
 	}
 
 	err = database.MigrateDatabase(pool)
 	if err != nil {
-		log.Error("migrations failed", zap.Error(err))
+		log.Error("migrations failed", err)
 	}
 
 	// Запуск Consumer'a
@@ -52,20 +52,25 @@ func main() {
 	svc := service.NewCallbackService(repo)
 	err = amqp.Consume(ctx, cfg.MsgBroker.Url, "create", svc)
 	if err != nil {
-		log.Error("failed to start consumer", zap.Error(err))
+		log.Error("failed to start consumer", err)
 	}
-
 }
 
 func SetupLogger(env string) logger.ILogger {
 	var log *zap.Logger
+	var err error
 
 	switch env {
 	case envLocal:
-		log = logger.NewDevLogger()
+		log, err = logger.NewDevLogger()
+		if err != nil {
+			panic(err)
+		}
 	case envProd:
-		log = logger.NewProdLogger()
+		log, err = logger.NewProdLogger()
+		if err != nil {
+			panic(err)
+		}
 	}
-
 	return logger.NewZapLogger(log)
 }
