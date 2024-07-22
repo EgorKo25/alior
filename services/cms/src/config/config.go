@@ -1,6 +1,7 @@
 package config
 
 import (
+	"errors"
 	"flag"
 	"github.com/ilyakaznacheev/cleanenv"
 	"os"
@@ -20,23 +21,23 @@ type Config struct {
 	MsgBroker MsgBrokerConfig `yaml:"msgBroker"`
 }
 
-func MustLoad() *Config {
+func Load() (*Config, error) {
 	path := fetchConfigPath()
 
 	if path == "" {
-		panic("Config path is empty")
+		return nil, errors.New("config file path is empty")
 	}
 
 	if _, err := os.Stat(path); os.IsNotExist(err) {
-		panic("Config file does not exist: " + path)
+		return nil, errors.New("Config file does not exist: " + path)
 	}
 
 	var cfg Config
 
 	if err := cleanenv.ReadConfig(path, &cfg); err != nil {
-		panic("Failed to load config: " + err.Error())
+		return nil, errors.New("Failed to load config: " + err.Error())
 	}
-	return &cfg
+	return &cfg, nil
 }
 
 func fetchConfigPath() string {

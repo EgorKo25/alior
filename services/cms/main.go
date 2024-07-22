@@ -22,7 +22,10 @@ func main() {
 	ctx := context.Background()
 
 	// Инициализация config
-	cfg := config.MustLoad()
+	cfg, err := config.Load()
+	if err != nil {
+		panic(err)
+	}
 
 	// Инициализация logger
 	log := SetupLogger(cfg.Env)
