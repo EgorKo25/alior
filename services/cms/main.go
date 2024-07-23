@@ -50,9 +50,9 @@ func main() {
 	// Запуск Consumer'a
 	repo := repository.NewRepository(pool)
 	svc := service.NewCallbackService(repo)
-	err = amqp.Consume(ctx, cfg.MsgBroker.Url, "create", svc)
-	if err != nil {
-		log.Error("failed to start consumer", err)
+	consumer := amqp.NewConsumer(cfg.MsgBroker.Url, "create", svc, log)
+	if err := consumer.Consume(ctx); err != nil {
+		log.Error("Failed to start consumer: %v", err)
 	}
 }
 

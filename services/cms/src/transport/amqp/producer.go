@@ -1,21 +1,39 @@
 package amqp
 
 import (
+	"callback_service/src/logger"
 	"callback_service/src/transport"
 	"context"
 	amqp "github.com/rabbitmq/amqp091-go"
-	"log"
 	"time"
 )
 
-func Produce(ctx context.Context, amqpURL, queueName string, body string) error {
-	conn, err := amqp.Dial(amqpURL)
+type IProducer interface {
+	Produce(ctx context.Context, body string) error
+}
+
+type Producer struct {
+	amqp   string
+	queue  string
+	logger logger.ILogger
+}
+
+func NewProducer(amqpURL, queueName string, logger logger.ILogger) *Producer {
+	return &Producer{
+		amqp:   amqpURL,
+		queue:  queueName,
+		logger: logger,
+	}
+}
+
+func (p *Producer) Produce(ctx context.Context, body string) error {
+	conn, err := amqp.Dial(p.amqp)
 	if err != nil {
 		return err
 	}
 	defer func() {
 		if err := conn.Close(); err != nil {
-			log.Printf("Failed to close connection: %v", err)
+			p.logger.Error("failed to close connection: %v", err)
 		}
 	}()
 
@@ -25,11 +43,11 @@ func Produce(ctx context.Context, amqpURL, queueName string, body string) error 
 	}
 	defer func() {
 		if err := ch.Close(); err != nil {
-			log.Printf("Failed to close channel: %v", err)
+			p.logger.Error("failed to close channel: %v", err)
 		}
 	}()
 
-	q, err := transport.DeclareQueue(ch, queueName)
+	q, err := transport.DeclareQueue(ch, p.queue)
 	if err != nil {
 		return err
 	}
@@ -47,10 +65,10 @@ func Produce(ctx context.Context, amqpURL, queueName string, body string) error 
 			Body:        []byte(body),
 		})
 	if err != nil {
-		log.Printf("Failed to produce notification")
+		p.logger.Error("failed to produce notification")
 	}
 
-	log.Printf(" [x] Sent %s\n", body)
+	p.logger.Info(" [x] Sent %s\n", body)
 
 	return nil
 }

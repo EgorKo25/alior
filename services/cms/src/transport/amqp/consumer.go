@@ -1,23 +1,43 @@
 package amqp
 
 import (
+	"callback_service/src/logger"
 	"callback_service/src/repository"
 	"callback_service/src/service"
 	"callback_service/src/transport"
 	"context"
 	"encoding/json"
 	amqp "github.com/rabbitmq/amqp091-go"
-	"log"
 )
 
-func Consume(ctx context.Context, amqpURL, queueName string, svc *service.CallbackService) error {
-	conn, err := amqp.Dial(amqpURL)
+type IConsumer interface {
+	Consume(ctx context.Context) error
+}
+
+type Consumer struct {
+	amqp    string
+	queue   string
+	service *service.CallbackService
+	logger  logger.ILogger
+}
+
+func NewConsumer(amqpURL, queueName string, svc *service.CallbackService, logger logger.ILogger) *Consumer {
+	return &Consumer{
+		amqp:    amqpURL,
+		queue:   queueName,
+		service: svc,
+		logger:  logger,
+	}
+}
+
+func (c Consumer) Consume(ctx context.Context) error {
+	conn, err := amqp.Dial(c.amqp)
 	if err != nil {
 		return err
 	}
 	defer func() {
 		if err := conn.Close(); err != nil {
-			log.Printf("Failed to close connection: %v", err)
+			c.logger.Error("Failed to close connection: %v", err)
 		}
 	}()
 
@@ -27,11 +47,11 @@ func Consume(ctx context.Context, amqpURL, queueName string, svc *service.Callba
 	}
 	defer func() {
 		if err := ch.Close(); err != nil {
-			log.Printf("Failed to close channel: %v", err)
+			c.logger.Error("Failed to close channel: %v", err)
 		}
 	}()
 
-	q, err := transport.DeclareQueue(ch, queueName)
+	q, err := transport.DeclareQueue(ch, c.queue)
 	if err != nil {
 		return err
 	}
@@ -53,25 +73,26 @@ func Consume(ctx context.Context, amqpURL, queueName string, svc *service.Callba
 
 	go func() {
 		for d := range msgs {
-			log.Printf("Received a message: %s", d.Body)
+			c.logger.Info("Received a message: %s", d.Body)
 
 			var msg repository.Callback
 			if err := json.Unmarshal(d.Body, &msg); err != nil {
-				log.Printf("Failed to unmarshal message: %v", err)
+				c.logger.Error("failed to unmarshal message: %v", err)
 				continue
 			}
 
-			if err := svc.CreateCallback(ctx, msg.Name, msg.Phone, msg.Type, msg.Idea); err != nil {
-				log.Printf("Failed to create callback: %v", err)
+			if err := c.service.CreateCallback(ctx, msg.Name, msg.Phone, msg.Type, msg.Idea); err != nil {
+				c.logger.Error("failed to create callback: %v", err)
 			}
 
-			if err := Produce(ctx, amqpURL, "notify", "new callback"); err != nil {
-				log.Printf("Failed to send notification: %v", err)
+			producer := NewProducer(c.amqp, c.queue, c.logger)
+			if err := producer.Produce(ctx, "new callback"); err != nil {
+				c.logger.Error("failed to send notification: %v", err)
 			}
 		}
 	}()
 
-	log.Printf("Waiting for messages. To exit press CTRL+C")
+	c.logger.Info("Waiting for messages. To exit press CTRL+C")
 	<-forever
 
 	return nil
