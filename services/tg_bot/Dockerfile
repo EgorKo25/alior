@@ -18,7 +18,7 @@ COPY --from=base /usr/local/bin/ /usr/local/bin/
 ENV PYTHONUNBUFFERED 1
 ENV PYTHONDONTWRITEBYTECODE 1
 
-COPY . /tn_service
-WORKDIR /tn_service
+COPY . /tg_bot
+WORKDIR /tg_bot
 
 CMD ["python3", "main.py"]

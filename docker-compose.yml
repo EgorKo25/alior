@@ -33,5 +33,10 @@ services:
     volumes:
       - ./services/cms/logs:/app/logs
 
+  tg_bot:
+    build: ./services/tg_bot
+    depends_on:
+      - cms
+
 volumes:
   pgdata:
