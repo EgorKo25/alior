@@ -15,6 +15,7 @@ func upCreateTableServices(ctx context.Context, tx *sql.Tx) error {
 	_, err := tx.ExecContext(ctx, `
 		CREATE TABLE services (
 			id SERIAL PRIMARY KEY,
+			name VARCHAR(255),
     		description TEXT,
     		price NUMERIC CHECK (price >= 0)
 		);

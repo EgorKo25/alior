@@ -6,3 +6,4 @@ services/tn_service/venv/
 .isort.cfg
 alembic/versions/*.pyc
 .idea/
+.golangci.yml
