@@ -8,15 +8,14 @@ import (
 )
 
 func main() {
-
 	ctx := context.Background()
-	connString := ""
+	connString := "postgres://postgres:postgres@localhost:5432/postgres?sslmode=disable"
 	migrationDir := "."
 	DB, err := database.NewDB(ctx, connString, migrationDir)
 	if err != nil {
 		log.Fatal(err)
 	}
-	ser := &types.Service{ID: 1}
+	ser := &types.Service{ID: 1, Name: "serv1", Description: "desc1", Price: 2}
 	id, err := DB.InsertService(ctx, ser)
 	if err != nil {
 		log.Fatal(err)
@@ -26,4 +25,8 @@ func main() {
 		log.Fatal(err)
 	}
 	log.Println(ser2.Name)
+	servs, err := DB.GetPaginatedServices(ctx, 2, 3)
+	for _, service := range servs {
+		log.Println(service.Name, service.ID)
+	}
 }

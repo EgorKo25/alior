@@ -13,7 +13,7 @@ type DB struct {
 	pool *pgxpool.Pool
 }
 
-func NewDB(ctx context.Context, connString string, migrationDir string) (*DB, error) {
+func NewDB(ctx context.Context, connString, migrationDir string) (*DB, error) {
 	pool, err := pgxpool.New(ctx, connString)
 	if err != nil {
 		return nil, err
@@ -28,16 +28,53 @@ func NewDB(ctx context.Context, connString string, migrationDir string) (*DB, er
 }
 
 func (db *DB) InsertService(ctx context.Context, service *types.Service) (int32, error) {
-	query := `INSERT INTO $1
-    (description, price) VALUES ($2, $3, $4) RETURNING id`
-	tablePath := `services.public.services` // TODO: Брать путь из переменных окружения
-	return service.ID, db.pool.QueryRow(ctx, query, tablePath, service.Name, service.Description, service.Price).Scan(&service.ID)
+	query := `INSERT INTO services
+    (name, description, price) VALUES ($1, $2, $3) RETURNING id`
+	// tablePath := `postgres.public.postgres` // TODO: Брать путь из переменных окружения
+	return service.ID, db.pool.QueryRow(ctx, query, service.Name, service.Description, service.Price).Scan(&service.ID)
 }
 
-func (d *DB) GetServiceByID(ctx context.Context, id int32) (*types.Service, error) {
-	tablePath := `services.public.services`
-	query := `SELECT name, description, price FROM $1 WHERE id = $2`
+func (db *DB) GetServiceByID(ctx context.Context, id int32) (*types.Service, error) {
+	// tablePath := `postgres.public.postgres`
+	query := `SELECT name, description, price FROM services WHERE id = $1`
 	service := &types.Service{ID: id}
 
-	return service, d.pool.QueryRow(ctx, query, tablePath, id).Scan(&service.Name, &service.Description, &service.Price)
+	return service, db.pool.QueryRow(ctx, query, id).Scan(&service.Name, &service.Description, &service.Price)
+}
+
+func (db *DB) DelServiceByID(ctx context.Context, id int32) error {
+	// tablePath := `postgres.public.postgres`
+	query := `DELETE FROM services WHERE id = $1`
+	_, err := db.pool.Exec(ctx, query, id)
+
+	return err
+}
+
+func (db *DB) GetPaginatedServices(ctx context.Context, limit, offset int32) ([]*types.Service, error) {
+	query := `SELECT id, name, description, price
+	FROM services ORDER BY id LIMIT $1 OFFSET $2`
+	rows, err := db.pool.Query(ctx, query, limit, offset)
+
+	if err != nil {
+		return nil, err
+	}
+
+	defer rows.Close()
+
+	services := make([]*types.Service, 0, limit)
+
+	for rows.Next() {
+		var service types.Service
+		if err := rows.Scan(&service.ID, &service.Name, &service.Description, &service.Price); err != nil {
+			return nil, err
+		}
+
+		services = append(services, &service)
+	}
+
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+
+	return services, nil
 }
