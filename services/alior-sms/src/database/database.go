@@ -5,7 +5,7 @@ import (
 
 	"github.com/jackc/pgx/v5/pgxpool"
 
-	_ "alior-sms/migrations"
+	_ "alior-sms/migrations" // линтер жалуется, но это нужно, чтобы MigrateDatabase работал
 	"alior-sms/src/types"
 )
 
@@ -30,12 +30,10 @@ func NewDB(ctx context.Context, connString, migrationDir string) (*DB, error) {
 func (db *DB) InsertService(ctx context.Context, service *types.Service) (int32, error) {
 	query := `INSERT INTO services
     (name, description, price) VALUES ($1, $2, $3) RETURNING id`
-	// tablePath := `postgres.public.postgres` // TODO: Брать путь из переменных окружения
 	return service.ID, db.pool.QueryRow(ctx, query, service.Name, service.Description, service.Price).Scan(&service.ID)
 }
 
 func (db *DB) GetServiceByID(ctx context.Context, id int32) (*types.Service, error) {
-	// tablePath := `postgres.public.postgres`
 	query := `SELECT name, description, price FROM services WHERE id = $1`
 	service := &types.Service{ID: id}
 
@@ -43,7 +41,6 @@ func (db *DB) GetServiceByID(ctx context.Context, id int32) (*types.Service, err
 }
 
 func (db *DB) DelServiceByID(ctx context.Context, id int32) error {
-	// tablePath := `postgres.public.postgres`
 	query := `DELETE FROM services WHERE id = $1`
 	_, err := db.pool.Exec(ctx, query, id)
 

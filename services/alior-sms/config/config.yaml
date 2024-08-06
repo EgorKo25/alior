@@ -2,11 +2,12 @@ service: Alior-sms
 version: 0.0.1
 
 databases:
-  services:
+  smsDatabase:
     engine: postgres
     host: localhost
     port: 5432
-    database: services
-    user: services
-    password: aliorServices
+    sslmode: disable
+    dbName: postgres
+    dbUser: postgres
+    dbPassword: postgres
     
