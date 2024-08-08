@@ -1,21 +1,31 @@
 package service
 
 import (
-	"callback_service/src/broker"
 	"callback_service/src/database"
-	"callback_service/src/logger"
 	"context"
 	"encoding/json"
-	"fmt"
 )
 
-type CMS struct {
-	broker  broker.IBroker
-	storage database.ICallback
-	logger  logger.ILogger
+type IBroker interface {
+	Consume(ctx context.Context, queueName string, handler func(context.Context, []byte) error) error
+	Produce(ctx context.Context, queueName string, body []byte) error
 }
 
-func NewCMS(broker broker.IBroker, storage database.ICallback, logger logger.ILogger) *CMS {
+type ICallback interface {
+	CreateCallback(ctx context.Context, data database.Callback) error
+}
+
+type ILogger interface {
+	Error(msg string, args ...interface{})
+}
+
+type CMS struct {
+	broker  IBroker
+	storage ICallback
+	logger  ILogger
+}
+
+func NewCMS(broker IBroker, storage ICallback, logger ILogger) *CMS {
 	return &CMS{
 		broker:  broker,
 		storage: storage,
@@ -40,7 +50,7 @@ func (c *CMS) handleMessage(ctx context.Context, body []byte) error {
 		return c.broker.Produce(ctx, "error", []byte(err.Error()))
 	}
 
-	successMsg := fmt.Sprintf("Callback created successfully")
+	successMsg := "Callback created successfully"
 	return c.broker.Produce(ctx, "success", []byte(successMsg))
 }
 

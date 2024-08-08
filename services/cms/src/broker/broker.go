@@ -1,12 +1,16 @@
 package broker
 
 import (
-	"callback_service/src/logger"
 	"context"
 	"time"
 
 	amqp "github.com/rabbitmq/amqp091-go"
 )
+
+type ILogger interface {
+	Info(msg string, args ...interface{})
+	Error(msg string, args ...interface{})
+}
 
 type IBroker interface {
 	Consume(ctx context.Context, queueName string, handler func(context.Context, []byte) error) error
@@ -15,10 +19,10 @@ type IBroker interface {
 
 type Broker struct {
 	Url    string
-	logger logger.ILogger
+	logger ILogger
 }
 
-func NewBroker(Url string, logger logger.ILogger) IBroker {
+func NewBroker(Url string, logger ILogger) IBroker {
 	return &Broker{
 		Url:    Url,
 		logger: logger,
