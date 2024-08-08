@@ -1,6 +1,0 @@
-env: "prod"
-db:
-  postgresql_url: postgres://user:password@postgres:5432/db?sslmode=disable
-msgBroker:
-  rabbitmq_url: amqp://guest:guest@localhost:5672/
-

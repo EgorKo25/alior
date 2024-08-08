@@ -16,7 +16,6 @@ type MsgBrokerConfig struct {
 }
 
 type Config struct {
-	Env       string          `yaml:"env" env-default:"local"`
 	Database  DatabaseConfig  `yaml:"db"`
 	MsgBroker MsgBrokerConfig `yaml:"msgBroker"`
 }

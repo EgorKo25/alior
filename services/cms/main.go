@@ -1,20 +1,13 @@
 package main
 
 import (
+	"callback_service/src/broker"
 	"callback_service/src/config"
+	"callback_service/src/database"
 	"callback_service/src/logger"
-	"callback_service/src/migrator"
 	"callback_service/src/repository"
 	"callback_service/src/service"
-	"callback_service/src/transport/amqp"
 	"context"
-	"github.com/jackc/pgx/v5/pgxpool"
-	"go.uber.org/zap"
-)
-
-const (
-	envLocal = "local"
-	envProd  = "prod"
 )
 
 func main() {
@@ -28,49 +21,27 @@ func main() {
 	}
 
 	// Инициализация logger
-	log := SetupLogger(cfg.Env)
-
-	log.Info("Starting Callback service")
-	log.Info("env: ", cfg.Env)
-	log.Info("Database url", cfg.Database.Url)
-	log.Info("MsgBroker url", cfg.MsgBroker.Url)
-	log.Info("cfg", cfg)
+	log := logger.NewZapLogger()
+	log.Info("Config: ", cfg)
 
 	// Иициализация БД
-	pool, err := pgxpool.New(ctx, cfg.Database.Url)
+	db, err := database.New(ctx, cfg)
 	if err != nil {
-		log.Error("failed to connect to database", err)
+		log.Fatal("failed to initialize database: %v", err)
 	}
+	defer db.Close()
 
-	err = database.MigrateDatabase(pool)
-	if err != nil {
-		log.Error("migrations failed", err)
+	/// Инициализация репозитория
+	repo := repository.NewRepository(db)
+
+	// Инициализация брокера
+	b := broker.NewBroker(cfg.MsgBroker.Url, log)
+
+	// Инициализация сервиса
+	cms := service.NewCMS(b, repo, log)
+
+	// Запуск приложения
+	if err := cms.Run(ctx); err != nil {
+		log.Fatal("failed to run CMS service: %v", err)
 	}
-
-	// Запуск Consumer'a
-	repo := repository.NewRepository(pool)
-	svc := service.NewCallbackService(repo)
-	consumer := amqp.NewConsumer(cfg.MsgBroker.Url, "create", svc, log)
-	if err := consumer.Consume(ctx); err != nil {
-		log.Error("Failed to start consumer: %v", err)
-	}
-}
-
-func SetupLogger(env string) logger.ILogger {
-	var log *zap.Logger
-	var err error
-
-	switch env {
-	case envLocal:
-		log, err = logger.NewDevLogger()
-		if err != nil {
-			panic(err)
-		}
-	case envProd:
-		log, err = logger.NewProdLogger()
-		if err != nil {
-			panic(err)
-		}
-	}
-	return logger.NewZapLogger(log)
 }

@@ -6,8 +6,8 @@ import (
 	"os"
 )
 
-func NewDevLogger() (*zap.Logger, error) {
-	encoderCfg := zap.NewDevelopmentEncoderConfig()
+func SetupLogger() (*zap.Logger, error) {
+	encoderCfg := zap.NewProductionEncoderConfig()
 	encoderCfg.TimeKey = "timestamp"
 	encoderCfg.EncodeTime = zapcore.ISO8601TimeEncoder
 
@@ -15,20 +15,30 @@ func NewDevLogger() (*zap.Logger, error) {
 	if err != nil {
 		return nil, err
 	}
-	debugFile, _ := os.Create("logs/debug.log")
-	errorFile, _ := os.Create("logs/error.log")
-	infoFile, _ := os.Create("logs/info.log")
+
+	debugFile, err := os.Create("logs/debug.log")
+	if err != nil {
+		return nil, err
+	}
+	errorFile, err := os.Create("logs/error.log")
+	if err != nil {
+		return nil, err
+	}
+	infoFile, err := os.Create("logs/info.log")
+	if err != nil {
+		return nil, err
+	}
 
 	debugWS := zapcore.AddSync(debugFile)
 	errorWS := zapcore.AddSync(errorFile)
 	infoWS := zapcore.AddSync(infoFile)
 
 	debugLevel := zap.LevelEnablerFunc(func(lvl zapcore.Level) bool {
-		return lvl <= zap.DebugLevel
+		return lvl == zap.DebugLevel
 	})
 
 	errorLevel := zap.LevelEnablerFunc(func(lvl zapcore.Level) bool {
-		return lvl >= zap.WarnLevel
+		return lvl >= zap.ErrorLevel
 	})
 
 	infoLevel := zap.LevelEnablerFunc(func(lvl zapcore.Level) bool {
@@ -37,7 +47,7 @@ func NewDevLogger() (*zap.Logger, error) {
 
 	consoleDebugging := zapcore.Lock(os.Stderr)
 
-	encoder := zapcore.NewConsoleEncoder(encoderCfg)
+	encoder := zapcore.NewJSONEncoder(encoderCfg)
 
 	core := zapcore.NewTee(
 		zapcore.NewCore(encoder, consoleDebugging, zapcore.DebugLevel),

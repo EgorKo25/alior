@@ -17,7 +17,8 @@ type Logger struct {
 	logger *zap.Logger
 }
 
-func NewZapLogger(logger *zap.Logger) ILogger {
+func NewZapLogger() ILogger {
+	logger, _ := SetupLogger()
 	return &Logger{
 		logger: logger,
 	}

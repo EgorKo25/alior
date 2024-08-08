@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"callback_service/src/database"
 	"context"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
@@ -21,8 +22,8 @@ type Callback struct {
 	Idea  string `db:"idea"`
 }
 
-func NewRepository(db *pgxpool.Pool) IRepository {
-	return &CallbackRepository{db: db}
+func NewRepository(db *database.Database) IRepository {
+	return &CallbackRepository{db: db.Pool}
 }
 
 func (r *CallbackRepository) CreateCallback(ctx context.Context, data Callback) error {
