@@ -13,8 +13,12 @@ type DB struct {
 	pool *pgxpool.Pool
 }
 
-func NewDB(ctx context.Context, connString, migrationDir string) (*DB, error) {
-	pool, err := pgxpool.New(ctx, connString)
+type ConfigDatabase interface {
+	GetConnString() string
+}
+
+func NewDB(ctx context.Context, cfgDB ConfigDatabase, migrationDir string) (*DB, error) {
+	pool, err := pgxpool.New(ctx, cfgDB.GetConnString())
 	if err != nil {
 		return nil, err
 	}

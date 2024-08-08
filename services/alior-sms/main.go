@@ -1,51 +1,57 @@
 package main
 
 import (
-	"alior-sms/src/config"
-	"alior-sms/src/database"
-	"alior-sms/src/types"
+	"alior-sms/src/broker"
+	"bufio"
 	"context"
-	"log"
+	"fmt"
+	"io"
+	"os"
 )
 
+// read is this application's translation to the message format, scanning from
+// stdin.
+func read(r io.Reader) <-chan []byte {
+	lines := make(chan []byte)
+	go func() {
+		defer close(lines)
+		scan := bufio.NewScanner(r)
+		for scan.Scan() {
+			lines <- []byte(scan.Bytes())
+		}
+	}()
+	return lines
+}
+
+// write is this application's subscriber of application messages, printing to
+// stdout.
+func write(w io.Writer) chan<- []byte {
+	lines := make(chan []byte)
+	go func() {
+		for line := range lines {
+			fmt.Fprintln(w, string(line))
+		}
+	}()
+	return lines
+}
+
 func main() {
-	cfg, err := config.LoadConfig()
+	/*cfg, err := config.LoadConfig()
 	if err != nil {
 		log.Fatal(err)
-	}
+	}*/
 
-	connString := config.BuildConnString(&cfg.Databases.SMSDatabase)
+	ctx, done := context.WithCancel(context.Background())
 
-	ctx := context.Background()
+	uri := "amqp://guest:guest@localhost:5672/"
+	go func() {
+		broker.Publish(broker.Redial(ctx, uri, "Notify", "fanout", "", "Notify_queue"), read(os.Stdin))
+		done()
+	}()
 
-	migrationDir := "."
-
-	DB, err := database.NewDB(ctx, connString, migrationDir)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	ser := &types.Service{ID: 1, Name: "serv1", Description: "desc1", Price: 2}
-	id, err := DB.InsertService(ctx, ser)
-
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	ser2, err := DB.GetServiceByID(ctx, id)
-
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	log.Println(ser2.Name)
-	servs, err := DB.GetPaginatedServices(ctx, 2, 3)
-
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	for _, service := range servs {
-		log.Println(service.Name, service.ID)
-	}
+	go func() {
+		broker.Subscribe(broker.Redial(ctx, uri, "Notify", "fanout", "", "Notify_queue"), write(os.Stdout))
+		done()
+	}()
+	<-ctx.Done()
 }

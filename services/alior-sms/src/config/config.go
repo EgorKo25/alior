@@ -21,7 +21,7 @@ type Database struct {
 
 type Config struct {
 	Databases struct {
-		SMSDatabase Database `yaml:"smsDatabase"`
+		SMSDatabase *Database `yaml:"smsDatabase"`
 	} `yaml:"databases"`
 }
 
@@ -51,7 +51,7 @@ func LoadConfig() (*Config, error) {
 
 // TODO: Переделать как-нибудь (мб в качестве аргумента брать конфиг)
 // А еще лучше наверное это вынести в database.go, куда передовать конфиг - хз.
-func BuildConnString(db *Database) string {
+func (db *Database) GetConnString() string {
 	return fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=%s",
 		db.Host, db.Port, db.User, db.UserPassword, db.DatabaseName, db.SSLMode)
 }
