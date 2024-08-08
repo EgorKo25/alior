@@ -1543,18 +1543,9 @@ video {
   --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to);
 }
 
-.from-0\% {
-  --tw-gradient-from-position: 0%;
-}
-
-.via-orange-100\/70 {
-  --tw-gradient-to: rgb(255 182 97 / 0)  var(--tw-gradient-to-position);
-  --tw-gradient-stops: var(--tw-gradient-from), rgb(255 182 97 / 0.7) var(--tw-gradient-via-position), var(--tw-gradient-to);
-}
-
-.via-orange-100\/60 {
-  --tw-gradient-to: rgb(255 182 97 / 0)  var(--tw-gradient-to-position);
-  --tw-gradient-stops: var(--tw-gradient-from), rgb(255 182 97 / 0.6) var(--tw-gradient-via-position), var(--tw-gradient-to);
+.via-black\/30 {
+  --tw-gradient-to: rgb(0 0 0 / 0)  var(--tw-gradient-to-position);
+  --tw-gradient-stops: var(--tw-gradient-from), rgb(0 0 0 / 0.3) var(--tw-gradient-via-position), var(--tw-gradient-to);
 }
 
 .via-blue-100\/60 {
@@ -1562,22 +1553,9 @@ video {
   --tw-gradient-stops: var(--tw-gradient-from), rgb(134 167 252 / 0.6) var(--tw-gradient-via-position), var(--tw-gradient-to);
 }
 
-.via-black\/60 {
-  --tw-gradient-to: rgb(0 0 0 / 0)  var(--tw-gradient-to-position);
-  --tw-gradient-stops: var(--tw-gradient-from), rgb(0 0 0 / 0.6) var(--tw-gradient-via-position), var(--tw-gradient-to);
-}
-
-.via-black\/30 {
-  --tw-gradient-to: rgb(0 0 0 / 0)  var(--tw-gradient-to-position);
-  --tw-gradient-stops: var(--tw-gradient-from), rgb(0 0 0 / 0.3) var(--tw-gradient-via-position), var(--tw-gradient-to);
-}
-
-.via-\[percentage\:15\%_85\%\] {
-  --tw-gradient-via-position: 15% 85%;
-}
-
-.via-\[percentage\:15\%_75\%\] {
-  --tw-gradient-via-position: 15% 75%;
+.via-orange-100\/60 {
+  --tw-gradient-to: rgb(255 182 97 / 0)  var(--tw-gradient-to-position);
+  --tw-gradient-stops: var(--tw-gradient-from), rgb(255 182 97 / 0.6) var(--tw-gradient-via-position), var(--tw-gradient-to);
 }
 
 .via-\[percentage\:20\%_70\%\] {
@@ -1586,10 +1564,6 @@ video {
 
 .to-transparent {
   --tw-gradient-to: rgba(0,0,0,0) var(--tw-gradient-to-position);
-}
-
-.to-0\% {
-  --tw-gradient-to-position: 0%;
 }
 
 .fill-accent {
@@ -1817,6 +1791,10 @@ video {
 
 * {
   font-family: "Rubik", sans-serif;
+}
+
+body {
+  overflow-x: hidden;
 }
 
 @media (min-width: 768px) {
@@ -2711,24 +2689,19 @@ video {
     left: 4%;
   }
 
+  .xl\:mx-24 {
+    margin-left: 6rem;
+    margin-right: 6rem;
+  }
+
   .xl\:mx-28 {
     margin-left: 7rem;
     margin-right: 7rem;
   }
 
-  .xl\:mx-\[100px\] {
-    margin-left: 100px;
-    margin-right: 100px;
-  }
-
   .xl\:mx-5 {
     margin-left: 1.25rem;
     margin-right: 1.25rem;
-  }
-
-  .xl\:mx-24 {
-    margin-left: 6rem;
-    margin-right: 6rem;
   }
 
   .xl\:mb-10 {
@@ -2783,24 +2756,16 @@ video {
     width: 874px;
   }
 
-  .xl\:w-\[40\%\] {
-    width: 40%;
-  }
-
   .xl\:w-\[42vw\] {
     width: 42vw;
   }
 
-  .xl\:w-\[70\%\] {
-    width: 70%;
-  }
-
-  .xl\:w-\[45\%\] {
-    width: 45%;
-  }
-
   .xl\:w-\[43\%\] {
     width: 43%;
+  }
+
+  .xl\:w-\[70\%\] {
+    width: 70%;
   }
 
   .xl\:flex-row {

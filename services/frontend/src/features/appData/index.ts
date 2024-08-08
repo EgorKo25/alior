@@ -1,1 +1,5 @@
-export { ServiceCardsData, FeaturesThesesData } from "./appData";
+export {
+  ServiceCardsData,
+  FeaturesThesesData,
+  ProjectsDummyData,
+} from "./appData";

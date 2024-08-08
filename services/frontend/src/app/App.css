@@ -173,3 +173,7 @@
 * {
   @apply font-rubik;
 }
+
+body {
+  overflow-x: hidden;
+}
