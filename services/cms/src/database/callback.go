@@ -1,17 +1,11 @@
-package repository
+package database
 
 import (
-	"callback_service/src/database"
 	"context"
-	"github.com/jackc/pgx/v5/pgxpool"
 )
 
-type IRepository interface {
+type ICallback interface {
 	CreateCallback(ctx context.Context, data Callback) error
-}
-
-type CallbackRepository struct {
-	db *pgxpool.Pool
 }
 
 type Callback struct {
@@ -22,12 +16,8 @@ type Callback struct {
 	Idea  string `db:"idea"`
 }
 
-func NewRepository(db *database.Database) IRepository {
-	return &CallbackRepository{db: db.Pool}
-}
-
-func (r *CallbackRepository) CreateCallback(ctx context.Context, data Callback) error {
-	_, err := r.db.Exec(ctx, `
+func (d *Database) CreateCallback(ctx context.Context, data Callback) error {
+	_, err := d.Pool.Exec(ctx, `
         INSERT INTO callbacks (name, phone, type, idea) 
         VALUES ($1, $2, $3, $4)`,
 		data.Name, data.Phone, data.Type, data.Idea)

@@ -106,7 +106,7 @@ func (b *Broker) Produce(ctx context.Context, queueName string, body []byte) err
 		return err
 	}
 
-	ctxWTO, cancel := context.WithTimeout(ctx, 5*time.Second)
+	ctxWTO, cancel := context.WithTimeout(ctx, 1*time.Second)
 	defer cancel()
 
 	err = ch.PublishWithContext(ctxWTO,

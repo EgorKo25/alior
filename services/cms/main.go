@@ -5,7 +5,6 @@ import (
 	"callback_service/src/config"
 	"callback_service/src/database"
 	"callback_service/src/logger"
-	"callback_service/src/repository"
 	"callback_service/src/service"
 	"context"
 )
@@ -24,21 +23,18 @@ func main() {
 	log := logger.NewZapLogger()
 	log.Info("Config: ", cfg)
 
-	// Иициализация БД
+	// Инициализация БД
 	db, err := database.New(ctx, cfg)
 	if err != nil {
 		log.Fatal("failed to initialize database: %v", err)
 	}
 	defer db.Close()
 
-	/// Инициализация репозитория
-	repo := repository.NewRepository(db)
-
 	// Инициализация брокера
 	b := broker.NewBroker(cfg.MsgBroker.Url, log)
 
 	// Инициализация сервиса
-	cms := service.NewCMS(b, repo, log)
+	cms := service.NewCMS(b, db, log)
 
 	// Запуск приложения
 	if err := cms.Run(ctx); err != nil {

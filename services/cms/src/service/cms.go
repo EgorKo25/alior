@@ -2,8 +2,8 @@ package service
 
 import (
 	"callback_service/src/broker"
+	"callback_service/src/database"
 	"callback_service/src/logger"
-	"callback_service/src/repository"
 	"context"
 	"encoding/json"
 	"fmt"
@@ -11,11 +11,11 @@ import (
 
 type CMS struct {
 	broker  broker.IBroker
-	storage repository.IRepository
+	storage database.ICallback
 	logger  logger.ILogger
 }
 
-func NewCMS(broker broker.IBroker, storage repository.IRepository, logger logger.ILogger) *CMS {
+func NewCMS(broker broker.IBroker, storage database.ICallback, logger logger.ILogger) *CMS {
 	return &CMS{
 		broker:  broker,
 		storage: storage,
@@ -44,11 +44,11 @@ func (c *CMS) handleMessage(ctx context.Context, body []byte) error {
 	return c.broker.Produce(ctx, "success", []byte(successMsg))
 }
 
-func convertToRepositoryAndValidate(callbackSrc []byte) (repository.Callback, error) {
-	var callback repository.Callback
+func convertToRepositoryAndValidate(callbackSrc []byte) (database.Callback, error) {
+	var callback database.Callback
 	err := json.Unmarshal(callbackSrc, &callback)
 	if err != nil {
-		return repository.Callback{}, err
+		return database.Callback{}, err
 	}
 	return callback, nil
 }

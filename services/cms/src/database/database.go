@@ -34,6 +34,6 @@ func runMigrations(pool *pgxpool.Pool) error {
 	return goose.Up(db, "migrations")
 }
 
-func (db *Database) Close() {
-	db.Pool.Close()
+func (d *Database) Close() {
+	d.Pool.Close()
 }
