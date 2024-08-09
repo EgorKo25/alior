@@ -12,7 +12,7 @@ type IBroker interface {
 }
 
 type ICallback interface {
-	CreateCallback(ctx context.Context, data database.Callback) error
+	CreateCallback(ctx context.Context, data *database.Callback) error
 }
 
 type ILogger interface {
@@ -54,11 +54,11 @@ func (c *CMS) handleMessage(ctx context.Context, body []byte) error {
 	return c.broker.Produce(ctx, "success", []byte(successMsg))
 }
 
-func convertToRepositoryAndValidate(callbackSrc []byte) (database.Callback, error) {
+func convertToRepositoryAndValidate(callbackSrc []byte) (*database.Callback, error) {
 	var callback database.Callback
 	err := json.Unmarshal(callbackSrc, &callback)
 	if err != nil {
-		return database.Callback{}, err
+		return nil, err
 	}
-	return callback, nil
+	return &callback, nil
 }

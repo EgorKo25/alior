@@ -17,7 +17,7 @@ type Logger struct {
 	logger *zap.Logger
 }
 
-func NewZapLogger() ILogger {
+func NewZapLogger() *Logger {
 	logger, _ := SetupLogger()
 	return &Logger{
 		logger: logger,
@@ -32,26 +32,21 @@ func formatMessage(msg string, args ...interface{}) string {
 }
 
 func (l *Logger) Debug(msg string, args ...interface{}) {
-	formattedMsg := formatMessage(msg, args...)
-	l.logger.Debug(formattedMsg)
+	l.logger.Debug(formatMessage(msg, args...))
 }
 
 func (l *Logger) Info(msg string, args ...interface{}) {
-	formattedMsg := formatMessage(msg, args...)
-	l.logger.Info(formattedMsg)
+	l.logger.Info(formatMessage(msg, args...))
 }
 
 func (l *Logger) Warn(msg string, args ...interface{}) {
-	formattedMsg := formatMessage(msg, args...)
-	l.logger.Warn(formattedMsg)
+	l.logger.Warn(formatMessage(msg, args...))
 }
 
 func (l *Logger) Error(msg string, args ...interface{}) {
-	formattedMsg := formatMessage(msg, args...)
-	l.logger.Error(formattedMsg)
+	l.logger.Error(formatMessage(msg, args...))
 }
 
 func (l *Logger) Fatal(msg string, args ...interface{}) {
-	formattedMsg := formatMessage(msg, args...)
-	l.logger.Fatal(formattedMsg)
+	l.logger.Fatal(formatMessage(msg, args...))
 }

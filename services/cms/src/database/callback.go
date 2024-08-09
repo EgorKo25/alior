@@ -5,7 +5,7 @@ import (
 )
 
 type ICallback interface {
-	CreateCallback(ctx context.Context, data Callback) error
+	CreateCallback(ctx context.Context, data *Callback) error
 }
 
 type Callback struct {
@@ -16,7 +16,7 @@ type Callback struct {
 	Idea  string `db:"idea"`
 }
 
-func (d *Database) CreateCallback(ctx context.Context, data Callback) error {
+func (d *Database) CreateCallback(ctx context.Context, data *Callback) error {
 	_, err := d.Pool.Exec(ctx, `
         INSERT INTO callbacks (name, phone, type, idea) 
         VALUES ($1, $2, $3, $4)`,

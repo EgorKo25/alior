@@ -4,7 +4,7 @@ import (
 	amqp "github.com/rabbitmq/amqp091-go"
 )
 
-func DeclareQueue(ch *amqp.Channel, queueName string) (amqp.Queue, error) {
+func DeclareQueue(ch *amqp.Channel, queueName string) (*amqp.Queue, error) {
 	q, err := ch.QueueDeclare(
 		queueName, // name
 		true,      // durable
@@ -14,7 +14,7 @@ func DeclareQueue(ch *amqp.Channel, queueName string) (amqp.Queue, error) {
 		nil,       // arguments
 	)
 	if err != nil {
-		return q, err
+		return nil, err
 	}
-	return q, nil
+	return &q, nil
 }

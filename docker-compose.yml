@@ -24,10 +24,7 @@ services:
       - "80:80"
 
   cms:
-    build:
-      context: ./services/cms
-      args:
-        CONFIG_FILE: ${CONFIG_FILE}
+    build: ./services/cms
     depends_on:
       postgres:
         condition: service_healthy

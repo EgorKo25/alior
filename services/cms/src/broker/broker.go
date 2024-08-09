@@ -12,17 +12,12 @@ type ILogger interface {
 	Error(msg string, args ...interface{})
 }
 
-type IBroker interface {
-	Consume(ctx context.Context, queueName string, handler func(context.Context, []byte) error) error
-	Produce(ctx context.Context, queueName string, body []byte) error
-}
-
 type Broker struct {
 	Url    string
 	logger ILogger
 }
 
-func NewBroker(Url string, logger ILogger) IBroker {
+func NewBroker(Url string, logger ILogger) *Broker {
 	return &Broker{
 		Url:    Url,
 		logger: logger,
