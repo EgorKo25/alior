@@ -15,10 +15,6 @@ const SLIDE_BG_GRADIENTS_CONFIG: {
   { colorSchema: "black", bg: "via-black/30" },
 ];
 
-//  0 -- orange
-//  1 -- blue
-//  2 -- black
-
 export const Carousel = () => {
   const [projects, setProjects] = useState<ProjData[]>([]);
   const [isProjectsLoaded, setIsProjectsLoaded] = useState(false);
@@ -60,6 +56,7 @@ export const Carousel = () => {
                 description={project.description}
                 projectUrl={project.url}
                 key={index}
+                isActive={index === activeSlide}
               />
             );
           })}

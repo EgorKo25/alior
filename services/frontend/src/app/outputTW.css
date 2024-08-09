@@ -1,5 +1,5 @@
 /*
-! tailwindcss v3.4.4 | MIT License | https://tailwindcss.com
+! tailwindcss v3.4.9 | MIT License | https://tailwindcss.com
 */
 
 /*
@@ -966,11 +966,6 @@ video {
   z-index: 10;
 }
 
-.mx-2 {
-  margin-left: 0.5rem;
-  margin-right: 0.5rem;
-}
-
 .mx-2\.5 {
   margin-left: 0.625rem;
   margin-right: 0.625rem;
@@ -1023,10 +1018,6 @@ video {
   margin-bottom: 2rem;
 }
 
-.ml-0 {
-  margin-left: 0px;
-}
-
 .ml-0\.5 {
   margin-left: 0.125rem;
 }
@@ -1045,10 +1036,6 @@ video {
 
 .mr-4 {
   margin-right: 1rem;
-}
-
-.mt-0 {
-  margin-top: 0px;
 }
 
 .mt-0\.5 {
@@ -1165,6 +1152,10 @@ video {
   height: 12rem;
 }
 
+.h-500 {
+  height: 500px;
+}
+
 .h-56 {
   height: 14rem;
 }
@@ -1181,8 +1172,16 @@ video {
   height: 24rem;
 }
 
+.h-\[1010px\] {
+  height: 1010px;
+}
+
 .h-\[6em\] {
   height: 6em;
+}
+
+.h-\[980px\] {
+  height: 980px;
 }
 
 .h-fit {
@@ -1236,6 +1235,14 @@ video {
 
 .w-96 {
   width: 24rem;
+}
+
+.w-\[1280px\] {
+  width: 1280px;
+}
+
+.w-\[768px\] {
+  width: 768px;
 }
 
 .w-fit {
@@ -1306,6 +1313,10 @@ video {
 
 .translate-y-2 {
   --tw-translate-y: 0.5rem;
+  transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
+}
+
+.transform {
   transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
 }
 
@@ -2239,6 +2250,10 @@ body {
     right: -1.25rem;
   }
 
+  .md\:-top-\[15\%\] {
+    top: -15%;
+  }
+
   .md\:left-0 {
     left: 0px;
   }
@@ -2353,6 +2368,10 @@ body {
     height: 18rem;
   }
 
+  .md\:h-\[130\%\] {
+    height: 130%;
+  }
+
   .md\:h-\[330px\] {
     height: 330px;
   }
@@ -2375,6 +2394,10 @@ body {
 
   .md\:w-90\% {
     width: 90%;
+  }
+
+  .md\:w-\[50\%\] {
+    width: 50%;
   }
 
   .md\:w-\[55\%\] {
@@ -2764,6 +2787,10 @@ body {
     width: 43%;
   }
 
+  .xl\:w-\[60\%\] {
+    width: 60%;
+  }
+
   .xl\:w-\[70\%\] {
     width: 70%;
   }
@@ -2855,6 +2882,14 @@ body {
 
   .\32xl\:mr-\[5vw\] {
     margin-right: 5vw;
+  }
+
+  .\32xl\:block {
+    display: block;
+  }
+
+  .\32xl\:hidden {
+    display: none;
   }
 
   .\32xl\:h-16 {

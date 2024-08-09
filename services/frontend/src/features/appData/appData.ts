@@ -69,7 +69,7 @@ export const ProjectsDummyData = [
     title: "Unicorn bot",
     description:
       "Бот для управления бронированием в ресторане, который интегрируется с CRM-системой клиента, автоматизируя процессы и снижая нагрузку на персонал",
-    url: "/",
+    url: "https://geodesia.pingco.ru/",
   },
   {
     title: "Get магазин",

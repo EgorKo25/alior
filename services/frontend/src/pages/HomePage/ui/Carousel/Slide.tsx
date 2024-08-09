@@ -1,4 +1,5 @@
 import { ButtonColorSchema, MainButton } from "src/shared/ui/MainButton";
+import { TabletCanvas } from "./ui/TabletCanvas";
 
 const COLOR_SCHEMA_CONFIG: Record<
   string,
@@ -30,7 +31,8 @@ export const Slide: React.FC<{
   title: string;
   description: string;
   projectUrl: string;
-}> = ({ ColorSchema, title, description, projectUrl }) => {
+  isActive: boolean;
+}> = ({ ColorSchema, title, description, projectUrl, isActive }) => {
   return (
     <div
       className={
@@ -38,10 +40,17 @@ export const Slide: React.FC<{
         COLOR_SCHEMA_CONFIG[ColorSchema].background
       }
     >
-      <img
-        src="/images/Rectangle.png"
-        className=" w-full -mt-20 mb-5 overflow-visible md:w-1/2 md:absolute md:-right-5 md:top-1/2 md:translate-y-[-35%]"
-      />
+      {isActive ? (
+        <div className="canvas-wrapper md:w-[50%] md:absolute md:-right-5 h-500 md:h-[130%] md:-top-[15%] xl:w-[60%]">
+          <TabletCanvas url={projectUrl} />
+        </div>
+      ) : (
+        <img
+          src="/images/Rectangle.png"
+          className=" w-full h-500 -mt-20 mb-5 overflow-visible md:w-1/2 md:absolute md:-right-5 md:top-1/2 md:translate-y-[-35%]"
+        />
+      )}
+
       <div className={` flex flex-col gap-10 md:w-[55%] md:mt-10 xl:w-[43%]`}>
         <h2
           className={
