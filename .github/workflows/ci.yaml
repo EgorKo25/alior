@@ -31,9 +31,9 @@ jobs:
       - name: Deploy to GitHub Pages
         uses: bitovi/github-actions-react-to-github-pages@v1.2.4
         with:
-          checkout: true
+          checkout: false
           caching: true
-          path: services/fronted/production
+          path: ./services/fronted/production
 
   build-alior-auth:
     runs-on: ubuntu-latest
