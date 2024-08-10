@@ -30,7 +30,7 @@ jobs:
           npm run build  # Эта команда соберет ваш проект
 
       - name: Deploy to GitHub Pages
-        uses: peaceiris/actions-gh-pages@v4
+        uses: bitovi/github-actions-react-to-github-pages@v1.2.4
         with:
           checkout: true
           caching: true
