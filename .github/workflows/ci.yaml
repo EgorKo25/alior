@@ -34,7 +34,7 @@ jobs:
         with:
           checkout: true
           caching: true
-          path: services/frontend/src
+          path: services/frontend/build
 
   build-alior-auth:
     runs-on: ubuntu-latest
