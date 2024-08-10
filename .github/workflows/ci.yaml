@@ -27,13 +27,18 @@ jobs:
       - name: Build the project
         run: |
           cd services/frontend
-          npm run build  # Эта команда соберет ваш проект
+          npm run build
       - name: Where am I MF
         run: | 
           pwd
           ls
           cd services/frontend/
           ls -la
+
+      - name: List files in build directory
+        run: |
+          cd services/frontend
+          ls -la build  # Проверка наличия файлов в build папке
       - name: Deploy to GitHub Pages
         uses: bitovi/github-actions-react-to-github-pages@v1.2.4
         with:
