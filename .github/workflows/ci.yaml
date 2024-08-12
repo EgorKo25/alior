@@ -12,13 +12,20 @@ jobs:
   bulid-front-to-pages:
     runs-on: ubuntu-latest
     steps:
-      - name: Deploy to GitHub Pages
-        uses: bitovi/github-actions-react-to-github-pages@v1.2.4
+      - name: Checkout the repository
+        uses: actions/checkout@v3
         with:
-          checkout-sparse-checkout: services/frontend
+          sparse-checkout: true
           path: |
             services/frontend
-          caching: true
+
+      - name: Install dependencies
+        run: npm install
+        working-directory: ./services/frontend
+
+      - name: Build the project
+        run: npm run build
+        working-directory: ./services/frontend
 
   build-alior-auth:
     runs-on: ubuntu-latest
