@@ -179,15 +179,6 @@ jobs:
         run: go test -race -vet=off ./...
   deploy-front:
     needs: bulid-front
-
-    permissions:
-      pages: write
-      id-token: write
-
-    environment:
-      name: github-pages
-      url: https://egorko25.github.io/alior
-
     runs-on: ubuntu-latest
     steps:
       - name: Deploy to GitHub Pages
