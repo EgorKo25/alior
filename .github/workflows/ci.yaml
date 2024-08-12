@@ -9,7 +9,7 @@ on:
       - main
 
 jobs:
-  bulid-front-to-pages:
+  bulid-front:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout the repository
@@ -22,6 +22,12 @@ jobs:
       - name: Build the project
         run: npm run build
         working-directory: ./services/frontend
+
+      - run: |
+          pwd
+          ls
+          cd services/frontend/production
+          ls -la 
 
       - name: Archive artifact
         shell: sh
@@ -171,7 +177,7 @@ jobs:
 
       - name: Run tests
         run: go test -race -vet=off ./...
-  deploy-front-to-page:
+  deploy-front-:
     needs: bulid-front-to-pages
 
     permissions:
