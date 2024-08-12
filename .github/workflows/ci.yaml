@@ -18,7 +18,7 @@ jobs:
       - name: Deploy to GitHub Pages
         uses: bitovi/github-actions-react-to-github-pages@v1.2.4
         with:
-          path: ./services/frontend
+          checkout_filter: ./service/frontend
           checkout: true
           caching: false
           install_command: npm install
