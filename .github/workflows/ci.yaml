@@ -18,15 +18,15 @@ jobs:
           sparse-checkout: true
           path: |
             services/frontend
-
+      - run: |
+          pwd
+          ls -la
+        working-directory: ./services/frontend
       - name: Install dependencies
         run: npm install
         working-directory: ./services/frontend
 
-      - run: | 
-          pwd
-          ls -la
-        working-directory: ./services/frontend
+
       - name: Build the project
         run: npm run build
         working-directory: ./services/frontend
