@@ -191,9 +191,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
-
+        uses: actions/actions-gh-pages@v3
+        with:
+          github_token: $({secrets.GITHUB_TOKEN})
+          publish_dir: ./dist
   start-qa-test:
     needs:
       - check-tests-alior-api-gw
