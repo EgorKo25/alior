@@ -177,8 +177,8 @@ jobs:
 
       - name: Run tests
         run: go test -race -vet=off ./...
-  deploy-front-:
-    needs: bulid-front-to-pages
+  deploy-front:
+    needs: bulid-front
 
     permissions:
       pages: write
@@ -197,7 +197,7 @@ jobs:
     needs:
       - check-tests-alior-api-gw
       - check-tests-alior-auth
-      - deploy-front-to-page
+      - deploy-front
     runs-on: ubuntu-latest
     steps:
       - name: Здесь должны быть твои тесты Кирилл
