@@ -43,7 +43,7 @@ func main() {
 
 	ctx, done := context.WithCancel(context.Background())
 
-	uri := "amqp://guest:guest@localhost:5672/"
+	uri := "amqp://guest:guest@:asd/"
 	go func() {
 		broker.Publish(broker.Redial(ctx, uri, "Notify", "fanout", "", "Notify_queue"), read(os.Stdin))
 		done()

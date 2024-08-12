@@ -3,125 +3,140 @@ package broker
 import (
 	"context"
 	"log"
+	"time"
 
 	"github.com/streadway/amqp"
 )
 
-type AMQPSession struct {
-	*amqp.Connection
-	*amqp.Channel
-	exchangeName string
-	exchangeType string
-	routingKey   string
-	queueName    string
+//go:generate go run github.com/vektra/mockery/v2@v2.44.1 --name IConnection
+type IConnection interface {
+	Channel() (*amqp.Channel, error)
+	Close() error
 }
 
-func (c *AMQPSession) Close() error {
+//go:generate go run github.com/vektra/mockery/v2@v2.44.1 --name IChannel
+type IChannel interface {
+	Publish(exchange, key string, mandatory, immediate bool, msg amqp.Publishing) error
+	Confirm(noWait bool) error
+	NotifyPublish(confirm chan amqp.Confirmation) chan amqp.Confirmation
+	QueueDeclare(name string, durable, autoDelete, exclusive, noWait bool, args amqp.Table) (amqp.Queue, error)
+	QueueBind(name, key, exchange string, noWait bool, args amqp.Table) error
+	Consume(queue, consumer string, autoAck, exclusive, noLocal, noWait bool, args amqp.Table) (<-chan amqp.Delivery, error)
+	Ack(tag uint64, multiple bool) error
+	Close() error
+}
+
+type Session struct {
+	Connection   IConnection
+	Channel      IChannel
+	ExchangeName string
+	ExchangeKind string
+	RoutingKey   string
+	QueueName    string
+}
+
+func (c *Session) Close() error {
 	if c.Connection == nil {
 		return nil
 	}
-
 	return c.Connection.Close()
 }
 
-// Запускает горутину, которая постоянно пытается создать новое соединение и канал, возвращая их в виде сессии через канал.
-func Redial(ctx context.Context, uri, exchangeName, exchangeType, routingKey, queueName string) chan chan AMQPSession {
-	// Создаем канал для отправки каналов сессий
-	sessions := make(chan chan AMQPSession)
+func Redial(ctx context.Context, uri, exchangeName, exchangeKind, routingKey, queueName string) chan Session {
+	sessionChan := make(chan Session)
 
 	go func() {
-		// Создаем канал для сессии
-		session := make(chan AMQPSession)
-
-		defer close(sessions)
+		defer close(sessionChan)
 
 		for {
 			select {
-			case sessions <- session: // Отправляем канал текущей сессии через канал sessions
-			case <-ctx.Done(): // Проверяем, не завершен ли контекст
+			case <-ctx.Done():
 				log.Println("Shutting down session factory")
-				return // Выходим из горутины, завершая её работу
-			}
-
-			// Пытаемся установить соединение с RabbitMQ
-			conn, err := amqp.Dial(uri)
-			if err != nil {
-				log.Fatalf("cannot (re)dial: %v: %q", err, uri)
-			}
-
-			// Пытаемся создать канал
-			ch, err := conn.Channel()
-			if err != nil {
-				log.Fatalf("cannot create channel: %v", err)
-			}
-
-			// Объявляем эксченж
-			if err := ch.ExchangeDeclare(
-				exchangeName, // Название эксченжа
-				exchangeType, // Тип эксченжа
-				false,        // durable
-				true,         // autodelete
-				false,        // internal
-				false,        // noWait
-				nil); err != nil {
-				log.Fatalf("cannot declare fanout exchange: %v", err)
-			}
-
-			select {
-			case session <- AMQPSession{conn, ch, exchangeName, exchangeType, routingKey, queueName}: // Отправляем текущую сессию в канал
-			case <-ctx.Done(): // Если контекст завершен, выходим из горутины
-				log.Println("shutting down new session")
 				return
+			default:
+				// Пытаемся установить соединение с RabbitMQ
+				conn, err := amqp.Dial(uri)
+				if err != nil {
+					log.Fatalf("cannot (re)dial: %v: %q", err, uri)
+				}
+
+				// Пытаемся создать канал
+				ch, err := conn.Channel()
+				if err != nil {
+					conn.Close()
+					log.Fatalf("cannot create channel: %v", err)
+				}
+
+				// Объявляем exchange
+				if err := ch.ExchangeDeclare(
+					exchangeName,
+					exchangeKind, // Тип exchange
+					false,        // флаг durable
+					true,         // флаг autoDelete
+					false,        // флаг internal
+					false,        // флаг noWait
+					nil); err != nil {
+					log.Printf("cannot declare exchange: %v", err)
+					ch.Close()
+					conn.Close()
+					time.Sleep(time.Second) // Задержка перед повторной попыткой
+					continue
+				}
+
+				// Отправляем текущую сессию в канал
+				sessionChan <- Session{
+					Connection:   conn,
+					Channel:      ch,
+					ExchangeName: exchangeName,
+					ExchangeKind: exchangeKind,
+					RoutingKey:   routingKey,
+					QueueName:    queueName,
+				}
 			}
 		}
 	}()
 
-	return sessions
+	return sessionChan
 }
 
-// Отправляет сообщения в RabbitMQ с возможностью автоматического восстановления соединения в случае его разрыва.
-// Эта функция работает с сессиями, предоставляемыми функцией redial, и использует подтверждения публикации, чтобы гарантировать доставку сообщений.
-func Publish(sessions chan chan AMQPSession, messages <-chan []byte) {
-	for session := range sessions { // Получаем новую сессию от канала sessions
+func Publish(sessionChan chan Session, messages <-chan []byte) {
+	for session := range sessionChan {
 		var (
-			running bool                              // Есть ли что отправить
-			reading = messages                        // Канал из которого читаем что отправить
-			pending = make(chan []byte, 1)            // Буфер
-			confirm = make(chan amqp.Confirmation, 1) // Канал для получения подтверждений об отправке от RabbitMQ
+			running bool                              // Флаг, указывающий, есть ли сообщения для отправки
+			reading = messages                        // Канал, из которого читаются сообщения
+			pending = make(chan []byte, 1)            // Буфер для хранения сообщений, ожидающих отправки
+			confirm = make(chan amqp.Confirmation, 1) // Канал для получения подтверждений публикации от RabbitMQ
+			body    []byte                            // Переменная для хранения текущего сообщения
 		)
 
-		pub := <-session // Получаем текущую сессию (соединение и канал)
-
 		// Включаем подтверждения публикации для текущего канала
-		if err := pub.Confirm(false); err != nil {
-			log.Printf("publisher confirms not supported")
+		if err := session.Channel.Confirm(false); err != nil {
+			log.Printf("publisher confirms not supported: %v", err)
 			close(confirm) // Если подтверждения не поддерживаются, закрываем канал confirm
 		} else {
-			pub.NotifyPublish(confirm) // Включаем получение подтверждений публикации
+			session.Channel.NotifyPublish(confirm) // Включаем получение подтверждений публикации
 		}
 
-	Publish:
+	PublishLoop:
 		for {
-			var body []byte
 			select {
 			case confirmed, ok := <-confirm:
 				if !ok {
-					break Publish // Если канал confirm закрыт, выходим из цикла и переходим к следующей сессии
+					break PublishLoop // Если канал confirm закрыт, выходим из цикла и переходим к следующей сессии
 				}
 				if !confirmed.Ack {
-					log.Printf("nack message %d, body: %q", confirmed.DeliveryTag, string(body))
+					log.Printf("nack message %d", confirmed.DeliveryTag)
 				}
 				reading = messages // Возобновляем чтение новых сообщений
 
-			case body = <-pending:
-				err := pub.Publish(pub.exchangeName, pub.routingKey, false, false, amqp.Publishing{
+			case body := <-pending:
+				err := session.Channel.Publish(session.ExchangeName, session.RoutingKey, false, false, amqp.Publishing{
 					Body: body,
 				})
-				// Если публикация не удалась, повторяем попытку на следующей сессии
 				if err != nil {
-					pending <- body
-					pub.Close()
-					break Publish
+					pending <- body // Если публикация не удалась, сохраняем сообщение в буфере и выходим
+					session.Connection.Close()
+					break PublishLoop
 				}
 
 			case body, running = <-reading:
@@ -135,53 +150,57 @@ func Publish(sessions chan chan AMQPSession, messages <-chan []byte) {
 	}
 }
 
-// Подписывается на сообщения из RabbitMQ.
-// Эта функция создаёт очередь для потребителя, связывает её с эксченжем, и затем начинает получать сообщения из этой очереди.
-// Все полученные сообщения отправляются в канал messages, чтобы их можно было дальше обрабатывать.
-func Subscribe(sessions chan chan AMQPSession, messages chan<- []byte) {
-	for session := range sessions {
-		// Когда сессия становится доступной, она извлекается из канала
-		sub := <-session
-		// Создаётся очередь
-		if _, err := sub.QueueDeclare(sub.queueName,
+func Subscribe(sessionChan chan Session, messages chan<- []byte) {
+	for session := range sessionChan {
+		// Создаем очередь
+		_, err := session.Channel.QueueDeclare(
+			session.QueueName,
 			false, // durable
-			true,  // autodelete
+			true,  // autoDelete
 			true,  // exclusive
 			false, // noWait
-			nil); err != nil {
-			log.Printf("cannot consume from queue: %q, %v", sub.queueName, err)
-			return
+			nil)   // args
+		if err != nil {
+			log.Printf("cannot declare queue: %q, %v", session.QueueName, err)
+			continue // Переходим к следующей сессии в случае ошибки
 		}
 
-		// Связывание очереди с эксчежем
-		if err := sub.QueueBind(sub.queueName, sub.routingKey, sub.exchangeName, false, nil); err != nil {
-			log.Printf("cannot consume without a binding to exchange: %q, %v", sub.exchangeName, err)
-			return
+		// Привязываем очередь к exchange
+		err = session.Channel.QueueBind(
+			session.QueueName,
+			session.RoutingKey,
+			session.ExchangeName,
+			false, // noWait
+			nil)   // args
+		if err != nil {
+			log.Printf("cannot bind queue: %q to exchange: %q, %v", session.QueueName, session.ExchangeName, err)
+			continue // Переходим к следующей сессии в случае ошибки
 		}
 
-		// Консюмит сообщения из очереди
-		deliveries, err := sub.Consume(sub.queueName,
-			"",    // consumer
+		// Подписываемся на сообщения из очереди
+		deliveries, err := session.Channel.Consume(
+			session.QueueName,
+			"",    // consumerTag
 			false, // autoAck
 			true,  // exclusive
 			false, // noLocal
 			false, // noWait
-			nil)
+			nil)   // args
 		if err != nil {
-			log.Printf("cannot consume from: %q, %v", sub.queueName, err)
-			return
+			log.Printf("cannot consume from queue: %q, %v", session.QueueName, err)
+			continue // Переходим к следующей сессии в случае ошибки
 		}
 
-		log.Printf("subscribed...")
+		log.Printf("subscribed to queue: %q...", session.QueueName)
 
-		// цикл обрабатывает каждое сообщение, приходящее в очередь
+		// Обрабатываем сообщения из очереди
 		for msg := range deliveries {
-			messages <- msg.Body // тело сообщения передаётся в канал messages для дальнейшей обработки
+			messages <- msg.Body // Отправляем тело сообщения в канал messages
 
-			err := sub.Ack(msg.DeliveryTag, false) // сообщение подтверждается как обработанное, чтобы оно не было доставлено другим консюмерам
-
+			// Подтверждаем получение сообщения
+			err := session.Channel.Ack(msg.DeliveryTag, false)
 			if err != nil {
-				log.Fatal(err)
+				log.Printf("cannot ack message: %v", err)
 			}
 		}
 	}
