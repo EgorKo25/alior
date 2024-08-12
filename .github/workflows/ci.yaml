@@ -32,6 +32,7 @@ jobs:
       - name: Update base paths for GitHub Pages
         run: |
           find ./services/frontend/production -name '*.html' -exec sed -i 's|/assets/|/alior/assets/|g' {} +
+          find ./services/frontend/production -name '*.html' -exec sed -i 's|/image/|/alior/assets/|g' {} +
         working-directory: .
       - name: Archive artifact
         shell: sh
