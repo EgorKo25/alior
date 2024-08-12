@@ -174,7 +174,7 @@ jobs:
 
       - name: Run tests
         run: go test -race -vet=off ./...
-  deploy:
+  deploy-front-to-page:
     needs: bulid-front-to-pages
 
     permissions:
