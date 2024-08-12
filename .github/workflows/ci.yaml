@@ -186,7 +186,7 @@ jobs:
 
     environment:
       name: github-pages
-      url: https://egorko25.github.io/alior/
+      url: https://egorko25.github.io/
 
     runs-on: ubuntu-latest
     steps:
