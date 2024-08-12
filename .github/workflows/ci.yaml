@@ -21,8 +21,6 @@ jobs:
       - name: Check pwd
         run: |
           pwd
-          cd services
-          cd frontend
       - name: Deploy to GitHub Pages
         uses: bitovi/github-actions-react-to-github-pages@v1.2.4
         with:
