@@ -22,7 +22,9 @@ jobs:
       - name: Build the project
         run: npm run build
         working-directory: ./services/frontend
-
+      - name: Build the project
+        run: npm deploy build
+        working-directory: ./services/frontend
       - run: |
           pwd
           ls
@@ -193,6 +195,11 @@ jobs:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
+      - name: Проверка содержимого после деплоя
+        run: |
+          ls -la
+          ls -la services/frontend/production
+
   start-qa-test:
     needs:
       - check-tests-alior-api-gw
