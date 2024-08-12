@@ -5,40 +5,53 @@ import (
 	"context"
 	"testing"
 	"time"
-
-	"github.com/stretchr/testify/assert"
 )
 
-func TestRedial(t *testing.T) {
+func TestDialSessionChan(t *testing.T) {
 	tests := []struct {
-		name         string
-		ctx          context.Context
-		uri          string
-		exchangeName string
-		exchangeKind string
-		routingKey   string
-		queueName    string
-		expectError  bool
+		name        string
+		ctx         context.Context
+		Dconfig     broker.DialConfig
+		expectError bool
 	}{
 		{
-			name:         "successful connection",
-			ctx:          context.Background(),
-			url:          "amqp://guest:guest@localhost:5672/",
-			exchangeName: "test_exchange",
-			routingKey:   "test_key",
-			queueName:    "test_queue",
-			consumerTag:  "test_consumer",
-			expectError:  false,
+			name: "successful connection with queue",
+			ctx:  context.Background(),
+			Dconfig: *broker.NewDialConfig(
+				"amqp://guest:guest@localhost:5672/",
+				"test_exchange",
+				"direct",
+				"test_key",
+				"test_queue",
+				true,
+			),
+			expectError: false,
 		},
 		{
-			name:         "invalid URL",
-			ctx:          context.Background(),
-			url:          "amqp://invalid:url",
-			exchangeName: "test_exchange",
-			routingKey:   "test_key",
-			queueName:    "test_queue",
-			consumerTag:  "test_consumer",
-			expectError:  true,
+			name: "successful connection without queue",
+			ctx:  context.Background(),
+			Dconfig: *broker.NewDialConfig(
+				"amqp://guest:guest@localhost:5672/",
+				"test_exchange",
+				"direct",
+				"test_key",
+				"",
+				false,
+			),
+			expectError: false,
+		},
+		{
+			name: "invalid URL",
+			ctx:  context.Background(),
+			Dconfig: *broker.NewDialConfig(
+				"amqp://guest:guest@fkganoewn:asdasdsa/",
+				"test_exchange",
+				"direct",
+				"test_key",
+				"test_queue",
+				true,
+			),
+			expectError: true,
 		},
 		{
 			name: "context cancellation before connection",
@@ -47,102 +60,112 @@ func TestRedial(t *testing.T) {
 				cancel()
 				return ctx
 			}(),
-			url:          "amqp://guest:guest@localhost:5672/",
-			exchangeName: "test_exchange",
-			routingKey:   "test_key",
-			queueName:    "test_queue",
-			consumerTag:  "test_consumer",
-			expectError:  true,
+			Dconfig: *broker.NewDialConfig(
+				"amqp://guest:guest@localhost:5672/",
+				"test_exchange",
+				"direct",
+				"test_key",
+				"test_queue",
+				true,
+			),
+			expectError: true,
 		},
 		{
-			name:         "connection to unavailable server",
-			ctx:          context.Background(),
-			url:          "amqp://guest:guest@unavailable:5672/",
-			exchangeName: "test_exchange",
-			routingKey:   "test_key",
-			queueName:    "test_queue",
-			consumerTag:  "test_consumer",
-			expectError:  true,
+			name: "empty URL",
+			ctx:  context.Background(),
+			Dconfig: *broker.NewDialConfig(
+				"",
+				"test_exchange",
+				"direct",
+				"test_key",
+				"test_queue",
+				true,
+			),
+			expectError: true,
 		},
 		{
-			name:         "error creating channel",
-			ctx:          context.Background(),
-			url:          "amqp://guest:guest@localhost:5672/",
-			exchangeName: "test_exchange",
-			routingKey:   "test_key",
-			queueName:    "test_queue",
-			consumerTag:  "test_consumer",
-			expectError:  true,
+			name: "empty exchange name",
+			ctx:  context.Background(),
+			Dconfig: *broker.NewDialConfig(
+				"amqp://guest:guest@localhost:5672/",
+				"",
+				"direct",
+				"test_key",
+				"test_queue",
+				true,
+			),
+			expectError: true,
 		},
 		{
-			name:         "context with timeout",
-			ctx:          context.Background(),
-			url:          "amqp://guest:guest@localhost:5672/",
-			exchangeName: "test_exchange",
-			routingKey:   "test_key",
-			queueName:    "test_queue",
-			consumerTag:  "test_consumer",
-			expectError:  true,
+			name: "empty routing key",
+			ctx:  context.Background(),
+			Dconfig: *broker.NewDialConfig(
+				"amqp://guest:guest@localhost:5672/",
+				"test_exchange",
+				"direct",
+				"",
+				"test_queue",
+				true,
+			),
+			expectError: true,
 		},
 		{
-			name:         "empty URL",
-			ctx:          context.Background(),
-			url:          "",
-			exchangeName: "test_exchange",
-			routingKey:   "test_key",
-			queueName:    "test_queue",
-			consumerTag:  "test_consumer",
-			expectError:  true,
-		},
-		{
-			name:         "reconnection after disconnection",
-			ctx:          context.Background(),
-			url:          "amqp://guest:guest@localhost:5672/",
-			exchangeName: "test_exchange",
-			routingKey:   "test_key",
-			queueName:    "test_queue",
-			consumerTag:  "test_consumer",
-			expectError:  false,
-		},
-		{
-			name:         "empty exchange name",
-			ctx:          context.Background(),
-			url:          "amqp://guest:guest@localhost:5672/",
-			exchangeName: "",
-			routingKey:   "test_key",
-			queueName:    "test_queue",
-			consumerTag:  "test_consumer",
-			expectError:  true,
-		},
-		{
-			name:         "empty routing key",
-			ctx:          context.Background(),
-			url:          "amqp://guest:guest@localhost:5672/",
-			exchangeName: "test_exchange",
-			routingKey:   "",
-			queueName:    "test_queue",
-			consumerTag:  "test_consumer",
-			expectError:  true,
+			name: "empty queue name",
+			ctx:  context.Background(),
+			Dconfig: *broker.NewDialConfig(
+				"amqp://guest:guest@localhost:5672/",
+				"test_exchange",
+				"direct",
+				"test_key",
+				"",
+				true,
+			),
+			expectError: true,
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			sessionChan := broker.Redial(tt.ctx, tt.url, tt.exchangeName, tt.routingKey, tt.queueName, tt.consumerTag)
+			sessionChan, err := broker.DialSessionChan(tt.ctx, tt.Dconfig)
 
-			select {
-			case session, ok := <-sessionChan:
-				if tt.expectError {
-					assert.False(t, ok, "expected no session to be received due to an error")
-				} else {
-					assert.True(t, ok, "expected session to be received")
-					assert.NotNil(t, session.Channel, "expected a valid session channel")
-				}
-			case <-time.After(time.Second):
-				if !tt.expectError {
-					t.Fatal("expected a session to be sent, but none was received")
-				}
+			// Ждем, пока установится соединение
+			time.Sleep(1000 * time.Millisecond) // Ожидание 100 миллисекунд
+
+			// Проверка, возникла ли ошибка
+			if (err != nil) != tt.expectError {
+				t.Fatalf("expected error: %v, but got: %v", tt.expectError, err)
 			}
+
+			// Если ожидается ошибка, то дальнейшие проверки не нужны
+			if tt.expectError {
+				return
+			}
+
+			// Проверка, что канал сессий был создан
+			if sessionChan == nil {
+				t.Fatal("expected session channel to be created, but got nil")
+			}
+
+			// Ожидание первой сессии из канала, если это возможно
+			select {
+			case session := <-sessionChan:
+				if session.Connection == nil || session.Channel == nil {
+					t.Fatal("expected valid connection and channel, but got nil")
+				}
+			case <-tt.ctx.Done():
+				t.Fatal("context cancelled before session could be received")
+			}
+
+			// Закрываем сессию, чтобы не оставлять открытые соединения
+			// Закрываем канал после завершения теста
+			/*close(sessionChan) // Закрытие канала для завершения цикла
+
+			for session := range sessionChan {
+				err := session.Close()
+				if err != nil {
+					t.Errorf("failed to close session: %v", err)
+				}
+			}*/
 		})
 	}
 }
