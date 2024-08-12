@@ -13,9 +13,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: WHERE
-        run:
-          pwd
-          ls -la
+        run: pwd
+      - name: WHERE2
+        run: ls -la
       - name: Deploy to GitHub Pages
         uses: bitovi/github-actions-react-to-github-pages@v1.2.4
         with:
