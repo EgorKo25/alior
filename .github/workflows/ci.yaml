@@ -17,8 +17,9 @@ jobs:
         with:
           checkout: true
           caching: true
-          path: ./services/fronted/production
-          build-command: npm run build
+          path: ./services/fronted
+          install_command: npm install
+          build_command: npm run build
 
   build-alior-auth:
     runs-on: ubuntu-latest
