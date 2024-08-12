@@ -186,17 +186,13 @@ jobs:
 
     environment:
       name: github-pages
-      url: https://egorko25.github.io/
+      url: https://egorko25.github.io/alior
 
     runs-on: ubuntu-latest
     steps:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
-      - name: Проверка содержимого после деплоя
-        run: |
-          ls -la
-          ls -la services/frontend/production
 
   start-qa-test:
     needs:
