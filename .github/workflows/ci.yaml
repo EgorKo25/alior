@@ -11,6 +11,9 @@ on:
 jobs:
   bulid-front-to-pages:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./services/frontend
     steps:
       - name: Deploy to GitHub Pages
         uses: bitovi/github-actions-react-to-github-pages@v1.2.4
