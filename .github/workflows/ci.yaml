@@ -18,18 +18,15 @@ jobs:
       - name: Check pwd
         run: |
           pwd
-          ls -la 
           cd services
-          ls -la 
           cd frontend
-          ls -la
+      - run: pwd
       - name: Deploy to GitHub Pages
         uses: bitovi/github-actions-react-to-github-pages@v1.2.4
-
         with:
+
           checkout: false
           caching: true
-          path: ./services/fronted
           install_command: npm install
           build_command: npm run build
 
