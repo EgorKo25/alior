@@ -14,8 +14,18 @@ jobs:
     steps:
       - name: Checkout the repository
         uses: actions/checkout@v3
+
+      - name: Check pwd
+        run: |
+          pwd
+          ls -la 
+          cd services
+          ls -la 
+          cd frontend
+          ls -la
       - name: Deploy to GitHub Pages
         uses: bitovi/github-actions-react-to-github-pages@v1.2.4
+
         with:
           checkout: false
           caching: true
