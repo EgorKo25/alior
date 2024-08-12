@@ -9,7 +9,6 @@ on:
       - main
 
 jobs:
-
   bulid-front-to-pages:
     runs-on: ubuntu-latest
     steps:
@@ -31,8 +30,8 @@ jobs:
           echo ::group::Archive artifact
           tar \
             --dereference --hard-dereference \
-            --directory "$INPUT_PATH" \
-            -cvf "$RUNNER_TEMP/artifact.tar" \
+            --directory services/frontend/production \
+            -cvf "artifact.tar" \
             --exclude=.git \
             --exclude=.github \
             .
@@ -44,9 +43,9 @@ jobs:
         id: upload-artifact
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ inputs.name }}
-          path: ${{ runner.temp }}/artifact.tar
-          retention-days: ${{ inputs.retention-days }}
+          name: github-pages
+          path: artifact.tar
+          retention-days: 1
           if-no-files-found: error
 
   build-alior-auth:
