@@ -36,8 +36,6 @@ jobs:
             --exclude=.github \
             .
           echo ::endgroup::
-        env:
-          INPUT_PATH: ${{ inputs.path }}
 
       - name: Upload artifact
         id: upload-artifact
@@ -182,13 +180,13 @@ jobs:
 
     environment:
       name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
+      url: https://egorko25.github.io/alior/
 
     runs-on: ubuntu-latest
     steps:
       - name: Deploy to GitHub Pages
         id: deployment
-        uses: actions/deploy-pages@v4 # or specific "vX.X.X" version tag for this action
+        uses: actions/deploy-pages@v4
   start-qa-test:
     needs:
       - check-tests-alior-api-gw
