@@ -19,7 +19,7 @@ jobs:
         uses: bitovi/github-actions-react-to-github-pages@v1.2.4
         with:
           path: ./services/frontend
-          checkout: false
+          checkout: true
           caching: false
           install_command: npm install
           build_command: npm run build
