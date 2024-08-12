@@ -15,7 +15,7 @@ jobs:
       - name: Deploy to GitHub Pages
         uses: bitovi/github-actions-react-to-github-pages@v1.2.4
         with:
-          checkout-sparse-checkout: true
+          checkout-sparse-checkout: services/frontend
           path: |
             services/frontend
           caching: true
