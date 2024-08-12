@@ -29,8 +29,6 @@ jobs:
           path: ./service/frontend/production
           checkout: false
           caching: false
-          install_command: npm install
-          build_command: npm run build
 
   build-alior-auth:
     runs-on: ubuntu-latest
