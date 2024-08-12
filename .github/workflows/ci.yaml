@@ -12,16 +12,18 @@ jobs:
   bulid-front-to-pages:
     runs-on: ubuntu-latest
     steps:
-      - name: WHERE
-        run: pwd
-      - name: WHERE2
-        run: ls -la
+      - name: Checkout the repository
+        uses: actions/checkout@v3
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'  # Укажите нужную версию Node.js
       - name: Deploy to GitHub Pages
         uses: bitovi/github-actions-react-to-github-pages@v1.2.4
         with:
-          checkout: true
+          checkout: false
           caching: true
-          path: ./alior/services/fronted
+          path: ./services/fronted
           install_command: npm install
           build_command: npm run build
 
