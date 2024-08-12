@@ -22,9 +22,7 @@ jobs:
       - name: Build the project
         run: npm run build
         working-directory: ./services/frontend
-      - name: Build the project
-        run: npm run deploy
-        working-directory: ./services/frontend
+
       - run: |
           pwd
           ls
