@@ -12,12 +12,15 @@ jobs:
   bulid-front-to-pages:
     runs-on: ubuntu-latest
     steps:
+      - name: WHERE
+        run: pwd
+          ls -la
       - name: Deploy to GitHub Pages
         uses: bitovi/github-actions-react-to-github-pages@v1.2.4
         with:
           checkout: true
           caching: true
-          path: ./services/fronted
+          path: ./alior/services/fronted
           install_command: npm install
           build_command: npm run build
 
