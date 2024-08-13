@@ -2,6 +2,7 @@ package broker
 
 import (
 	"context"
+	"errors"
 	"log"
 
 	"github.com/streadway/amqp"
@@ -137,6 +138,7 @@ func DialSessionChan(ctx context.Context, Dconfig DialConfig) (chan Session, err
 			select {
 			case <-ctx.Done():
 				log.Println("Shutting down session factory")
+				errChan <- errors.New("context done")
 				return
 			default:
 				// Пытаемся установить соединение с RabbitMQ
@@ -173,6 +175,12 @@ func DialSessionChan(ctx context.Context, Dconfig DialConfig) (chan Session, err
 				}
 
 				if Dconfig.Connect2Queue {
+					if Dconfig.QueueCfg.QueueName == "" {
+						log.Printf("empty queue name")
+						errChan <- errors.New("empty queue name")
+						return
+					}
+
 					// Создаем очередь
 					_, err = ch.QueueDeclare(
 						Dconfig.QueueCfg.QueueName,
@@ -219,7 +227,7 @@ func DialSessionChan(ctx context.Context, Dconfig DialConfig) (chan Session, err
 	select {
 	case err := <-errChan:
 		return nil, err
-	default:
+	case <-sessionChan:
 		return sessionChan, nil
 	}
 }

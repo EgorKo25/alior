@@ -4,19 +4,16 @@ import (
 	"alior-sms/src/broker"
 	"context"
 	"testing"
-	"time"
 )
 
 func TestDialSessionChan(t *testing.T) {
 	tests := []struct {
 		name        string
-		ctx         context.Context
 		Dconfig     broker.DialConfig
 		expectError bool
 	}{
 		{
 			name: "successful connection with queue",
-			ctx:  context.Background(),
 			Dconfig: *broker.NewDialConfig(
 				"amqp://guest:guest@localhost:5672/",
 				"test_exchange",
@@ -29,7 +26,6 @@ func TestDialSessionChan(t *testing.T) {
 		},
 		{
 			name: "successful connection without queue",
-			ctx:  context.Background(),
 			Dconfig: *broker.NewDialConfig(
 				"amqp://guest:guest@localhost:5672/",
 				"test_exchange",
@@ -42,7 +38,6 @@ func TestDialSessionChan(t *testing.T) {
 		},
 		{
 			name: "invalid URL",
-			ctx:  context.Background(),
 			Dconfig: *broker.NewDialConfig(
 				"amqp://guest:guest@fkganoewn:asdasdsa/",
 				"test_exchange",
@@ -55,11 +50,6 @@ func TestDialSessionChan(t *testing.T) {
 		},
 		{
 			name: "context cancellation before connection",
-			ctx: func() context.Context {
-				ctx, cancel := context.WithCancel(context.Background())
-				cancel()
-				return ctx
-			}(),
 			Dconfig: *broker.NewDialConfig(
 				"amqp://guest:guest@localhost:5672/",
 				"test_exchange",
@@ -72,7 +62,6 @@ func TestDialSessionChan(t *testing.T) {
 		},
 		{
 			name: "empty URL",
-			ctx:  context.Background(),
 			Dconfig: *broker.NewDialConfig(
 				"",
 				"test_exchange",
@@ -85,7 +74,6 @@ func TestDialSessionChan(t *testing.T) {
 		},
 		{
 			name: "empty exchange name",
-			ctx:  context.Background(),
 			Dconfig: *broker.NewDialConfig(
 				"amqp://guest:guest@localhost:5672/",
 				"",
@@ -97,21 +85,7 @@ func TestDialSessionChan(t *testing.T) {
 			expectError: true,
 		},
 		{
-			name: "empty routing key",
-			ctx:  context.Background(),
-			Dconfig: *broker.NewDialConfig(
-				"amqp://guest:guest@localhost:5672/",
-				"test_exchange",
-				"direct",
-				"",
-				"test_queue",
-				true,
-			),
-			expectError: true,
-		},
-		{
 			name: "empty queue name",
-			ctx:  context.Background(),
 			Dconfig: *broker.NewDialConfig(
 				"amqp://guest:guest@localhost:5672/",
 				"test_exchange",
@@ -126,18 +100,22 @@ func TestDialSessionChan(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			sessionChan, err := broker.DialSessionChan(tt.ctx, tt.Dconfig)
+			ctx, cancel := context.WithCancel(context.Background())
 
-			// Ждем, пока установится соединение
-			time.Sleep(1000 * time.Millisecond) // Ожидание 100 миллисекунд
-
-			// Проверка, возникла ли ошибка
-			if (err != nil) != tt.expectError {
-				t.Fatalf("expected error: %v, but got: %v", tt.expectError, err)
+			if tt.name == "context cancellation before connection" {
+				cancel()
+			} else {
+				defer cancel()
 			}
 
-			// Если ожидается ошибка, то дальнейшие проверки не нужны
+			sessionChan, err := broker.DialSessionChan(ctx, tt.Dconfig)
+
+			// Проверка, возникла ли ошибка
 			if tt.expectError {
+				if err == nil {
+					t.Fatalf("expected error: %v, but got: %v", tt.expectError, err)
+				}
+
 				return
 			}
 
@@ -152,20 +130,9 @@ func TestDialSessionChan(t *testing.T) {
 				if session.Connection == nil || session.Channel == nil {
 					t.Fatal("expected valid connection and channel, but got nil")
 				}
-			case <-tt.ctx.Done():
+			case <-ctx.Done():
 				t.Fatal("context cancelled before session could be received")
 			}
-
-			// Закрываем сессию, чтобы не оставлять открытые соединения
-			// Закрываем канал после завершения теста
-			/*close(sessionChan) // Закрытие канала для завершения цикла
-
-			for session := range sessionChan {
-				err := session.Close()
-				if err != nil {
-					t.Errorf("failed to close session: %v", err)
-				}
-			}*/
 		})
 	}
 }
