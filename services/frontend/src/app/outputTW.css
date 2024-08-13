@@ -1193,6 +1193,14 @@ video {
   height: 100%;
 }
 
+.h-\[1024px\] {
+  height: 1024px;
+}
+
+.h-\[600px\] {
+  height: 600px;
+}
+
 .w-2 {
   width: 0.5rem;
 }
@@ -1261,6 +1269,10 @@ video {
 
 .w-screen {
   width: 100vw;
+}
+
+.w-\[800px\] {
+  width: 800px;
 }
 
 .max-w-335 {
@@ -1454,8 +1466,16 @@ video {
   border-radius: 32px;
 }
 
+.rounded-\[35px\] {
+  border-radius: 35px;
+}
+
 .rounded-full {
   border-radius: 9999px;
+}
+
+.rounded-\[20px\] {
+  border-radius: 20px;
 }
 
 .rounded-bl-none {

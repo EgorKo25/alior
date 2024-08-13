@@ -12,8 +12,7 @@ export const TabletMobile: React.FC<{ url: string }> = memo(({ url }) => {
 
   useFloating(tablet.scene, {
     range: 0.1,
-    speed: 0.005,
-    interval: 3000,
+    speed: 0.01,
   });
 
   return (
@@ -29,8 +28,8 @@ export const TabletMobile: React.FC<{ url: string }> = memo(({ url }) => {
         <primitive
           object={tablet.scene}
           position-y={0.15}
-          position-x={-0.27}
-          position-z={-4.2}
+          position-x={-0.25}
+          position-z={-4.5}
           rotation={[0, 0.25, 0]}
         >
           <Html

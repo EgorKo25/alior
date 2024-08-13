@@ -5,9 +5,15 @@ import {
   useGLTF,
 } from "@react-three/drei";
 import { memo } from "react";
+import { useFloating } from "src/features/useFloating";
 
 export const Tablet1440: React.FC<{ url: string }> = memo(({ url }) => {
   const tablet = useGLTF("/tablet/scene.gltf");
+
+  useFloating(tablet.scene, {
+    range: 0.03,
+    speed: 0.005,
+  });
 
   return (
     <>
@@ -27,10 +33,10 @@ export const Tablet1440: React.FC<{ url: string }> = memo(({ url }) => {
           rotation={[-0.4, -0.15, Math.PI * 0.45]}
         >
           <Html
-            position={[20.5, 11.4, -50]}
+            position={[3, 1.3, -7]}
             transform
-            rotation={[0, -0.25, Math.PI * -0.5]}
-            distanceFactor={10.6}
+            rotation={[0, -0.24, Math.PI * -0.5]}
+            distanceFactor={1.9}
           >
             <iframe
               src={url}

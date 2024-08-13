@@ -11,9 +11,8 @@ export const Tablet768: React.FC<{ url: string }> = memo(({ url }) => {
   const tablet = useGLTF("/tablet/scene.gltf");
 
   useFloating(tablet.scene, {
-    range: 0.1,
+    range: 0.07,
     speed: 0.005,
-    interval: 3000,
   });
 
   return (
@@ -34,14 +33,14 @@ export const Tablet768: React.FC<{ url: string }> = memo(({ url }) => {
           rotation={[0, 0.25, 0]}
         >
           <Html
-            position={[0.221, 0.185, -0.05]}
+            position={[0.208, 0.185, -0.05]}
             transform
             rotation={[0, -0.25, 0]}
             distanceFactor={1.145}
           >
             <iframe
               src={url}
-              className="bg-white w-[768px] h-[1010px] rounded-3xl"
+              className="bg-white w-[768px] h-[1010px] rounded-[32px]"
             />
           </Html>
         </primitive>
