@@ -2,6 +2,7 @@ package database
 
 import (
 	"context"
+	"errors"
 
 	"github.com/jackc/pgx/v5/pgxpool"
 
@@ -46,7 +47,11 @@ func (db *DB) GetServiceByID(ctx context.Context, id int32) (*types.Service, err
 
 func (db *DB) DelServiceByID(ctx context.Context, id int32) error {
 	query := `DELETE FROM services WHERE id = $1`
-	_, err := db.pool.Exec(ctx, query, id)
+	commTag, err := db.pool.Exec(ctx, query, id)
+
+	if commTag.RowsAffected() != 1 {
+		return errors.New("No row found to delete")
+	}
 
 	return err
 }
