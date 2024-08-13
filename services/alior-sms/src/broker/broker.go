@@ -1,8 +1,11 @@
 package broker
 
 import (
+	"bufio"
 	"context"
 	"errors"
+	"fmt"
+	"io"
 	"log"
 
 	"github.com/streadway/amqp"
@@ -114,6 +117,7 @@ func (c *Session) Close() error {
 	if c.Connection == nil {
 		return nil
 	}
+
 	return c.Connection.Close()
 }
 
@@ -139,6 +143,7 @@ func DialSessionChan(ctx context.Context, Dconfig DialConfig) (chan Session, err
 			case <-ctx.Done():
 				log.Println("Shutting down session factory")
 				errChan <- errors.New("context done")
+
 				return
 			default:
 				// Пытаемся установить соединение с RabbitMQ
@@ -146,6 +151,7 @@ func DialSessionChan(ctx context.Context, Dconfig DialConfig) (chan Session, err
 				if err != nil {
 					log.Printf("cannot (re)dial: %v: %q", err, Dconfig.URI)
 					errChan <- err // Отправляем ошибку в канал и завершаем горутину
+
 					return
 				}
 
@@ -155,6 +161,7 @@ func DialSessionChan(ctx context.Context, Dconfig DialConfig) (chan Session, err
 					conn.Close()
 					log.Printf("cannot create channel: %v", err)
 					errChan <- err // Отправляем ошибку в канал и завершаем горутину
+
 					return
 				}
 
@@ -171,6 +178,7 @@ func DialSessionChan(ctx context.Context, Dconfig DialConfig) (chan Session, err
 					conn.Close()
 					log.Printf("cannot declare exchange: %v", err)
 					errChan <- err // Отправляем ошибку в канал и завершаем горутину
+
 					return
 				}
 
@@ -178,6 +186,7 @@ func DialSessionChan(ctx context.Context, Dconfig DialConfig) (chan Session, err
 					if Dconfig.QueueCfg.QueueName == "" {
 						log.Printf("empty queue name")
 						errChan <- errors.New("empty queue name")
+
 						return
 					}
 
@@ -194,6 +203,7 @@ func DialSessionChan(ctx context.Context, Dconfig DialConfig) (chan Session, err
 						conn.Close()
 						log.Printf("cannot declare queue: %q, %v", Dconfig.QueueCfg.QueueName, err)
 						errChan <- err // Отправляем ошибку в канал и завершаем горутину
+
 						return
 					}
 
@@ -209,6 +219,7 @@ func DialSessionChan(ctx context.Context, Dconfig DialConfig) (chan Session, err
 						conn.Close()
 						log.Printf("cannot bind queue: %q to exchange: %q, %v", Dconfig.QueueCfg.QueueName, Dconfig.ExchangeCfg.ExchangeName, err)
 						errChan <- err // Отправляем ошибку в канал и завершаем горутину
+
 						return
 					}
 				}
@@ -323,4 +334,30 @@ func Subscribe(sessionChan chan Session, messages chan<- []byte) {
 			}
 		}
 	}
+}
+
+func MakeReaderChan(r io.Reader) <-chan []byte {
+	lines := make(chan []byte)
+	go func() {
+		defer close(lines)
+
+		scan := bufio.NewScanner(r)
+
+		for scan.Scan() {
+			lines <- scan.Bytes()
+		}
+	}()
+
+	return lines
+}
+
+func MakeWriterChan(w io.Writer) chan<- []byte {
+	lines := make(chan []byte)
+	go func() {
+		for line := range lines {
+			fmt.Fprintln(w, string(line))
+		}
+	}()
+
+	return lines
 }

@@ -2,35 +2,10 @@ package main
 
 import (
 	"alior-sms/src/broker"
-	"bufio"
 	"context"
-	"fmt"
-	"io"
 	"log"
 	"os"
 )
-
-func read(r io.Reader) <-chan []byte {
-	lines := make(chan []byte)
-	go func() {
-		defer close(lines)
-		scan := bufio.NewScanner(r)
-		for scan.Scan() {
-			lines <- []byte(scan.Bytes())
-		}
-	}()
-	return lines
-}
-
-func write(w io.Writer) chan<- []byte {
-	lines := make(chan []byte)
-	go func() {
-		for line := range lines {
-			fmt.Fprintln(w, string(line))
-		}
-	}()
-	return lines
-}
 
 func main() {
 	ctx, done := context.WithCancel(context.Background())
@@ -41,7 +16,8 @@ func main() {
 		if err != nil {
 			log.Fatalf(err.Error())
 		}
-		broker.Publish(dial, read(os.Stdin))
+
+		broker.Publish(dial, broker.MakeReaderChan(os.Stdin))
 		done()
 	}()
 	go func() {
@@ -49,7 +25,8 @@ func main() {
 		if err != nil {
 			log.Fatalf(err.Error())
 		}
-		broker.Subscribe(dial, write(os.Stdout))
+
+		broker.Subscribe(dial, broker.MakeWriterChan(os.Stdout))
 		done()
 	}()
 	<-ctx.Done()
