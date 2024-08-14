@@ -5,6 +5,10 @@ import (
 	"github.com/ilyakaznacheev/cleanenv"
 )
 
+var ReadConfig = func(path string, cfg interface{}) error {
+	return cleanenv.ReadConfig(path, cfg)
+}
+
 type DatabaseConfig struct {
 	Url string `yaml:"postgresql_url"`
 }
@@ -23,8 +27,8 @@ func Load() (*Config, error) {
 
 	path := "./config/config.yaml"
 
-	if err := cleanenv.ReadConfig(path, &cfg); err != nil {
-		return nil, errors.New("Failed to load config: " + err.Error())
+	if err := ReadConfig(path, &cfg); err != nil {
+		return nil, errors.New("failed to load config: " + err.Error())
 	}
 	return &cfg, nil
 }

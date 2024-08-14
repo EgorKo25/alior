@@ -34,19 +34,19 @@ func NewCMS(broker IBroker, storage ICallback, logger ILogger) *CMS {
 }
 
 func (c *CMS) Run(ctx context.Context) error {
-	return c.broker.Consume(ctx, "create", c.handleMessage)
+	return c.broker.Consume(ctx, "create", c.HandleMessage)
 }
 
-func (c *CMS) handleMessage(ctx context.Context, body []byte) error {
-	callback, err := convertToRepositoryAndValidate(body)
+func (c *CMS) HandleMessage(ctx context.Context, body []byte) error {
+	callback, err := ConvertToRepositoryAndValidate(body)
 	if err != nil {
-		c.logger.Error("Error during validation or conversion: %s", err.Error())
+		c.logger.Error("error during validation or conversion: %s", err.Error())
 		return c.broker.Produce(ctx, "error", []byte(err.Error()))
 	}
 
 	err = c.storage.CreateCallback(ctx, callback)
 	if err != nil {
-		c.logger.Error("Error inserting callback: %s", err.Error())
+		c.logger.Error("error inserting callback: %s", err.Error())
 		return c.broker.Produce(ctx, "error", []byte(err.Error()))
 	}
 
@@ -54,7 +54,7 @@ func (c *CMS) handleMessage(ctx context.Context, body []byte) error {
 	return c.broker.Produce(ctx, "success", []byte(successMsg))
 }
 
-func convertToRepositoryAndValidate(callbackSrc []byte) (*database.Callback, error) {
+func ConvertToRepositoryAndValidate(callbackSrc []byte) (*database.Callback, error) {
 	var callback database.Callback
 	err := json.Unmarshal(callbackSrc, &callback)
 	if err != nil {
