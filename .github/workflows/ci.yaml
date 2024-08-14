@@ -79,31 +79,31 @@ jobs:
         run: go build -o /dev/null ./...
         working-directory: ./services/alior-auth
   build-alior-api-gw:
-     runs-on: ubuntu-latest
-     steps:
-       - name: Копирование содержимого на виртуальную машину
-         uses: actions/checkout@v4
-       - name: Установка golang
-         uses: actions/setup-go@v5
-         with:
-           go-version: '1.22.4'
-       - name: Вывод версии Go
-         run: go version
-       - name: Установка кэша зависимостей
-         uses: actions/cache@v4
-         with:
-           path: |
-             ~/.cache/go-build
-             /go/pkg/mod
-           key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
-           restore-keys: |
-             ${{ runner.os }}-go-
-       - name: Установка зависимостей
-         run: go mod tidy
-         working-directory: ./services/alior-api-gw
-       - name: Попытка собрать проект
-         run: go build -o /dev/null ./...
-         working-directory: ./services/alior-api-gw
+    runs-on: ubuntu-latest
+    steps:
+      - name: Копирование содержимого на виртуальную машину
+        uses: actions/checkout@v4
+      - name: Установка golang
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.22.4'
+      - name: Вывод версии Go
+        run: go version
+      - name: Установка кэша зависимостей
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cache/go-build
+            /go/pkg/mod
+          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+          restore-keys: |
+            ${{ runner.os }}-go-
+      - name: Установка зависимостей
+        run: go mod tidy
+        working-directory: ./services/alior-api-gw
+      - name: Попытка собрать проект
+        run: go build -o /dev/null ./...
+        working-directory: ./services/alior-api-gw
   check-tests-alior-auth:
     defaults:
       run:
@@ -179,13 +179,21 @@ jobs:
         run: go test -race -vet=off ./...
   deploy-front:
     needs: bulid-front
+
+    permissions:
+      pages: write
+      id-token: write
+
+    environment:
+      name: github-pages
+      url: https://egorko25.github.io/alior
+
     runs-on: ubuntu-latest
     steps:
       - name: Deploy to GitHub Pages
-        uses: peaceiris/actions-gh-pages@v3
-        with:
-          github_token: ${{ secrets.SECRET }}
-          publish_dir: ./dist
+        id: deployment
+        uses: actions/deploy-pages@v4
+
   start-qa-test:
     needs:
       - check-tests-alior-api-gw
