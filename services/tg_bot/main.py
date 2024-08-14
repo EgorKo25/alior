@@ -27,6 +27,13 @@ async def main():
 
     await set_commands(bot)
 
+    amqp_url = config['rabbitmq']['url']
+    notify_queue = config['rabbitmq']['notify_queue']
+    chat_id = config['bot']['chat_id']
+
+    consumer = Consumer(bot, amqp_url, notify_queue, chat_id)
+    asyncio.create_task(consumer.consume())
+
     try:
         await dp.start_polling(bot)
     finally:
