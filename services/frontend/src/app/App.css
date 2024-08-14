@@ -1,7 +1,7 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-
+/* 
 @layer base {
   @font-face {
     font-family: "Rubik";
@@ -15,7 +15,7 @@
     font-weight: 400;
     font-style: normal;
   }
-}
+} */
 
 @layer components {
   .btn-accent-white {
