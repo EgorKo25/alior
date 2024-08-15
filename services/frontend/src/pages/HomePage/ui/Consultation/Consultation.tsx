@@ -4,7 +4,7 @@ import { FormGuySVG } from "./ui/FormGuySVG";
 
 export const Consultation = () => {
   return (
-    <section className=" mt-48 mb-20">
+    <section id="consult" className=" mt-48 mb-20">
       <div
         className={` flex flex-col md:flex-row md:justify-between gap-8 w-90% mx-auto`}
       >

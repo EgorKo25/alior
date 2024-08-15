@@ -1,3 +1,5 @@
+import { HashLink } from "react-router-hash-link";
+
 export const SendForConsult = () => {
   return (
     <div
@@ -15,21 +17,23 @@ export const SendForConsult = () => {
           консультацию
         </span>
       </h2>
-      <button className=" group rounded-full flex size-14 justify-center items-center bg-white text-black cursor-pointer hover:bg-black hover:text-white">
-        <svg
-          className=" group-hover:animate-arrowForwards"
-          width="12"
-          height="16"
-          viewBox="0 0 12 16"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <path
-            d="M0 10L1.45 8.6L5 12.15L5 0L7 0L7 12.15L10.55 8.6L12 10L6 16L0 10Z"
-            fill="currentColor"
-          />
-        </svg>
-      </button>
+      <HashLink smooth to={"#consult"}>
+        <button className=" group rounded-full flex size-14 justify-center items-center bg-white text-black cursor-pointer hover:bg-black hover:text-white">
+          <svg
+            className=" group-hover:animate-arrowForwards"
+            width="12"
+            height="16"
+            viewBox="0 0 12 16"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M0 10L1.45 8.6L5 12.15L5 0L7 0L7 12.15L10.55 8.6L12 10L6 16L0 10Z"
+              fill="currentColor"
+            />
+          </svg>
+        </button>
+      </HashLink>
     </div>
   );
 };

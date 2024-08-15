@@ -1,3 +1,4 @@
+import { HashLink } from "react-router-hash-link";
 import { MainButton } from "src/shared/ui/MainButton";
 import { FAQContainer } from "./ui/FAQContainer";
 import { SendForConsult } from "./ui/SendForConsult";
@@ -23,11 +24,13 @@ export const FAQ = () => {
         />
       </div>
       <FAQContainer />
-      <MainButton
-        className=" absolute bottom-1%"
-        colorSchema={" btn-accent-white"}
-        title="На консультацию"
-      />
+      <HashLink smooth to={"#consult"} className=" absolute bottom-1%">
+        <MainButton
+          className=""
+          colorSchema={" btn-accent-white"}
+          title="На консультацию"
+        />
+      </HashLink>
     </section>
   );
 };

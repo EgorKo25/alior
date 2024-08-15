@@ -2,6 +2,7 @@ import { MainButton } from "src/shared/ui/MainButton";
 import { ServiceCard } from "./ui/ServiceCard";
 import styles from "./Servicies.module.scss";
 import { useEffect, useState } from "react";
+import { HashLink } from "react-router-hash-link";
 export const Services = () => {
   const [activeCard, setActiveCard] = useState<number | null>(null);
 
@@ -46,11 +47,13 @@ export const Services = () => {
           </h2>
           <div className={styles.parallelogram}></div>
         </div>
-        <MainButton
-          className={styles.button}
-          title="Уже знаю, что хочу"
-          colorSchema={" btn-accent-white"}
-        />
+        <HashLink smooth to={"#consult"}>
+          <MainButton
+            className={styles.button}
+            title="Уже знаю, что хочу"
+            colorSchema={" btn-accent-white"}
+          />
+        </HashLink>
       </div>
     </section>
   );
