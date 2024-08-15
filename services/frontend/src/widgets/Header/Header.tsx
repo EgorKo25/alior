@@ -1,5 +1,6 @@
-import clsx from "clsx";
 import { useState, useEffect } from "react";
+import { HashLink } from "react-router-hash-link";
+import clsx from "clsx";
 import { IconBars } from "src/shared/ui/IconBars";
 import { IconCross } from "src/shared/ui/IconCross";
 import { MainButton } from "src/shared/ui/MainButton";
@@ -35,12 +36,18 @@ export const Header = () => {
         <Navbar isMobile={false} />
       </div>
       <div className="hidden sm:flex sm:ml-auto lg:ml-0">
-        <MainButton
-          className={` btn-accent ${isMenuOpen ? " hidden" : ""}`}
-          title="На консультацию"
-          type="submit"
-          colorSchema=" btn-accent-white"
-        />
+        <HashLink
+          smooth
+          to={"#consult"}
+          className={`${isMenuOpen ? " hidden" : ""}`}
+        >
+          <MainButton
+            className={` btn-accent `}
+            title="На консультацию"
+            type="submit"
+            colorSchema=" btn-accent-white"
+          />
+        </HashLink>
       </div>
       <div
         className={clsx(styles.menuIcon) + ` sm:ml-16 lg:hidden `}
@@ -57,12 +64,14 @@ export const Header = () => {
       {isMenuOpen && (
         <div className={styles.menu}>
           <Navbar isMobile={true} />
-          <MainButton
-            className={` btn-accent`}
-            title="Консультация"
-            type="submit"
-            colorSchema=" btn-accent-white"
-          />
+          <HashLink smooth to={"#consult"}>
+            <MainButton
+              className={` btn-accent`}
+              title="Консультация"
+              type="submit"
+              colorSchema=" btn-accent-white"
+            />
+          </HashLink>
         </div>
       )}
     </header>

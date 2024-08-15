@@ -8,7 +8,7 @@ export const CasesIcon = ({ className }: { className: string }) => {
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
     >
-      <g clip-path="url(#clip0_101_1757)">
+      <g clipPath="url(#clip0_101_1757)">
         <mask
           id="mask0_101_1757"
           style={{ maskType: "alpha" }}

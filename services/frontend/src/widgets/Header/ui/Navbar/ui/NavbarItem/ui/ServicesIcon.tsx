@@ -8,7 +8,7 @@ export const ServicesIcon = ({ className }: { className: string }) => {
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
     >
-      <g clip-path="url(#clip0_101_1755)">
+      <g clipPath="url(#clip0_101_1755)">
         <mask
           id="mask0_101_1755"
           style={{ maskType: "alpha" }}
