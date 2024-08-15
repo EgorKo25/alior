@@ -19,7 +19,7 @@ export const FAQ = () => {
           className={
             "object-cover object-center z-10 absolute top-36 w-full h-full 2xl:top-48"
           }
-          src="/images/bookworm.svg"
+          src="./images/bookworm.svg"
         ></img>
       </div>
       <FAQContainer />

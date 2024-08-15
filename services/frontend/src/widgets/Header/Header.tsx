@@ -77,7 +77,7 @@ export const Header = () => {
           // className={clsx("", {
           //   [styles.logo]: loading && isAtTop,
           // })}
-          src="/images/logo.svg"
+          src="./images/logo.svg"
           alt="Alior"
         />
       </div>
