@@ -1,6 +1,7 @@
 import { Message } from "src/shared/ui/Message";
-import { FirstArrow } from "../FirstArrow";
-import { SecondArrow } from "../SecondArrow";
+import { FirstArrow } from "./ui/FirstArrow";
+import { SecondArrow } from "./ui/SecondArrow";
+import { MeditationSVG } from "./ui/MeditationSVG";
 
 export const FAQContainer = () => {
   return (
@@ -53,10 +54,9 @@ export const FAQContainer = () => {
               "w-80 h-64 mt-14 md:mt-0 md:mb-28 self-center lg:w-431 lg:h-96 2xl:w-540 2xl:h-440"
             }
           >
-            <img
+            <MeditationSVG
               className={"object-cover object-center w-full h-full"}
-              src="./images/meditation.svg"
-            ></img>
+            />
           </div>
         </div>
       </div>

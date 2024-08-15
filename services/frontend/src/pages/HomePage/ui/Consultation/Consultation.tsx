@@ -1,5 +1,6 @@
 import { Message } from "src/shared/ui/Message";
 import { Form } from "src/widgets/Form";
+import { FormGuySVG } from "./ui/FormGuySVG";
 
 export const Consultation = () => {
   return (
@@ -29,11 +30,7 @@ export const Consultation = () => {
             className=" rounded-bl-none sm:min-w-72 sm:w-72 lg:text-base max-w-[65%] ml-auto hidden md:block xl:hidden md:mt-4"
             title="Расскажете детали, а мы поможем составить ТЗ"
           />
-          <img
-            src="./images/formguy.svg"
-            alt="flexing-guy"
-            className=" mx-auto w-80 md:mt-16 lg:w-96"
-          />
+          <FormGuySVG className="mx-auto w-80 md:mt-16 lg:w-96" />
         </div>
       </div>
     </section>
