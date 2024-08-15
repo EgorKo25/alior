@@ -55,7 +55,7 @@ export const FAQContainer = () => {
           >
             <img
               className={"object-cover object-center w-full h-full"}
-              src="/images/meditation.svg"
+              src="./images/meditation.svg"
             ></img>
           </div>
         </div>

@@ -12,7 +12,7 @@ export const Hero = () => {
           Пишите нам
         </span>
         <img
-          src="/images/arrow-for-tg.svg"
+          src="./images/arrow-for-tg.svg"
           alt="Arrow"
           className=" w-36 sm:w-44 text-accent fill-accent"
         />

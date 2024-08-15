@@ -30,7 +30,7 @@ export const Consultation = () => {
             title="Расскажете детали, а мы поможем составить ТЗ"
           />
           <img
-            src="/images/formguy.svg"
+            src="./images/formguy.svg"
             alt="flexing-guy"
             className=" mx-auto w-80 md:mt-16 lg:w-96"
           />
