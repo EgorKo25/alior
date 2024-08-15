@@ -1,1 +1,0 @@
-export { CheckDemo } from "./CheckDemo";

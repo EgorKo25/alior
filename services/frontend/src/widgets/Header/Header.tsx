@@ -1,43 +1,14 @@
-import { useState, useEffect } from "react";
-import { Navbar } from "./ui/Navbar";
-import styles from "./Header.module.scss";
 import clsx from "clsx";
+import { useState, useEffect } from "react";
 import { IconBars } from "src/shared/ui/IconBars";
 import { IconCross } from "src/shared/ui/IconCross";
 import { MainButton } from "src/shared/ui/MainButton";
+import { Navbar } from "./ui/Navbar";
+import { LogoSVG } from "./ui/LogoSVG";
+import styles from "./Header.module.scss";
 
 export const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  // const [loading, setLoading] = useState(true);
-  // const [isAtTop, setIsAtTop] = useState(true);
-
-  // useEffect(() => {
-  //   if (window.scrollY !== 0) {
-  //     setIsAtTop(false);
-  //   }
-
-  //   const handleScroll = () => {
-  //     if (!loading) {
-  //       setIsAtTop(window.scrollY === 0);
-  //     }
-  //   };
-
-  //   window.addEventListener("scroll", handleScroll);
-
-  //   return () => {
-  //     window.removeEventListener("scroll", handleScroll);
-  //   };
-  // }, [loading]);
-
-  // useEffect(() => {
-  //   if (isAtTop) {
-  //     const timer = setTimeout(() => {
-  //       setLoading(false);
-  //     }, 3000);
-
-  //     return () => clearTimeout(timer);
-  //   }
-  // }, [isAtTop]);
 
   const handleResize = () => {
     if (window.innerWidth > 640 && isMenuOpen) {
@@ -57,29 +28,8 @@ export const Header = () => {
     <header
       className={clsx(styles.header) + ` sm:justify-normal  lg:justify-between`}
     >
-      {/* {loading && isAtTop && (
-        <div
-          className={clsx(" preloader", {
-            " preloader_logo_visible": loading && isAtTop,
-          })}
-        >
-          <img
-            className={clsx(" ", {
-              " animated_logo_visible": loading && isAtTop,
-            })}
-            src="/images/logo.svg"
-            alt="Alior"
-          />
-        </div>
-      )} */}
       <div>
-        <img
-          // className={clsx("", {
-          //   [styles.logo]: loading && isAtTop,
-          // })}
-          src="./images/logo.svg"
-          alt="Alior"
-        />
+        <LogoSVG />
       </div>
       <div className="hidden lg:flex">
         <Navbar isMobile={false} />

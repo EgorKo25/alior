@@ -1,1 +1,0 @@
-export { CasesIcon } from "./CasesIcon";

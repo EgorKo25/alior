@@ -2,6 +2,7 @@ import { TgButton } from "src/shared/ui/TgButton";
 import { Guys } from "./ui/Guys";
 import { CheckDemo } from "./ui/CheckDemo";
 import { MainTitle } from "./ui/MainTitle";
+import { ArrowSVG } from "./ui/ArrowSVG";
 
 export const Hero = () => {
   return (
@@ -11,11 +12,7 @@ export const Hero = () => {
         <span className=" absolute left-0 sm:-left-12 -translate-x-[70%] translate-y-2 text-lg sm:static sm:translate-x-0 sm:translate-y-0 sm:mb-4">
           Пишите нам
         </span>
-        <img
-          src="./images/arrow-for-tg.svg"
-          alt="Arrow"
-          className=" w-36 sm:w-44 text-accent fill-accent"
-        />
+        <ArrowSVG className=" w-36 sm:w-44 text-accent fill-accent" />
         <TgButton className=" bg-[#487CD4] hover:bg-[#487CD4]/80  transition-all" />
       </div>
       <div className="flex flex-col xl:flex-row xl:gap-24">
