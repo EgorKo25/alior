@@ -13,10 +13,32 @@ jobs:
     env:
       REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.SECRET }}
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./service/alior-cms
     steps:
-      - uses: reviewdog/action-setup@v1
+      - uses: actions/checkout@v4
+
+      - name: Установка Go
+        uses: actions/setup-go@v5
         with:
-          reviewdog_version: latest
+          go-version: '1.22.4'
+
+      - name: Запуск golangci-lint через Reviewdog
+        run: |
+          curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin v1.50.1
+          golangci-lint run --out-format=line-number --disable typecheck | reviewdog -f=golangci-lint -name="golangci-lint" -reporter=github-pr-review -fail-on-error=true
+
+      - name: Запуск staticcheck через Reviewdog
+        run: |
+          go install honnef.co/go/tools/cmd/staticcheck@latest
+          staticcheck ./... | reviewdog -f="staticcheck" -name="staticcheck" -reporter=github-pr-review -fail-on-error=true
+
+      - name: Запуск golint через Reviewdog
+        run: |
+          go install golang.org/x/lint/golint@latest
+          golint ./... | reviewdog -f=golint -name="golint" -reporter=github-pr-review -fail-on-error=true
+
   build-alior-cms:
     needs: check-code
     runs-on: ubuntu-latest
@@ -97,18 +119,6 @@ jobs:
       - name: Запуск go vet
         run: go vet ./...
 
-      - name: Установка staticcheck
-        run: go install honnef.co/go/tools/cmd/staticcheck@latest
-
-      - name: Запуск staticcheck
-        run: staticcheck ./...
-
-      - name: Установка golint
-        run: go install golang.org/x/lint/golint@latest
-
-      - name: Запуск golint
-        run: golint ./...
-
       - name: Запуск тестов
         run: go test -race -vet=off ./...
 
@@ -136,18 +146,6 @@ jobs:
 
       - name: Запуск go vet
         run: go vet ./...
-
-      - name: Установка staticcheck
-        run: go install honnef.co/go/tools/cmd/staticcheck@latest
-
-      - name: Запуск staticcheck
-        run: staticcheck ./...
-
-      - name: Установка golint
-        run: go install golang.org/x/lint/golint@latest
-
-      - name: Запуск golint
-        run: golint ./...
 
       - name: Запуск тестов
         run: go test -race -vet=off ./...
