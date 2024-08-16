@@ -147,7 +147,6 @@ jobs:
     needs:
       - check-tests-alior-auth
       - check-tests-alior-cms
-      - deploy-front
     runs-on: ubuntu-latest
     steps:
       - name: Здесь должны быть твои тесты Кирилл
