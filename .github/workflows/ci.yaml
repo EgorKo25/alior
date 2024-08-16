@@ -15,7 +15,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: /service/alior-cms
+        working-directory: /services/alior-cms
     steps:
       - uses: actions/checkout@v4
 
