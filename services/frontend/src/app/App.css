@@ -176,4 +176,5 @@
 
 body {
   overflow-x: hidden;
+  @apply bg-white;
 }

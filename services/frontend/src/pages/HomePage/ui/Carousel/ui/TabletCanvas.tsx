@@ -8,7 +8,13 @@ import { Tablet768 } from "./Tablet768";
 
 export const TabletCanvas = ({ url }: { url: string }) => {
   return (
-    <Suspense fallback={<div>Loading...</div>}>
+    <Suspense
+      fallback={
+        <div className=" w-full h-full grid place-items-center">
+          <div>Loading...</div>
+        </div>
+      }
+    >
       <Canvas
         camera={{ fov: 45, near: 0.1, far: 2000, position: [0, 0, 0] }}
         className="md:hidden"

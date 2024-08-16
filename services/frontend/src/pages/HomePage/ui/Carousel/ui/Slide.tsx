@@ -1,5 +1,6 @@
 import { ButtonColorSchema, MainButton } from "src/shared/ui/MainButton";
-import { TabletCanvas } from "./ui/TabletCanvas";
+import { TabletCanvas } from "./TabletCanvas";
+import { LogoSVG } from "src/shared/ui/LogoSVG";
 
 const COLOR_SCHEMA_CONFIG: Record<
   string,
@@ -40,21 +41,20 @@ export const Slide: React.FC<{
         COLOR_SCHEMA_CONFIG[ColorSchema].background
       }
     >
-      {isActive ? (
-        <div className="canvas-wrapper md:w-[50%] md:absolute md:-right-5 h-500 md:h-[130%] md:-top-[15%] xl:w-[60%]">
+      <div className="canvas-wrapper w-full h-500 md:w-[350px] lg:w-[500px] lg:h-598 xl:w-[700px] 2xl:w-[950px] 2xl:h-[700px] md:absolute md:-right-5 md:-top-[15%] 2xl:-top-[20%]">
+        {isActive ? (
           <TabletCanvas url={projectUrl} />
-        </div>
-      ) : (
-        <img
-          src="/images/Rectangle.png"
-          className=" w-full h-500 -mt-20 mb-5 overflow-visible md:w-1/2 md:absolute md:-right-5 md:top-1/2 md:translate-y-[-35%]"
-        />
-      )}
+        ) : (
+          <div className="img-wrapper w-full h-full grid place-items-center">
+            <LogoSVG className={" scale-[1.8] xl:scale-[2.5] 2xl:scale-[4]"} />
+          </div>
+        )}
+      </div>
 
-      <div className={` flex flex-col gap-10 md:w-[55%] md:mt-10 xl:w-[43%]`}>
+      <div className={` flex flex-col gap-10 md:w-[55%] md:mt-10 xl:w-[45%]`}>
         <h2
           className={
-            ` font-bold text-40 lg:text-64 leading-none` +
+            ` font-bold text-40 lg:text-64 leading-none text-nowrap` +
             COLOR_SCHEMA_CONFIG[ColorSchema].textColor
           }
         >

@@ -1,10 +1,10 @@
+import { useEffect, useState } from "react";
 import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
-import { Slide } from "./Slide";
-import "./styles.css";
-import { useEffect, useState } from "react";
 import { ProjData, projectsData } from "src/entities/projects/";
+import { Slide } from "./ui/Slide";
+import "./styles.css";
 
 const SLIDE_BG_GRADIENTS_CONFIG: {
   colorSchema: "orange" | "blue" | "black";
@@ -42,6 +42,7 @@ export const Carousel = () => {
   };
   return isProjectsLoaded && projects.length > 0 ? (
     <section
+      id="cases"
       className={`w-screen overflow-hidden transition-all bg-gradient-to-b from-transparent ${
         SLIDE_BG_GRADIENTS_CONFIG[activeSlide % 3].bg
       } via-[percentage:20%_70%] to-transparent`}

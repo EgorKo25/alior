@@ -11,7 +11,7 @@ export const Tablet1024: React.FC<{ url: string }> = memo(({ url }) => {
   const tablet = useGLTF("/tablet/scene.gltf");
 
   useFloating(tablet.scene, {
-    range: 0.05,
+    range: 0.03,
     speed: 0.005,
   });
 
@@ -29,7 +29,7 @@ export const Tablet1024: React.FC<{ url: string }> = memo(({ url }) => {
           object={tablet.scene}
           position-y={-0.1}
           position-x={-0.1}
-          position-z={-4.7}
+          position-z={-4.9}
           rotation={[-0.4, -0.15, Math.PI * 0.45]}
         >
           <Html
