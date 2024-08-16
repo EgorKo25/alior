@@ -24,7 +24,7 @@ jobs:
       - name: Запуск golangci-lint через Reviewdog
         run: |
           go install github.com/golangci/golangci-lint/cmd/golangci-lint@v1.57.2
-          golangci-lint run --out-format=line-number --disable typecheck --new-from-rev=HEAD~1 > linter.report 
+          golangci-lint run --out-format=line-number --disable typecheck  > linter.report 
           cat linter.report
           cat linter.report | reviewdog -f=golangci-lint -name="golangci-lint" -reporter=github-pr-review -fail-on-error=true
         working-directory: ./services/alior-cms
