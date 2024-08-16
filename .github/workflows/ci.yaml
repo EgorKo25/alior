@@ -16,7 +16,7 @@ jobs:
           go-version: '1.22.4'
       - name: Установка reviewdog
         run: |
-          cd services/alior-sms
+          ls -la 
           go install github.com/reviewdog/reviewdog/cmd/reviewdog@latest
       - name: Запуск golangci-lint через Reviewdog
         run: |
