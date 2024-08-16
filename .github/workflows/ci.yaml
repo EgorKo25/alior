@@ -25,19 +25,19 @@ jobs:
         run: |
           curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin v1.50.1
           golangci-lint run --out-format=line-number --disable typecheck | reviewdog -f=golangci-lint -name="golangci-lint" -reporter=github-pr-review -fail-on-error=true
-        working-directory: /services/alior-cms
+        working-directory:  ./services/alior-cms
 
       - name: Запуск staticcheck через Reviewdog
         run: |
           go install honnef.co/go/tools/cmd/staticcheck@latest
           staticcheck ./... | reviewdog -f="staticcheck" -name="staticcheck" -reporter=github-pr-review -fail-on-error=true
-        working-directory: /services/alior-cms
+        working-directory:  ./services/alior-cms
 
       - name: Запуск golint через Reviewdog
         run: |
           go install golang.org/x/lint/golint@latest
           golint ./... | reviewdog -f=golint -name="golint" -reporter=github-pr-review -fail-on-error=true
-        working-directory: /services/alior-cms
+        working-directory: ./services/alior-cms
 
   build-alior-cms:
     needs: check-code
