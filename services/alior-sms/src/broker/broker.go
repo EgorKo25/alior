@@ -253,7 +253,7 @@ func DialSessionChan(ctx context.Context, Dconfig DialConfig, logger ILogger) (c
 
 // Постоянно принимает сообщения из messages <-chan []byte
 // Отдает их на exchange, к которому подключена сессия chan Session.
-func Publish(sessionChan chan Session, messages <-chan amqp.Publishing, logger ILogger) {
+func Publish(sessionChan chan Session, messages chan amqp.Publishing, logger ILogger) {
 	for session := range sessionChan {
 		var (
 			reading = messages                        // Канал, из которого читаются сообщения
@@ -308,7 +308,7 @@ func Publish(sessionChan chan Session, messages <-chan amqp.Publishing, logger I
 
 // Постоянно принимает сообщения из очереди, к которой подключена сессия chan Session
 // Отдает их в канал messages chan<- []byte.
-func Subscribe(sessionChan chan Session, messages chan<- amqp.Delivery, logger ILogger) {
+func Subscribe(sessionChan chan Session, messages chan amqp.Delivery, logger ILogger) {
 	for session := range sessionChan {
 		if !session.Cfg.Connect2Queue {
 			logger.Info("Session config Connect2Queue is false")
