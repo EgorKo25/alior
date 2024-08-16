@@ -22,13 +22,10 @@ jobs:
         run: go install github.com/reviewdog/reviewdog/cmd/reviewdog@latest
         working-directory:  ./services/alior-cms
       - name: Запуск golangci-lint через Reviewdog
-        continue-on-error: true
         run: |
           go install github.com/golangci/golangci-lint/cmd/golangci-lint@v1.57.2
           echo "Install done"
-          golangci-lint run --out-format=line-number --disable typecheck  > linter.report 
-          cat linter.report
-          cat linter.report | reviewdog -f=golangci-lint -name="golangci-lint" -reporter=github-pr-review -fail-on-error=true
+          golangci-lint run --out-format=line-number --disable typecheck | reviewdog -f=golangci-lint -name="golangci-lint" -reporter=github-pr-review -fail-on-error=true
         working-directory: ./services/alior-cms
       - name: Запуск staticcheck через Reviewdog
         run: |
