@@ -24,7 +24,9 @@ jobs:
       - name: Запуск golangci-lint через Reviewdog
         run: |
           curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin v1.50.1
-          golangci-lint run --out-format=line-number --disable typecheck | reviewdog -f=golangci-lint -name="golangci-lint" -reporter=github-pr-review -fail-on-error=true
+          golangci-lint run --out-format=line-number --disable typecheck > linter.report 
+          cat linter.report
+          cat linter.report | reviewdog -f=golangci-lint -name="golangci-lint" -reporter=github-pr-review -fail-on-error=true
         working-directory:  ./services/alior-cms
 
       - name: Запуск staticcheck через Reviewdog
