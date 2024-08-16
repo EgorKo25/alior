@@ -29,6 +29,11 @@ type ILogger interface {
 
 func doInsertionJob(ctx context.Context, db DB, msg *amqp.Delivery) (*amqp.Publishing, error) {
 	var service types.Service
+
+	if msg.Body == nil {
+		return nil, fmt.Errorf("message body is nil, msg")
+	}
+
 	err := json.Unmarshal(msg.Body, &service)
 
 	if err != nil {
