@@ -3,6 +3,7 @@ module alior-sms
 go 1.22.5
 
 require (
+	github.com/golang/mock v1.6.0
 	github.com/jackc/pgx/v5 v5.6.0
 	github.com/pressly/goose/v3 v3.21.1
 	github.com/streadway/amqp v1.1.0
