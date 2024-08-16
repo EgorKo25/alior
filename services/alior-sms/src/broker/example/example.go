@@ -21,7 +21,7 @@ func main() {
 
 	cfg := broker.NewDialConfig("amqp://guest:guest@localhost:5672/", "test-exchange", "direct", "test-key", "testin-queue", true)
 	go func() {
-		dial, err := broker.DialSessionChan(ctx, *cfg, logger)
+		dial, err := broker.DialSessionChan(ctx, *cfg, &zap.Logger{})
 		if err != nil {
 			log.Fatalf(err.Error())
 		}
