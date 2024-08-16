@@ -21,12 +21,9 @@ jobs:
       - name: Установка reviewdog
         run: go install github.com/reviewdog/reviewdog/cmd/reviewdog@latest
         working-directory:  ./services/alior-cms
-      - name: golangci-lint
-        uses: golangci/golangci-lint-action@v6
-        with:
-          version: v1.59
       - name: Запуск golangci-lint через Reviewdog
         run: |
+          go install github.com/golangci/golangci-lint/cmd/golangci-lint@v1.57.2
           golangci-lint run --out-format=line-number --disable typecheck --new-from-rev=HEAD~1 /services/alior-cms> linter.report 
           cat linter.report
           cat linter.report | reviewdog -f=golangci-lint -name="golangci-lint" -reporter=github-pr-review -fail-on-error=true
