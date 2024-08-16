@@ -10,14 +10,15 @@ jobs:
     runs-on:
       - ubuntu-latest
     steps:
+      - uses: actions/checkout@v4
       - name: Установка Go
         uses: actions/setup-go@v5
         with:
           go-version: '1.22.4'
       - name: Установка reviewdog
         run: |
-          ls -la 
           go install github.com/reviewdog/reviewdog/cmd/reviewdog@latest
+        working-directory: ./services/alior-sms
       - name: Запуск golangci-lint через Reviewdog
         run: |
           go install github.com/golangci/golangci-lint/cmd/golangci-lint@v1.57.2
