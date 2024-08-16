@@ -4,9 +4,6 @@ on:
   pull_request:
     branches:
       - main
-  push:
-    branches:
-      - AS-36
 
 jobs:
   check-code-alior-sms:
