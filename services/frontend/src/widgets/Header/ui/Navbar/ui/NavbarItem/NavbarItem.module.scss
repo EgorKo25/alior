@@ -26,18 +26,6 @@
   transition: all 0.3s ease;
 }
 
-.decoration_active_chair {
-  background-image: url("../../images/chair.svg");
-}
-
-.decoration_active_services {
-  background-image: url("../../images/services.svg");
-}
-
-.decoration_active_play {
-  background-image: url("../../images/play.svg");
-}
-
 .list__item:hover .decoration {
   background-color: transparent;
   width: 24px;

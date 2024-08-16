@@ -1,1 +1,0 @@
-export { AboutIcon } from "./AboutIcon";
