@@ -9,59 +9,70 @@ on:
       - main
 
 jobs:
-  bulid-front:
+  build-alior-cms:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout the repository
+      - name: Клонирование репозитория
         uses: actions/checkout@v4
-
-      - name: Install dependencies
-        run: npm ci
-        working-directory: ./services/frontend
-
-      - name: Build the project
-        run: npm run build
-        working-directory: ./services/frontend
-
-      - run: |
-          pwd
-          ls
-          cd services/frontend/production
-          ls -la 
-
-      - name: Archive artifact
-        shell: sh
-        if: runner.os == 'Linux'
-        run: |
-          echo ::group::Archive artifact
-          tar \
-            --dereference --hard-dereference \
-            --directory services/frontend/production \
-            -cvf "artifact.tar" \
-            --exclude=.git \
-            --exclude=.github \
-            .
-          echo ::endgroup::
-
-      - name: Upload artifact
-        id: upload-artifact
-        uses: actions/upload-artifact@v4
+      - name: Установка Go
+        uses: actions/setup-go@v5
         with:
-          name: github-pages
-          path: artifact.tar
-          retention-days: 1
-          if-no-files-found: error
+          go-version: '1.22.4'
+      - name: Проверка версии Go
+        run: go version
+      - name: Установка кэша зависимостей
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cache/go-build
+            /go/pkg/mod
+          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+          restore-keys: |
+            ${{ runner.os }}-go-
+      - name: Установка зависимостей
+        run: go mod tidy
+        working-directory: ./services/alior-cms
+      - name: Сборка проекта
+        run: go build -o /dev/null ./...
+        working-directory: ./services/alior-cms
+
+  build-alior-sms:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Клонирование репозитория
+        uses: actions/checkout@v4
+      - name: Установка Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.22.4'
+      - name: Проверка версии Go
+        run: go version
+      - name: Установка кэша зависимостей
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cache/go-build
+            /go/pkg/mod
+          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+          restore-keys: |
+            ${{ runner.os }}-go-
+      - name: Установка зависимостей
+        run: go mod tidy
+        working-directory: ./services/alior-sms
+      - name: Сборка проекта
+        run: go build -o /dev/null ./...
+        working-directory: ./services/alior-sms
 
   build-alior-auth:
     runs-on: ubuntu-latest
     steps:
-      - name: Копирование содержимого на виртуальную машину
+      - name: Клонирование репозитория
         uses: actions/checkout@v4
-      - name: Установка golang
+      - name: Установка Go
         uses: actions/setup-go@v5
         with:
           go-version: '1.22.4'
-      - name: Вывод версии Go
+      - name: Проверка версии Go
         run: go version
       - name: Установка кэша зависимостей
         uses: actions/cache@v4
@@ -75,19 +86,20 @@ jobs:
       - name: Установка зависимостей
         run: go mod tidy
         working-directory: ./services/alior-auth
-      - name: Попытка собрать проект
+      - name: Сборка проекта
         run: go build -o /dev/null ./...
         working-directory: ./services/alior-auth
+
   build-alior-api-gw:
     runs-on: ubuntu-latest
     steps:
-      - name: Копирование содержимого на виртуальную машину
+      - name: Клонирование репозитория
         uses: actions/checkout@v4
-      - name: Установка golang
+      - name: Установка Go
         uses: actions/setup-go@v5
         with:
           go-version: '1.22.4'
-      - name: Вывод версии Go
+      - name: Проверка версии Go
         run: go version
       - name: Установка кэша зависимостей
         uses: actions/cache@v4
@@ -101,9 +113,90 @@ jobs:
       - name: Установка зависимостей
         run: go mod tidy
         working-directory: ./services/alior-api-gw
-      - name: Попытка собрать проект
+      - name: Сборка проекта
         run: go build -o /dev/null ./...
         working-directory: ./services/alior-api-gw
+
+  check-tests-alior-cms:
+    defaults:
+      run:
+        working-directory: ./services/alior-cms
+    needs:
+      - build-alior-cms
+    runs-on: ubuntu-latest
+    steps:
+      - name: Клонирование репозитория
+        uses: actions/checkout@v4
+
+      - name: Установка Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: 1.22.4
+
+      - name: Проверка зависимостей
+        run: go mod verify
+
+      - name: Сборка
+        run: go build -v ./...
+
+      - name: Запуск go vet
+        run: go vet ./...
+
+      - name: Установка staticcheck
+        run: go install honnef.co/go/tools/cmd/staticcheck@latest
+
+      - name: Запуск staticcheck
+        run: staticcheck ./...
+
+      - name: Установка golint
+        run: go install golang.org/x/lint/golint@latest
+
+      - name: Запуск golint
+        run: golint ./...
+
+      - name: Запуск тестов
+        run: go test -race -vet=off ./...
+
+  check-tests-alior-sms:
+    defaults:
+      run:
+        working-directory: ./services/alior-sms
+    needs:
+      - build-alior-sms
+    runs-on: ubuntu-latest
+    steps:
+      - name: Клонирование репозитория
+        uses: actions/checkout@v4
+
+      - name: Установка Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: 1.22.4
+
+      - name: Проверка зависимостей
+        run: go mod verify
+
+      - name: Сборка
+        run: go build -v ./...
+
+      - name: Запуск go vet
+        run: go vet ./...
+
+      - name: Установка staticcheck
+        run: go install honnef.co/go/tools/cmd/staticcheck@latest
+
+      - name: Запуск staticcheck
+        run: staticcheck ./...
+
+      - name: Установка golint
+        run: go install golang.org/x/lint/golint@latest
+
+      - name: Запуск golint
+        run: golint ./...
+
+      - name: Запуск тестов
+        run: go test -race -vet=off ./...
+
   check-tests-alior-auth:
     defaults:
       run:
@@ -112,96 +205,85 @@ jobs:
       - build-alior-auth
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - name: Клонирование репозитория
+        uses: actions/checkout@v4
 
-      - name: Set up Go
+      - name: Установка Go
         uses: actions/setup-go@v2
         with:
           go-version: 1.22.4
 
-      - name: Verify dependencies
+      - name: Проверка зависимостей
         run: go mod verify
 
-      - name: Build
+      - name: Сборка
         run: go build -v ./...
 
-      - name: Run go vet
+      - name: Запуск go vet
         run: go vet ./...
 
-      - name: Install staticcheck
+      - name: Установка staticcheck
         run: go install honnef.co/go/tools/cmd/staticcheck@latest
 
-      - name: Run staticcheck
+      - name: Запуск staticcheck
         run: staticcheck ./...
 
-      - name: Install golint
+      - name: Установка golint
         run: go install golang.org/x/lint/golint@latest
 
-      - name: Run golint
+      - name: Запуск golint
         run: golint ./...
 
-      - name: Run tests
+      - name: Запуск тестов
         run: go test -race -vet=off ./...
 
   check-tests-alior-api-gw:
+    defaults:
+      run:
+        working-directory: ./services/alior-api-gw
     needs: build-alior-api-gw
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - name: Клонирование репозитория
+        uses: actions/checkout@v4
 
-      - name: Set up Go
+      - name: Установка Go
         uses: actions/setup-go@v2
         with:
           go-version: 1.22.4
 
-      - name: Verify dependencies
+      - name: Проверка зависимостей
         run: go mod verify
 
-      - name: Build
+      - name: Сборка
         run: go build -v ./...
 
-      - name: Run go vet
+      - name: Запуск go vet
         run: go vet ./...
 
-      - name: Install staticcheck
+      - name: Установка staticcheck
         run: go install honnef.co/go/tools/cmd/staticcheck@latest
 
-      - name: Run staticcheck
+      - name: Запуск staticcheck
         run: staticcheck ./...
 
-      - name: Install golint
+      - name: Установка golint
         run: go install golang.org/x/lint/golint@latest
 
-      - name: Run golint
+      - name: Запуск golint
         run: golint ./...
 
-      - name: Run tests
+      - name: Запуск тестов
         run: go test -race -vet=off ./...
-  deploy-front:
-    needs: bulid-front
-
-    permissions:
-      pages: write
-      id-token: write
-
-    environment:
-      name: github-pages
-      url: https://egorko25.github.io/alior
-
-    runs-on: ubuntu-latest
-    steps:
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
 
   start-qa-test:
     needs:
       - check-tests-alior-api-gw
       - check-tests-alior-auth
+      - check-tests-alior-sms
+      - check-tests-alior-cms
       - deploy-front
     runs-on: ubuntu-latest
     steps:
       - name: Здесь должны быть твои тесты Кирилл
-        run: echo "Добавь запуск своих тестов сюда
-
-
+        run: echo "Добавь запуск своих тестов сюда"

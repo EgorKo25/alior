@@ -1,0 +1,67 @@
+name: CI Pipeline for Main Branch
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  bulid-front:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Клонирование репозитория
+        uses: actions/checkout@v4
+
+      - name: Установка зависимостей
+        run: npm ci
+        working-directory: ./services/frontend
+
+      - name: Сборка проекта
+        run: npm run build
+        working-directory: ./services/frontend
+
+      - run: |
+          pwd
+          ls
+          cd services/frontend/production
+          ls -la 
+
+      - name: Архивирование артефакта
+        shell: sh
+        if: runner.os == 'Linux'
+        run: |
+          echo ::group::Архивирование артефакта
+          tar \
+            --dereference --hard-dereference \
+            --directory services/frontend/production \
+            -cvf "artifact.tar" \
+            --exclude=.git \
+            --exclude=.github \
+            .
+          echo ::endgroup::
+
+      - name: Загрузка артефакта
+        id: upload-artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: github-pages
+          path: artifact.tar
+          retention-days: 1
+          if-no-files-found: error
+  deploy-front:
+    needs: bulid-front
+
+    permissions:
+      pages: write
+      id-token: write
+
+    environment:
+      name: github-pages
+      url: https://egorko25.github.io/alior
+
+    runs-on: ubuntu-latest
+    steps:
+      - name: Деплой на GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
+

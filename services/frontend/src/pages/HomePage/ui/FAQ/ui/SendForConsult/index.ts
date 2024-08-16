@@ -1,1 +1,0 @@
-export { SendForConsult } from "./SendForConsult";

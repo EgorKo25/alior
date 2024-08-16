@@ -1,9 +1,9 @@
 import { Link } from "react-router-dom";
 import styles from "./NavbarItem.module.scss";
 import clsx from "clsx";
-import { ServicesIcon } from "../ServicesIcon";
-import { AboutIcon } from "../AboutIcon";
-import { CasesIcon } from "../CasesIcon";
+import { ServicesIcon } from "./ui/ServicesIcon";
+import { AboutIcon } from "./ui/AboutIcon";
+import { CasesIcon } from "./ui/CasesIcon";
 
 interface NavigationItemProps {
   item: string;
