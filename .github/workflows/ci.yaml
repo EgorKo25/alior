@@ -6,7 +6,7 @@ on:
       - main
   push:
     branches:
-      - main
+      - AS-35
 
 jobs:
   build-alior-cms:
