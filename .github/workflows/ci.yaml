@@ -27,10 +27,9 @@ jobs:
           version: v1.59
       - name: Запуск golangci-lint через Reviewdog
         run: |
-          golangci-lint run --out-format=line-number --disable typecheck --new-from-rev=HEAD~1 > linter.report 
+          golangci-lint run --out-format=line-number --disable typecheck --new-from-rev=HEAD~1 /services/alior-cms> linter.report 
           cat linter.report
           cat linter.report | reviewdog -f=golangci-lint -name="golangci-lint" -reporter=github-pr-review -fail-on-error=true
-        working-directory:  ./services/alior-cms
 
       - name: Запуск staticcheck через Reviewdog
         run: |
