@@ -9,6 +9,8 @@ jobs:
   check-code-alior-sms:
     runs-on:
       - ubuntu-latest
+    env:
+      REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.SECRET }}
     steps:
       - uses: actions/checkout@v4
       - name: Установка Go
