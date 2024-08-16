@@ -11,8 +11,10 @@ export default defineConfig({
     },
   },
   build: {
+    assetsDir: "./",
     outDir: "production",
   },
+  base: "./",
   preview: {
     host: true,
   },

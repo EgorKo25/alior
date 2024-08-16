@@ -8,7 +8,7 @@ export const AboutIcon = ({ className }: { className: string }) => {
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
     >
-      <g clip-path="url(#clip0_2138_10)">
+      <g clipPath="url(#clip0_2138_10)">
         <mask
           id="mask0_2138_10"
           style={{ maskType: "alpha" }}

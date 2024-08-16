@@ -1,9 +1,10 @@
-import { QuestionIcon } from "./ui/QuestionIcon";
-import styles from "./Footer.module.scss";
 import clsx from "clsx";
+import { QuestionIcon } from "./ui/QuestionIcon";
 import { GitIcon } from "./ui/GitIcon";
 import { TgFooterIcon } from "./ui/TgFooterIcon";
-import { LinkedinIcon } from "./ui/LinkedinIcon/LinkedinIcon";
+import { LinkedinIcon } from "./ui/LinkedinIcon";
+import styles from "./Footer.module.scss";
+
 export const Footer = () => {
   return (
     <footer className={clsx(styles.footer)}>
