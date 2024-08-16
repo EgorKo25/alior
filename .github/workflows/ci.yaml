@@ -27,12 +27,6 @@ jobs:
           echo "Install done"
           golangci-lint run --out-format=line-number --disable typecheck | reviewdog -f=golangci-lint -name="golangci-lint" -reporter=github-pr-review -fail-on-error=true
         working-directory: ./services/alior-cms
-      - name: Запуск staticcheck через Reviewdog
-        run: |
-          go install honnef.co/go/tools/cmd/staticcheck@latest
-          staticcheck ./... | reviewdog -f="staticcheck" -name="staticcheck" -reporter=github-pr-review -fail-on-error=true
-        working-directory:  ./services/alior-cms
-
       - name: Запуск golint через Reviewdog
         run: |
           go install golang.org/x/lint/golint@latest
