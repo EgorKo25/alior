@@ -1,1 +1,0 @@
-export { FirstArrow } from "./FirstArrow";

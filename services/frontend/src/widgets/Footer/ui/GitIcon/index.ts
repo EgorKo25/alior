@@ -1,1 +1,0 @@
-export { GitIcon } from "./GitIcon";

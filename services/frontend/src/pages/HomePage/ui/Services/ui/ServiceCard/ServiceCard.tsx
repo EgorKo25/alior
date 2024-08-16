@@ -2,6 +2,7 @@ import { ServiceCardsData } from "src/features/appData";
 import { MainButton } from "src/shared/ui/MainButton";
 import styles from "./ServicieCard.module.scss";
 import clsx from "clsx";
+import { HashLink } from "react-router-hash-link";
 export const ServiceCard = ({
   index,
   isActive,
@@ -21,11 +22,13 @@ export const ServiceCard = ({
         {ServiceCardsData[index].description}
       </p>
       {isActive && (
-        <MainButton
-          colorSchema=" btn-orange-white"
-          className={styles.button}
-          title="Мне это надо"
-        />
+        <HashLink smooth to={"#consult"}>
+          <MainButton
+            colorSchema=" btn-orange-white"
+            className={styles.button}
+            title="Мне это надо"
+          />
+        </HashLink>
       )}
     </div>
   );
