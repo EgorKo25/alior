@@ -2,6 +2,7 @@ package broker
 
 import (
 	amqp "github.com/rabbitmq/amqp091-go"
+	"time"
 )
 
 func DeclareQueue(ch *amqp.Channel, queueName string) (*amqp.Queue, error) {
@@ -17,4 +18,12 @@ func DeclareQueue(ch *amqp.Channel, queueName string) (*amqp.Queue, error) {
 		return nil, err
 	}
 	return &q, nil
+}
+
+func CreateResponseMessage(delivery amqp.Delivery, responseBody string, responseType string) *RabbitMQMessage {
+	msg := NewMessage(responseBody, delivery)
+	msg.Properties.Type = responseType
+	msg.Properties.Timestamp = time.Now()
+
+	return msg
 }

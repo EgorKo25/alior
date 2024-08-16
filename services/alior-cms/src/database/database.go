@@ -1,6 +1,7 @@
 package database
 
 import (
+	_ "callback_service/migrations"
 	"callback_service/src/config"
 	"context"
 	"database/sql"

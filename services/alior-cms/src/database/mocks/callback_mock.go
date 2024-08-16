@@ -48,3 +48,33 @@ func (mr *MockICallbackMockRecorder) CreateCallback(ctx, data interface{}) *gomo
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateCallback", reflect.TypeOf((*MockICallback)(nil).CreateCallback), ctx, data)
 }
+
+// GetCallback mocks base method.
+func (m *MockICallback) GetCallback(ctx context.Context, limit, offset int) (*database.Callback, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetCallback", ctx, limit, offset)
+	ret0, _ := ret[0].(*database.Callback)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetCallback indicates an expected call of GetCallback.
+func (mr *MockICallbackMockRecorder) GetCallback(ctx, limit, offset interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetCallback", reflect.TypeOf((*MockICallback)(nil).GetCallback), ctx, limit, offset)
+}
+
+// GetTotalCallbacks mocks base method.
+func (m *MockICallback) GetTotalCallbacks(ctx context.Context) (int, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetTotalCallbacks", ctx)
+	ret0, _ := ret[0].(int)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetTotalCallbacks indicates an expected call of GetTotalCallbacks.
+func (mr *MockICallbackMockRecorder) GetTotalCallbacks(ctx interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetTotalCallbacks", reflect.TypeOf((*MockICallback)(nil).GetTotalCallbacks), ctx)
+}

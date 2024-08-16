@@ -8,6 +8,6 @@ RUN go mod download
 
 COPY . .
 
-RUN go build -o start.cms main.go
+RUN go build -o start.alior-cms main.go
 
 CMD ["sh", "-c", "./start.cms"]
