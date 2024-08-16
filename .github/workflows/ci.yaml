@@ -146,11 +146,8 @@ jobs:
 
   start-qa-test:
     needs:
-      - check-tests-alior-api-gw
       - check-tests-alior-auth
       - check-tests-alior-sms
-      - check-tests-alior-cms
-      - deploy-front
     runs-on: ubuntu-latest
     steps:
       - name: Здесь должны быть твои тесты Кирилл
