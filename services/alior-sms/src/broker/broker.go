@@ -1,12 +1,9 @@
 package broker
 
 import (
-	"bufio"
 	"context"
 	"errors"
 	"fmt"
-	"io"
-	"log"
 
 	"github.com/streadway/amqp"
 )
@@ -27,6 +24,15 @@ type IChannel interface {
 	Consume(queue, consumer string, autoAck, exclusive, noLocal, noWait bool, args amqp.Table) (<-chan amqp.Delivery, error)
 	Ack(tag uint64, multiple bool) error
 	Close() error
+}
+
+//go:generate go run github.com/vektra/mockery/v2@v2.44.1 --name ILogger
+type ILogger interface {
+	Debug(msg string, args ...interface{})
+	Info(msg string, args ...interface{})
+	Warn(msg string, args ...interface{})
+	Error(msg string, args ...interface{})
+	Fatal(msg string, args ...interface{})
 }
 
 type QueueConfig struct {
@@ -130,18 +136,20 @@ func (c *Session) Close() error {
 
 // Функция, которая создает и поддерживает подключение к брокеру, согласно конфигу
 // Если в конфиге Connect2Queue = 0, то подключится только к exchange, если 1, то еще и к очереди.
-func DialSessionChan(ctx context.Context, Dconfig DialConfig) (chan Session, error) {
+func DialSessionChan(ctx context.Context, Dconfig DialConfig, logger ILogger) (chan Session, error) {
 	sessionChan := make(chan Session)
 	errChan := make(chan error, 1)
 
 	go func() {
-		defer close(sessionChan)
-		defer close(errChan)
+		defer func() {
+			close(sessionChan)
+			close(errChan)
+		}()
 
 		for {
 			select {
 			case <-ctx.Done():
-				log.Println("Shutting down session factory")
+				logger.Info("Shutting down session factory")
 				errChan <- errors.New("context done")
 
 				return
@@ -149,7 +157,7 @@ func DialSessionChan(ctx context.Context, Dconfig DialConfig) (chan Session, err
 				// Пытаемся установить соединение с RabbitMQ
 				conn, err := amqp.Dial(Dconfig.URI)
 				if err != nil {
-					log.Printf("cannot (re)dial: %v: %q", err, Dconfig.URI)
+					logger.Error(fmt.Sprintf("cannot (re)dial: %v: %q", err, Dconfig.URI))
 					errChan <- err // Отправляем ошибку в канал и завершаем горутину
 
 					return
@@ -159,7 +167,7 @@ func DialSessionChan(ctx context.Context, Dconfig DialConfig) (chan Session, err
 				ch, err := conn.Channel()
 				if err != nil {
 					conn.Close()
-					log.Printf("cannot create channel: %v", err)
+					logger.Error(fmt.Sprintf("cannot create channel: %v", err))
 					errChan <- err // Отправляем ошибку в канал и завершаем горутину
 
 					return
@@ -176,7 +184,7 @@ func DialSessionChan(ctx context.Context, Dconfig DialConfig) (chan Session, err
 					Dconfig.ExchangeCfg.Args); err != nil {
 					ch.Close()
 					conn.Close()
-					log.Printf("cannot declare exchange: %v", err)
+					logger.Error(fmt.Sprintf("cannot declare exchange: %v", err))
 					errChan <- err // Отправляем ошибку в канал и завершаем горутину
 
 					return
@@ -184,7 +192,7 @@ func DialSessionChan(ctx context.Context, Dconfig DialConfig) (chan Session, err
 
 				if Dconfig.Connect2Queue {
 					if Dconfig.QueueCfg.QueueName == "" {
-						log.Printf("empty queue name")
+						logger.Error("empty queue name")
 						errChan <- errors.New("empty queue name")
 
 						return
@@ -201,7 +209,7 @@ func DialSessionChan(ctx context.Context, Dconfig DialConfig) (chan Session, err
 					if err != nil {
 						ch.Close()
 						conn.Close()
-						log.Printf("cannot declare queue: %q, %v", Dconfig.QueueCfg.QueueName, err)
+						logger.Error(fmt.Sprintf("cannot declare queue: %q, %v", Dconfig.QueueCfg.QueueName, err))
 						errChan <- err // Отправляем ошибку в канал и завершаем горутину
 
 						return
@@ -217,7 +225,7 @@ func DialSessionChan(ctx context.Context, Dconfig DialConfig) (chan Session, err
 					if err != nil {
 						ch.Close()
 						conn.Close()
-						log.Printf("cannot bind queue: %q to exchange: %q, %v", Dconfig.QueueCfg.QueueName, Dconfig.ExchangeCfg.ExchangeName, err)
+						logger.Error(fmt.Sprintf("cannot bind queue: %q to exchange: %q, %v", Dconfig.QueueCfg.QueueName, Dconfig.ExchangeCfg.ExchangeName, err))
 						errChan <- err // Отправляем ошибку в канал и завершаем горутину
 
 						return
@@ -245,19 +253,17 @@ func DialSessionChan(ctx context.Context, Dconfig DialConfig) (chan Session, err
 
 // Постоянно принимает сообщения из messages <-chan []byte
 // Отдает их на exchange, к которому подключена сессия chan Session.
-func Publish(sessionChan chan Session, messages <-chan []byte) {
+func Publish(sessionChan chan Session, messages <-chan amqp.Publishing, logger ILogger) {
 	for session := range sessionChan {
 		var (
-			running bool                              // Флаг, указывающий, есть ли сообщения для отправки
 			reading = messages                        // Канал, из которого читаются сообщения
-			pending = make(chan []byte, 1)            // Буфер для хранения сообщений, ожидающих отправки
+			pending = make(chan amqp.Publishing, 1)   // Буфер для хранения сообщений, ожидающих отправки
 			confirm = make(chan amqp.Confirmation, 1) // Канал для получения подтверждений публикации от RabbitMQ
-			body    []byte                            // Переменная для хранения текущего сообщения
 		)
 
 		// Включаем подтверждения публикации для текущего канала
 		if err := session.Channel.Confirm(false); err != nil {
-			log.Printf("publisher confirms not supported: %v", err)
+			logger.Info(fmt.Sprintf("publisher confirms not supported: %v", err))
 			close(confirm) // Если подтверждения не поддерживаются, закрываем канал confirm
 		} else {
 			session.Channel.NotifyPublish(confirm) // Включаем получение подтверждений публикации
@@ -271,30 +277,30 @@ func Publish(sessionChan chan Session, messages <-chan []byte) {
 					break PublishLoop // Если канал confirm закрыт, выходим из цикла и переходим к следующей сессии
 				}
 				if !confirmed.Ack {
-					log.Printf("nack message %d", confirmed.DeliveryTag)
+					logger.Warn(fmt.Sprintf("nack message %d", confirmed.DeliveryTag))
 				}
 				reading = messages // Возобновляем чтение новых сообщений
 
-			case body := <-pending:
+			case msg := <-pending:
 				err := session.Channel.Publish(
 					session.Cfg.ExchangeCfg.ExchangeName,
 					session.Cfg.ExchangeCfg.RoutingKey,
+					true,
 					false,
-					false,
-					amqp.Publishing{Body: body},
+					msg,
 				)
 				if err != nil {
-					pending <- body // Если публикация не удалась, сохраняем сообщение в буфере и выходим
+					pending <- msg // Если публикация не удалась, сохраняем сообщение в буфере и выходим
 					session.Connection.Close()
 					break PublishLoop
 				}
 
-			case body, running = <-reading:
+			case msg, running := <-reading:
 				if !running {
 					return // Если больше нет сообщений для отправки, завершаем работу функции
 				}
-				pending <- body // Отправляем сообщение в канал pending для публикации
-				reading = nil   // Останавливаем чтение новых сообщений, пока текущее не будет опубликовано
+				pending <- msg // Отправляем сообщение в канал pending для публикации
+				reading = nil  // Останавливаем чтение новых сообщений, пока текущее не будет опубликовано
 			}
 		}
 	}
@@ -302,10 +308,10 @@ func Publish(sessionChan chan Session, messages <-chan []byte) {
 
 // Постоянно принимает сообщения из очереди, к которой подключена сессия chan Session
 // Отдает их в канал messages chan<- []byte.
-func Subscribe(sessionChan chan Session, messages chan<- []byte) {
+func Subscribe(sessionChan chan Session, messages chan<- amqp.Delivery, logger ILogger) {
 	for session := range sessionChan {
 		if !session.Cfg.Connect2Queue {
-			log.Printf("Session config Connect2Queue is false")
+			logger.Info("Session config Connect2Queue is false")
 			continue
 		}
 		// Подписываемся на сообщения из очереди
@@ -318,46 +324,19 @@ func Subscribe(sessionChan chan Session, messages chan<- []byte) {
 			session.Cfg.ConsumeCfg.NoWait,    // noWait
 			session.Cfg.ConsumeCfg.Args)      // args
 		if err != nil {
-			log.Printf("cannot consume from queue: %q, %v", session.Cfg.QueueCfg.QueueName, err)
+			logger.Error(fmt.Sprintf("cannot consume from queue: %q, %v", session.Cfg.QueueCfg.QueueName, err))
 			continue // Переходим к следующей сессии в случае ошибки
 		}
 
-		log.Printf("subscribed to queue: %q...", session.Cfg.QueueCfg.QueueName)
+		logger.Info(fmt.Sprintf("subscribed to queue: %q...", session.Cfg.QueueCfg.QueueName))
 		// Обрабатываем сообщения из очереди
 		for msg := range deliveries {
-			messages <- msg.Body // Отправляем тело сообщения в канал messages
-
+			messages <- msg // Отправляем тело сообщения в канал messages
 			// Подтверждаем получение сообщения
 			err := session.Channel.Ack(msg.DeliveryTag, false)
 			if err != nil {
-				log.Printf("cannot ack message: %v", err)
+				logger.Error(fmt.Sprintf("cannot ack message: %v", err))
 			}
 		}
 	}
-}
-
-func MakeReaderChan(r io.Reader) <-chan []byte {
-	lines := make(chan []byte)
-	go func() {
-		defer close(lines)
-
-		scan := bufio.NewScanner(r)
-
-		for scan.Scan() {
-			lines <- scan.Bytes()
-		}
-	}()
-
-	return lines
-}
-
-func MakeWriterChan(w io.Writer) chan<- []byte {
-	lines := make(chan []byte)
-	go func() {
-		for line := range lines {
-			fmt.Fprintln(w, string(line))
-		}
-	}()
-
-	return lines
 }

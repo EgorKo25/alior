@@ -20,7 +20,7 @@ func main() {
 		broker.Publish(dial, broker.MakeReaderChan(os.Stdin))
 		done()
 	}()
-	go func() {
+	/*go func() {
 		dial, err := broker.DialSessionChan(ctx, *cfg)
 		if err != nil {
 			log.Fatalf(err.Error())
@@ -28,6 +28,6 @@ func main() {
 
 		broker.Subscribe(dial, broker.MakeWriterChan(os.Stdout))
 		done()
-	}()
+	}()*/
 	<-ctx.Done()
 }

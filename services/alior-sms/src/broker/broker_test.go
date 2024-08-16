@@ -2,6 +2,7 @@ package broker_test
 
 import (
 	"alior-sms/src/broker"
+	"alior-sms/src/broker/mocks"
 	"context"
 	"testing"
 
@@ -110,7 +111,7 @@ func TestDialSessionChan(t *testing.T) {
 				defer cancel()
 			}
 
-			sessionChan, err := broker.DialSessionChan(ctx, tt.Dconfig)
+			sessionChan, err := broker.DialSessionChan(ctx, tt.Dconfig, &mocks.ILogger{})
 
 			// Проверка, возникла ли ошибка
 			if tt.expectError {
