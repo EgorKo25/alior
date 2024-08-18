@@ -1,6 +1,7 @@
 import { ButtonColorSchema, MainButton } from "src/shared/ui/MainButton";
-import { TabletCanvas } from "./TabletCanvas";
+import { TabletsCanvas } from "./TabletsCanvas";
 import { LogoSVG } from "src/shared/ui/LogoSVG";
+import { Placeholders } from "./Placeholders";
 
 const COLOR_SCHEMA_CONFIG: Record<
   string,
@@ -42,19 +43,13 @@ export const Slide: React.FC<{
       }
     >
       <div className="canvas-wrapper w-full h-500 md:w-[350px] lg:w-[500px] lg:h-598 xl:w-[700px] 2xl:w-[950px] 2xl:h-[700px] md:absolute md:-right-5 md:-top-[15%] 2xl:-top-[20%]">
-        {isActive ? (
-          <TabletCanvas url={projectUrl} />
-        ) : (
-          <div className="img-wrapper w-full h-full grid place-items-center">
-            <LogoSVG className={" scale-[1.8] xl:scale-[2.5] 2xl:scale-[4]"} />
-          </div>
-        )}
+        {isActive ? <TabletsCanvas url={projectUrl} /> : <Placeholders />}
       </div>
 
       <div className={` flex flex-col gap-10 md:w-[55%] md:mt-10 xl:w-[45%]`}>
         <h2
           className={
-            ` font-bold text-40 lg:text-64 leading-none text-nowrap` +
+            ` font-bold text-40 lg:text-64 leading-none` +
             COLOR_SCHEMA_CONFIG[ColorSchema].textColor
           }
         >

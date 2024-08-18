@@ -66,7 +66,7 @@ export const FeaturesThesesData: FeaturesThesisData[] = [
 
 export const ProjectsDummyData = [
   {
-    title: `ООО "Геодезия"`,
+    title: `Геодезия`,
     description:
       "Сайт для геодезической компании, занимающейся предоставлением набора инструментов и технологий для обработки пространственных данных, в том числе для нужд военной отрасли России.",
     url: "https://geodesia.pingco.ru/",
@@ -78,7 +78,7 @@ export const ProjectsDummyData = [
     url: "https://interior.top/",
   },
   {
-    title: "Web-студия Alior",
+    title: "Alior",
     description: `Сайт нашей компании, тот самый, на котором вы сейчас находитесь, не находите ли вы в этой рекурсии некоторую магию? И вам даже не нужна кнопка "Посмотреть демо"!`,
     url: "https://egorko25.github.io/alior/",
   },
