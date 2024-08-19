@@ -32,14 +32,14 @@ export const TabletsCanvas = ({ url }: { url: string }) => {
         <Tablet1024 url={url} />
       </Canvas>
       <Canvas
-        id="tablet-1440"
+        id="tv-1440"
         camera={{ fov: 45, near: 0.1, far: 2000, position: [0, 0, 0] }}
         className="hidden xl:block 2xl:hidden"
       >
         <Tv1440 url={url} />
       </Canvas>
       <Canvas
-        id="tablet-1920"
+        id="tv-1920"
         camera={{ fov: 45, near: 0.1, far: 2000, position: [0, 0, 0] }}
         className="hidden 2xl:block"
       >

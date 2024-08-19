@@ -1,6 +1,5 @@
 import { ButtonColorSchema, MainButton } from "src/shared/ui/MainButton";
 import { TabletsCanvas } from "./TabletsCanvas";
-import { LogoSVG } from "src/shared/ui/LogoSVG";
 import { Placeholders } from "./Placeholders";
 
 const COLOR_SCHEMA_CONFIG: Record<
@@ -46,7 +45,7 @@ export const Slide: React.FC<{
         {isActive ? <TabletsCanvas url={projectUrl} /> : <Placeholders />}
       </div>
 
-      <div className={` flex flex-col gap-10 md:w-[55%] md:mt-10 xl:w-[45%]`}>
+      <div className={` flex flex-col gap-10 md:w-[53%] md:mt-10 xl:w-[45%]`}>
         <h2
           className={
             ` font-bold text-40 lg:text-64 leading-none` +

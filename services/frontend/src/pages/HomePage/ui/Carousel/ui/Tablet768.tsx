@@ -15,10 +15,10 @@ export const Tablet768: React.FC<{ url: string }> = memo(({ url }) => {
         rotation={[0, 0.25, 0]}
       >
         <Html
-          position={[0.208, 0.185, -0.05]}
+          position={[6.23, 0.45, -25]}
           transform
           rotation={[0, -0.25, 0]}
-          distanceFactor={1.145}
+          distanceFactor={7.65}
         >
           <iframe
             src={url}
