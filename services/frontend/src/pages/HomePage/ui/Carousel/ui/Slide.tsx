@@ -62,7 +62,7 @@ export const Slide: React.FC<{
         >
           {description}
         </div>
-        <a href={projectUrl}>
+        <a href={projectUrl} target="_blank">
           <MainButton
             title={"Посмотреть демо"}
             className={"w-full"}
