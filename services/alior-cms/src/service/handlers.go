@@ -29,6 +29,15 @@ func (c *CMS) HandleMessage(ctx context.Context, delivery amqp.Delivery) error {
 				c.logger.Info("successful query build")
 				return c.broker.Produce(ctx, delivery, "successful query build", "success")
 			}
+		case "delete":
+			err := c.HandleDeleteMessage(ctx, delivery)
+			if err != nil {
+				c.logger.Error("error: %s", err.Error())
+				return c.broker.Produce(ctx, delivery, err.Error(), "error")
+			} else {
+				c.logger.Info("successful delete")
+				return c.broker.Produce(ctx, delivery, "successful delete", "success")
+			}
 		default:
 			c.logger.Error("unknown action type: %s", delivery.Type)
 			return c.broker.Produce(ctx, delivery, "unknown action type", "error")
@@ -56,6 +65,7 @@ func (c *CMS) HandleAskMessage(ctx context.Context, delivery amqp.Delivery) erro
 	c.logger.Info("Offset: %d", database.Offset)
 	switch delivery.Type {
 	case "initial":
+		database.Offset = 0
 		callback, err := c.storage.GetCallback(ctx, database.Limit, 0)
 		if err != nil {
 			c.logger.Error("error fetching callback: %s", err.Error())
@@ -85,7 +95,7 @@ func (c *CMS) HandleAskMessage(ctx context.Context, delivery amqp.Delivery) erro
 			return err
 		}
 	case "previous":
-		if database.Offset-1 > 0 {
+		if database.Offset > 0 {
 			database.Offset -= 1
 		}
 		callback, err := c.storage.GetCallback(ctx, database.Limit, database.Offset)
@@ -100,6 +110,21 @@ func (c *CMS) HandleAskMessage(ctx context.Context, delivery amqp.Delivery) erro
 		}
 	}
 	c.logger.Info("Offset new: %d", database.Offset)
+	return nil
+}
+
+func (c *CMS) HandleDeleteMessage(ctx context.Context, delivery amqp.Delivery) error {
+	var body database.Callback
+	err := json.Unmarshal(delivery.Body, &body)
+	if err != nil {
+		c.logger.Error("error unmarshaling message body: %s", err.Error())
+		return err
+	}
+	err = c.storage.DeleteCallbackByID(ctx, body.ID)
+	if err != nil {
+		c.logger.Error("error deleting callback: %s", err.Error())
+		return err
+	}
 	return nil
 }
 
