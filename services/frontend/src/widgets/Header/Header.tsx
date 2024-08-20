@@ -5,7 +5,7 @@ import { IconBars } from "src/shared/ui/IconBars";
 import { IconCross } from "src/shared/ui/IconCross";
 import { MainButton } from "src/shared/ui/MainButton";
 import { Navbar } from "./ui/Navbar";
-import { LogoSVG } from "./ui/LogoSVG";
+import { LogoSVG } from "../../shared/ui/LogoSVG";
 import styles from "./Header.module.scss";
 
 export const Header = () => {
@@ -30,7 +30,7 @@ export const Header = () => {
       className={clsx(styles.header) + ` sm:justify-normal  lg:justify-between`}
     >
       <div>
-        <LogoSVG />
+        <LogoSVG className={""} />
       </div>
       <div className="hidden lg:flex">
         <Navbar isMobile={false} />
