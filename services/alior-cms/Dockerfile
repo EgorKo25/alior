@@ -10,4 +10,4 @@ COPY . .
 
 RUN go build -o start.alior-cms main.go
 
-CMD ["sh", "-c", "./start.cms"]
+CMD ["sh", "-c", "./start.alior-cms"]
