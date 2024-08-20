@@ -3,20 +3,24 @@ package service
 import (
 	"callback_service/src/database"
 	"context"
-	"encoding/json"
+	amqp "github.com/rabbitmq/amqp091-go"
 )
 
 type IBroker interface {
-	Consume(ctx context.Context, queueName string, handler func(context.Context, []byte) error) error
-	Produce(ctx context.Context, queueName string, body []byte) error
+	Consume(ctx context.Context, queueName string, handler func(context.Context, amqp.Delivery) error) error
+	Produce(ctx context.Context, delivery amqp.Delivery, responseBody string, responseType string) error
 }
 
 type ICallback interface {
 	CreateCallback(ctx context.Context, data *database.Callback) error
+	GetCallback(ctx context.Context, limit int, offset int) (callback *database.Callback, err error)
+	DeleteCallbackByID(ctx context.Context, id int32) error
+	GetTotalCallbacks(ctx context.Context) (int, error)
 }
 
 type ILogger interface {
 	Error(msg string, args ...interface{})
+	Info(msg string, args ...interface{})
 }
 
 type CMS struct {
@@ -34,31 +38,13 @@ func NewCMS(broker IBroker, storage ICallback, logger ILogger) *CMS {
 }
 
 func (c *CMS) Run(ctx context.Context) error {
-	return c.broker.Consume(ctx, "create", c.HandleMessage)
-}
+	errCh := make(chan error, 1)
 
-func (c *CMS) HandleMessage(ctx context.Context, body []byte) error {
-	callback, err := ConvertToRepositoryAndValidate(body)
-	if err != nil {
-		c.logger.Error("error during validation or conversion: %s", err.Error())
-		return c.broker.Produce(ctx, "error", []byte(err.Error()))
-	}
+	go func() {
+		if err := c.broker.Consume(ctx, "ask", c.HandleMessage); err != nil {
+			errCh <- err
+		}
+	}()
 
-	err = c.storage.CreateCallback(ctx, callback)
-	if err != nil {
-		c.logger.Error("error inserting callback: %s", err.Error())
-		return c.broker.Produce(ctx, "error", []byte(err.Error()))
-	}
-
-	successMsg := "Callback created successfully"
-	return c.broker.Produce(ctx, "success", []byte(successMsg))
-}
-
-func ConvertToRepositoryAndValidate(callbackSrc []byte) (*database.Callback, error) {
-	var callback database.Callback
-	err := json.Unmarshal(callbackSrc, &callback)
-	if err != nil {
-		return nil, err
-	}
-	return &callback, nil
+	return <-errCh
 }
