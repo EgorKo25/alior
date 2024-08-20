@@ -8,22 +8,21 @@ export const Services = () => {
 
   const handleScroll = () => {
     const cards = document.querySelectorAll("[data-card-index]");
-    let newActiveCard = null;
 
     cards.forEach((card, index) => {
       const cardRect = card.getBoundingClientRect();
-      const isFullyVisible =
-        cardRect.top >= 0 && cardRect.bottom <= window.innerHeight;
+      const isMiddle =
+        cardRect.top <= window.innerHeight / 2 &&
+        cardRect.bottom >= window.innerHeight / 2 - 17;
 
-      if (isFullyVisible) {
-        newActiveCard = index;
+      if (isMiddle && index != activeCard) {
+        setActiveCard(index);
       }
     });
-
-    setActiveCard(newActiveCard);
   };
 
   useEffect(() => {
+    setActiveCard(0);
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
