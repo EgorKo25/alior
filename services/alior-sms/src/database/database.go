@@ -84,3 +84,27 @@ func (db *DB) GetPaginatedServices(ctx context.Context, limit, offset int32) ([]
 
 	return services, nil
 }
+
+func (db *DB) InsertProject(ctx context.Context, project *types.Project) (int32, error) {
+	query := `INSERT INTO projects
+    (url, description) VALUES ($1, $2) RETURNING id`
+	return project.ID, db.pool.QueryRow(ctx, query, project.URL, project.Description).Scan(&project.ID)
+}
+
+func (db *DB) GetProjectByID(ctx context.Context, id int32) (*types.Project, error) {
+	query := `SELECT url, description FROM projects WHERE id = $1`
+	project := &types.Project{ID: id}
+
+	return project, db.pool.QueryRow(ctx, query, id).Scan(&project.URL, &project.Description)
+}
+
+func (db *DB) DelProjectByID(ctx context.Context, id int32) error {
+	query := `DELETE FROM projects WHERE id = $1`
+	commTag, err := db.pool.Exec(ctx, query, id)
+
+	if commTag.RowsAffected() != 1 {
+		return errors.New("No row found to delete")
+	}
+
+	return err
+}

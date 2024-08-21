@@ -20,6 +20,7 @@ func upCreateTableServices(ctx context.Context, tx *sql.Tx) error {
     		price NUMERIC CHECK (price >= 0)
 		);
 	`)
+
 	return err
 }
 

@@ -11,3 +11,9 @@ type PagineBody struct {
 	Limit  int32 `json:"limit"`
 	Offset int32 `json:"offset"`
 }
+
+type Project struct {
+	ID          int32  `json:"id"`
+	URL         string `json:"url"`
+	Description string `json:"description"`
+}
