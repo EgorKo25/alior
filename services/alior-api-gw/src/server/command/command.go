@@ -8,12 +8,11 @@ import (
 
 type ICommand interface {
 	Name() string
-	Apply() error
+	Apply() (any, error)
 	Parse(ctx *gin.Context) error
 }
 
 type Commander interface {
-	// GetCommand(name string) gin.HandlerFunc
 	Register(command ICommand) gin.HandlerFunc
 }
 
@@ -36,12 +35,16 @@ func (c *Manager) Register(command ICommand) gin.HandlerFunc {
 	}
 	c.commands[command.Name()] = command
 	return func(ctx *gin.Context) {
-		c.logger.Info("New request to command: %s", command.Name())
+		c.logger.Info("new request to command: %s", command.Name())
 		if err := command.Parse(ctx); err != nil {
+			c.logger.Error("cannot parse request: %s, error: %s", command.Name(), err.Error())
 			ctx.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		}
-		if err := command.Apply(); err != nil {
+		response, err := command.Apply()
+		if err != nil {
+			c.logger.Error("cannot apply request: %s, error: %s", command.Name(), err.Error())
 			ctx.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		}
+		ctx.JSON(http.StatusOK, response)
 	}
 }
