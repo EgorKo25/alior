@@ -6,19 +6,20 @@ import (
 	"net/http"
 )
 
-type Command interface {
+type ICommand interface {
 	Name() string
 	Apply() error
 	Parse(ctx *gin.Context) error
 }
 
 type Commander interface {
-	GetCommand(name string) gin.HandlerFunc
+	// GetCommand(name string) gin.HandlerFunc
+	Register(command ICommand) gin.HandlerFunc
 }
 
 func NewCommand(logger logger.ILogger) (*Manager, error) {
 	manager := &Manager{logger: logger}
-	manager.Register("callback/create", &CallbackCreate{})
+	manager.Register(&CallbackCreate{})
 
 	return manager, nil
 }
@@ -26,17 +27,14 @@ func NewCommand(logger logger.ILogger) (*Manager, error) {
 type Manager struct {
 	logger logger.ILogger
 
-	commands map[string]Command
+	commands map[string]ICommand
 }
 
-func (c *Manager) Register(name string, command Command) {
+func (c *Manager) Register(command ICommand) gin.HandlerFunc {
 	if c.commands == nil {
-		c.commands = make(map[string]Command)
+		c.commands = make(map[string]ICommand)
 	}
-	c.commands[name] = command
-}
-
-func (c *Manager) CastToGin(command Command) gin.HandlerFunc {
+	c.commands[command.Name()] = command
 	return func(ctx *gin.Context) {
 		c.logger.Info("New request to command: %s", command.Name())
 		if err := command.Parse(ctx); err != nil {
