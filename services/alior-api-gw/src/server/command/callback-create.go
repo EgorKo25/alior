@@ -37,6 +37,6 @@ func (c *CallbackCreate) Parse(ctx *gin.Context) error {
 	return nil
 }
 
-func (c *CallbackCreate) Apply() error {
-	return nil //TODO: дописать обработку
+func (c *CallbackCreate) Apply() (any, error) {
+	return nil, nil //TODO: дописать обработку
 }
