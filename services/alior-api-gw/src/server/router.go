@@ -15,7 +15,7 @@ type Handlers interface {
 func GetRouter(commands command.Commander) {
 	router := gin.Default()
 	v1 := router.Group("/v1")
-	v1.GET("/carousel/list", commands.GetCommand("carousel/list"))
-	v1.GET("/service/list", commands.GetCommand("service/list"))
-	v1.POST("/callback/create", commands.GetCommand("callback/create"))
+	var c command.ICommand
+	c = &command.CallbackCreate{}
+	v1.POST("/"+c.Name(), commands.Register(c))
 }
