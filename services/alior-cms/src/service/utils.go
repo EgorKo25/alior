@@ -1,6 +1,7 @@
 package service
 
 import (
+	"callback_service/src/broker"
 	"callback_service/src/database"
 	"encoding/json"
 	"errors"
@@ -27,4 +28,18 @@ func convertToRepositoryAndValidate(callbackSrc []byte) (*database.Callback, err
 		return nil, err
 	}
 	return callback, nil
+}
+
+func (c *CMS) createResponse(callback *database.Callback) error {
+	callbackJSON, err := json.Marshal(callback)
+	if err != nil {
+		c.logger.Error("error marshalling callback: %s", err.Error())
+		return err
+	}
+
+	msg := broker.NewMessage(string(callbackJSON), "callback")
+	if err := c.broker.Publish(msg); err != nil {
+		return err
+	}
+	return nil
 }

@@ -1,14 +1,15 @@
 package service
 
 import (
+	"callback_service/src/broker"
 	"callback_service/src/database"
 	"context"
 	amqp "github.com/rabbitmq/amqp091-go"
 )
 
 type IBroker interface {
-	Consume(ctx context.Context, queueName string, handler func(context.Context, amqp.Delivery) error) error
-	Produce(ctx context.Context, delivery amqp.Delivery, responseBody string, responseType string) error
+	Subscribe(ctx context.Context, queue string, handler func(ctx context.Context, delivery amqp.Delivery) error) error
+	Publish(message *broker.Message) error
 }
 
 type ICallback interface {
@@ -41,7 +42,7 @@ func (c *CMS) Run(ctx context.Context) error {
 	errCh := make(chan error, 1)
 
 	go func() {
-		if err := c.broker.Consume(ctx, "ask", c.HandleMessage); err != nil {
+		if err := c.broker.Subscribe(ctx, "ask", c.HandleMessage); err != nil {
 			errCh <- err
 		}
 	}()

@@ -1,6 +1,7 @@
 package service
 
 import (
+	"callback_service/src/broker"
 	"callback_service/src/database"
 	"context"
 	"encoding/json"
@@ -13,34 +14,68 @@ func (c *CMS) HandleMessage(ctx context.Context, delivery amqp.Delivery) error {
 		case "create":
 			err := c.CreateCallbackHandler(ctx, delivery)
 			if err != nil {
-				c.logger.Error("failed to create callback: %s", err)
-				return c.broker.Produce(ctx, delivery, err.Error(), "error")
-			} else {
-				c.logger.Info("callback created successfully")
-				return c.broker.Produce(ctx, delivery, "callback created successfully", "success")
+				c.logger.Error("error creating callback: %s", err)
+				response := broker.NewMessage("error creating callback", "error")
+				return c.broker.Publish(response)
 			}
-		case "initial", "next", "previous":
-			err := c.HandleAskMessage(ctx, delivery)
-			delivery.Body = []byte("")
+			c.logger.Info("callback created")
+
+			response := broker.NewMessage("created successfully", "success")
+			return c.broker.Publish(response)
+
+		case "initial":
+			err := c.InitialCallbackHandler(ctx)
 			if err != nil {
-				c.logger.Error("error: %s", err.Error())
-				return c.broker.Produce(ctx, delivery, err.Error(), "error")
-			} else {
-				c.logger.Info("successful query build")
-				return c.broker.Produce(ctx, delivery, "successful query build", "success")
+				c.logger.Error("error getting init callback: %s", err)
+				response := broker.NewMessage("error getting init callback", "error")
+				return c.broker.Publish(response)
 			}
+			c.logger.Info("got initial callback")
+
+			response := broker.NewMessage("got initial callback", "success")
+			return c.broker.Publish(response)
+
+		case "next":
+			err := c.NextCallbackHandler(ctx)
+			if err != nil {
+				c.logger.Error("error getting next callback: %s", err)
+				response := broker.NewMessage("error getting next callback", "error")
+				return c.broker.Publish(response)
+			}
+			c.logger.Info("got next callback")
+
+			response := broker.NewMessage("got next callback", "success")
+			return c.broker.Publish(response)
+
+		case "previous":
+			err := c.PreviousCallbackHandler(ctx)
+			if err != nil {
+				c.logger.Error("error getting previous callback: %s", err)
+				response := broker.NewMessage("error getting previous callback", "error")
+				return c.broker.Publish(response)
+			}
+			c.logger.Info("got previous callback")
+
+			response := broker.NewMessage("got previous callback", "success")
+			return c.broker.Publish(response)
+
 		case "delete":
-			err := c.HandleDeleteMessage(ctx, delivery)
+			err := c.DeleteCallbackHandler(ctx, delivery)
 			if err != nil {
-				c.logger.Error("error: %s", err.Error())
-				return c.broker.Produce(ctx, delivery, err.Error(), "error")
-			} else {
-				c.logger.Info("successful delete")
-				return c.broker.Produce(ctx, delivery, "successful delete", "success")
+				c.logger.Error("error deleting callback: %s", err)
+				response := broker.NewMessage("error deleting callback", "error")
+				return c.broker.Publish(response)
 			}
+			c.logger.Info("got delete callback")
+
+			response := broker.NewMessage("deleted successfully", "success")
+			return c.broker.Publish(response)
+
 		default:
-			c.logger.Error("unknown action type: %s", delivery.Type)
-			return c.broker.Produce(ctx, delivery, "unknown action type", "error")
+			c.logger.Error("unknown message type: %s", delivery.Type)
+
+			response := broker.NewMessage("unknown message type", "error")
+			return c.broker.Publish(response)
 		}
 	}
 	return nil
@@ -58,84 +93,92 @@ func (c *CMS) CreateCallbackHandler(ctx context.Context, delivery amqp.Delivery)
 		c.logger.Error("error inserting callback: %s", err.Error())
 		return err
 	}
+
 	return nil
 }
 
-func (c *CMS) HandleAskMessage(ctx context.Context, delivery amqp.Delivery) error {
-	c.logger.Info("Offset: %d", database.Offset)
-	switch delivery.Type {
-	case "initial":
-		database.Offset = 0
-		callback, err := c.storage.GetCallback(ctx, database.Limit, 0)
-		if err != nil {
-			c.logger.Error("error fetching callback: %s", err.Error())
-			return err
-		}
-		err = c.processRabbitResponse(ctx, callback, delivery)
-		if err != nil {
-			c.logger.Error("error processing rabbit response: %s", err.Error())
-			return err
-		}
-	case "next":
-		total, err := c.storage.GetTotalCallbacks(ctx)
-		if err != nil {
-			c.logger.Error("error getting total callbacks: %s", err.Error())
-		}
-		if database.Offset+1 < total {
-			database.Offset += 1
-		}
-		callback, err := c.storage.GetCallback(ctx, database.Limit, database.Offset)
-		if err != nil {
-			c.logger.Error("error fetching callback: %s", err.Error())
-			return err
-		}
-		err = c.processRabbitResponse(ctx, callback, delivery)
-		if err != nil {
-			c.logger.Error("error processing rabbit response: %s", err.Error())
-			return err
-		}
-	case "previous":
-		if database.Offset > 0 {
-			database.Offset -= 1
-		}
-		callback, err := c.storage.GetCallback(ctx, database.Limit, database.Offset)
-		if err != nil {
-			c.logger.Error("error fetching callback: %s", err.Error())
-			return err
-		}
-		err = c.processRabbitResponse(ctx, callback, delivery)
-		if err != nil {
-			c.logger.Error("error processing rabbit response: %s", err.Error())
-			return err
-		}
-	}
-	c.logger.Info("Offset new: %d", database.Offset)
-	return nil
-}
-
-func (c *CMS) HandleDeleteMessage(ctx context.Context, delivery amqp.Delivery) error {
-	var body database.Callback
-	err := json.Unmarshal(delivery.Body, &body)
+func (c *CMS) InitialCallbackHandler(ctx context.Context) error {
+	database.Offset = 0
+	callback, err := c.storage.GetCallback(ctx, database.Limit, 0)
 	if err != nil {
-		c.logger.Error("error unmarshaling message body: %s", err.Error())
+		c.logger.Error("error fetching callback: %s", err.Error())
 		return err
 	}
+
+	err = c.createResponse(callback)
+	if err != nil {
+		c.logger.Error("error processing rabbit response: %s", err.Error())
+		return err
+	}
+
+	c.logger.Info("got initial callback: %s", callback)
+	return nil
+}
+
+func (c *CMS) NextCallbackHandler(ctx context.Context) error {
+	total, err := c.storage.GetTotalCallbacks(ctx)
+	if err != nil {
+		c.logger.Error("error getting total callbacks: %s", err.Error())
+	}
+
+	if database.Offset+1 < total {
+		database.Offset += 1
+	}
+
+	callback, err := c.storage.GetCallback(ctx, database.Limit, database.Offset)
+	if err != nil {
+		c.logger.Error("error fetching callback: %s", err.Error())
+		return err
+	}
+
+	err = c.createResponse(callback)
+	if err != nil {
+		c.logger.Error("error processing rabbit response: %s", err.Error())
+		return err
+	}
+
+	c.logger.Info("got next callback: %s", callback)
+	return nil
+}
+
+func (c *CMS) PreviousCallbackHandler(ctx context.Context) error {
+	if database.Offset > 0 {
+		database.Offset -= 1
+	}
+	callback, err := c.storage.GetCallback(ctx, database.Limit, database.Offset)
+	if err != nil {
+		c.logger.Error("error fetching callback: %s", err.Error())
+		return err
+	}
+	err = c.createResponse(callback)
+	if err != nil {
+		c.logger.Error("error processing rabbit response: %s", err.Error())
+		return err
+	}
+
+	c.logger.Info("got previous callback: %s", callback)
+	return nil
+}
+
+func (c *CMS) DeleteCallbackHandler(ctx context.Context, delivery amqp.Delivery) error {
+	var body database.Callback
+	err := json.Unmarshal(delivery.Body, &body)
+	c.logger.Info("got delete request: %s", delivery.Body)
+	if err != nil {
+		c.logger.Error("error unmarshalling message body: %s", err.Error())
+		return err
+	}
+
 	err = c.storage.DeleteCallbackByID(ctx, body.ID)
 	if err != nil {
 		c.logger.Error("error deleting callback: %s", err.Error())
 		return err
 	}
-	return nil
-}
 
-func (c *CMS) processRabbitResponse(ctx context.Context, callback *database.Callback, delivery amqp.Delivery) error {
-	callbackJSON, err := json.Marshal(callback)
-	if err != nil {
-		c.logger.Error("error marshalling callback: %s", err.Error())
-		return err
+	if database.Offset-1 >= 0 {
+		database.Offset -= 1
 	}
-	if err := c.broker.Produce(ctx, delivery, string(callbackJSON), "success"); err != nil {
-		return err
-	}
+
+	c.logger.Info("deleted callback: %s", body.ID)
 	return nil
 }

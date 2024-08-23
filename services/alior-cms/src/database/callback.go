@@ -85,10 +85,5 @@ func (d *Database) DeleteCallbackByID(ctx context.Context, id int32) error {
 	if commit.RowsAffected() != 1 {
 		return errors.New("object not found")
 	}
-	if Offset-1 == 0 {
-		Offset -= 1
-	} else if Offset-2 > 0 {
-		Offset -= 2
-	}
 	return err
 }

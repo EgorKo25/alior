@@ -4,9 +4,11 @@ import (
 	"callback_service/src/broker"
 	"callback_service/src/config"
 	"callback_service/src/database"
-	"callback_service/src/logger"
 	"callback_service/src/service"
+	//"common/logger"
 	"context"
+	//"github.com/EgorKo25/common/logger"
+	"callback_service/src/logger"
 )
 
 func main() {
@@ -31,7 +33,10 @@ func main() {
 	defer db.Close()
 
 	// Инициализация брокера
-	b := broker.NewBroker(cfg.MsgBroker.Url, log)
+	b, err := broker.NewBroker(cfg.MsgBroker.Url, log)
+	if err != nil {
+		log.Fatal("failed to initialize broker: %v", err)
+	}
 
 	// Инициализация сервиса
 	cms := service.NewCMS(b, db, log)
