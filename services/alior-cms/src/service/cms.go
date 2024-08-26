@@ -25,16 +25,16 @@ type ILogger interface {
 }
 
 type CMS struct {
-	broker  IBroker
-	storage ICallback
-	logger  ILogger
+	Broker  IBroker
+	Storage ICallback
+	Logger  ILogger
 }
 
-func NewCMS(broker IBroker, storage ICallback, logger ILogger) *CMS {
+func NewCMS(Broker IBroker, Storage ICallback, Logger ILogger) *CMS {
 	return &CMS{
-		broker:  broker,
-		storage: storage,
-		logger:  logger,
+		Broker:  Broker,
+		Storage: Storage,
+		Logger:  Logger,
 	}
 }
 
@@ -42,7 +42,7 @@ func (c *CMS) Run(ctx context.Context) error {
 	errCh := make(chan error, 1)
 
 	go func() {
-		if err := c.broker.Subscribe(ctx, "ask", c.HandleMessage); err != nil {
+		if err := c.Broker.Subscribe(ctx, "ask", c.HandleMessage); err != nil {
 			errCh <- err
 		}
 	}()

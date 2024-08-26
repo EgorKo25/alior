@@ -15,7 +15,7 @@ func validateCallbackFields(callback *database.Callback) error {
 	return nil
 }
 
-func convertToRepositoryAndValidate(callbackSrc []byte) (*database.Callback, error) {
+func ConvertToRepositoryAndValidate(callbackSrc []byte) (*database.Callback, error) {
 	callback := new(database.Callback)
 	err := json.Unmarshal(callbackSrc, callback)
 	if err != nil {
@@ -30,15 +30,15 @@ func convertToRepositoryAndValidate(callbackSrc []byte) (*database.Callback, err
 	return callback, nil
 }
 
-func (c *CMS) createResponse(callback *database.Callback) error {
+func (c *CMS) CreateResponse(callback *database.Callback) error {
 	callbackJSON, err := json.Marshal(callback)
 	if err != nil {
-		c.logger.Error("error marshalling callback: %s", err.Error())
+		c.Logger.Error("error marshalling callback: %s", err.Error())
 		return err
 	}
 
 	msg := broker.NewMessage(string(callbackJSON), "callback")
-	if err := c.broker.Publish(msg); err != nil {
+	if err := c.Broker.Publish(msg); err != nil {
 		return err
 	}
 	return nil

@@ -20,46 +20,52 @@ type IChannelManager interface {
 	Close(channel *amqp.Channel) error
 }
 
+type IBroker interface {
+	Publish(message *Message) error
+	Subscribe(ctx context.Context, queue string, handler func(ctx context.Context, delivery amqp.Delivery) error) error
+	Close()
+}
+
 type ConnectionManager struct {
 	Url    string
-	logger ILogger
-	conn   *amqp.Connection
+	Logger ILogger
+	Conn   *amqp.Connection
 }
 
 func (cm *ConnectionManager) Connect() (*amqp.Connection, error) {
 	conn, err := amqp.Dial(cm.Url)
 	if err != nil {
-		cm.logger.Error("failed to connect to AMQP broker", "error", err)
+		cm.Logger.Error("failed to connect to AMQP broker: %s", err)
 		return nil, err
 	}
-	cm.conn = conn
-	cm.logger.Info("connected to AMQP broker")
+	cm.Conn = conn
+	cm.Logger.Info("connected to AMQP broker")
 	return conn, nil
 }
 
 func (cm *ConnectionManager) Close() error {
-	if cm.conn != nil {
-		err := cm.conn.Close()
+	if cm.Conn != nil {
+		err := cm.Conn.Close()
 		if err != nil {
-			cm.logger.Error("failed to close AMQP connection", "error", err)
+			cm.Logger.Error("failed to close AMQP connection: %s", err)
 			return err
 		}
-		cm.logger.Info("AMQP connection closed")
+		cm.Logger.Info("AMQP connection closed")
 	}
 	return nil
 }
 
 type ChannelManager struct {
-	logger ILogger
+	Logger ILogger
 }
 
 func (cm *ChannelManager) CreateChannel(conn *amqp.Connection) (*amqp.Channel, error) {
 	channel, err := conn.Channel()
 	if err != nil {
-		cm.logger.Error("failed to create AMQP channel", "error", err)
+		cm.Logger.Error("failed to create AMQP channel: %s", err)
 		return nil, err
 	}
-	cm.logger.Info("AMQP channel created")
+	cm.Logger.Info("AMQP channel created")
 	return channel, nil
 }
 
@@ -67,30 +73,30 @@ func (cm *ChannelManager) Close(channel *amqp.Channel) error {
 	if channel != nil {
 		err := channel.Close()
 		if err != nil {
-			cm.logger.Error("failed to close AMQP channel", "error", err)
+			cm.Logger.Error("failed to close AMQP channel: %s", err)
 			return err
 		}
-		cm.logger.Info("AMQP channel closed")
+		cm.Logger.Info("AMQP channel closed")
 	}
 	return nil
 }
 
 type Broker struct {
-	connManager    IConnectionManager
-	channelManager IChannelManager
-	conn           *amqp.Connection
-	channel        *amqp.Channel
-	logger         ILogger
+	ConnManager    IConnectionManager
+	ChannelManager IChannelManager
+	Conn           *amqp.Connection
+	Channel        *amqp.Channel
+	Logger         ILogger
 }
 
 func NewBroker(Url string, logger ILogger) (*Broker, error) {
 	connManager := &ConnectionManager{
 		Url:    Url,
-		logger: logger,
+		Logger: logger,
 	}
 
 	channelManager := &ChannelManager{
-		logger: logger,
+		Logger: logger,
 	}
 
 	conn, err := connManager.Connect()
@@ -100,30 +106,33 @@ func NewBroker(Url string, logger ILogger) (*Broker, error) {
 
 	channel, err := channelManager.CreateChannel(conn)
 	if err != nil {
-		connManager.Close()
+		err := connManager.Close()
+		if err != nil {
+			return nil, err
+		}
 		return nil, err
 	}
 
 	return &Broker{
-		conn:           conn,
-		channel:        channel,
-		logger:         logger,
-		connManager:    connManager,
-		channelManager: channelManager,
+		Conn:           conn,
+		Channel:        channel,
+		Logger:         logger,
+		ConnManager:    connManager,
+		ChannelManager: channelManager,
 	}, nil
 }
 
 func (b *Broker) Close() {
-	if err := b.channelManager.Close(b.channel); err != nil {
-		b.logger.Error("failed to close channel: %v", err)
+	if err := b.ChannelManager.Close(b.Channel); err != nil {
+		b.Logger.Error("failed to close channel: %v", err)
 	}
-	if err := b.connManager.Close(); err != nil {
-		b.logger.Error("failed to close connection: %v", err)
+	if err := b.ConnManager.Close(); err != nil {
+		b.Logger.Error("failed to close connection: %v", err)
 	}
 }
 
 func (b *Broker) Publish(message *Message) error {
-	return b.channel.Publish(
+	return b.Channel.Publish(
 		message.Headers.Exchange,   // exchange
 		message.Headers.RoutingKey, // routing key
 		false,                      // mandatory
@@ -135,7 +144,7 @@ func (b *Broker) Publish(message *Message) error {
 }
 
 func (b *Broker) Subscribe(ctx context.Context, queue string, handler func(ctx context.Context, delivery amqp.Delivery) error) error {
-	msgs, err := b.channel.Consume(
+	messages, err := b.Channel.Consume(
 		queue, // queue
 		"",    // consumer
 		true,  // auto-ack
@@ -149,9 +158,9 @@ func (b *Broker) Subscribe(ctx context.Context, queue string, handler func(ctx c
 	}
 
 	go func() {
-		for m := range msgs {
+		for m := range messages {
 			if err := handler(ctx, m); err != nil {
-				b.logger.Error("error handling message: %v", err)
+				b.Logger.Error("error handling message: %v", err)
 			}
 		}
 	}()

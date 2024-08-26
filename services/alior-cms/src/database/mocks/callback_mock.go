@@ -49,6 +49,20 @@ func (mr *MockICallbackMockRecorder) CreateCallback(ctx, data interface{}) *gomo
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateCallback", reflect.TypeOf((*MockICallback)(nil).CreateCallback), ctx, data)
 }
 
+// DeleteCallbackByID mocks base method.
+func (m *MockICallback) DeleteCallbackByID(ctx context.Context, id int32) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "DeleteCallbackByID", ctx, id)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// DeleteCallbackByID indicates an expected call of DeleteCallbackByID.
+func (mr *MockICallbackMockRecorder) DeleteCallbackByID(ctx, id interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteCallbackByID", reflect.TypeOf((*MockICallback)(nil).DeleteCallbackByID), ctx, id)
+}
+
 // GetCallback mocks base method.
 func (m *MockICallback) GetCallback(ctx context.Context, limit, offset int) (*database.Callback, error) {
 	m.ctrl.T.Helper()

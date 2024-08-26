@@ -1,6 +1,6 @@
 module callback_service
 
-go 1.22
+go 1.22.5
 
 require (
 	github.com/golang/mock v1.6.0
@@ -14,6 +14,7 @@ require (
 
 require (
 	github.com/BurntSushi/toml v1.2.1 // indirect
+	github.com/EgorKo25/common v0.0.0-20240823121229-73179f38edbe // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/jackc/pgpassfile v1.0.0 // indirect
 	github.com/jackc/pgservicefile v0.0.0-20221227161230-091c0ba34f0a // indirect
