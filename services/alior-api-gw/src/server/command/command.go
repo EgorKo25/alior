@@ -16,11 +16,8 @@ type Commander interface {
 	Register(command ICommand) gin.HandlerFunc
 }
 
-func NewCommand(logger logger.ILogger) (*Manager, error) {
-	manager := &Manager{logger: logger}
-	manager.Register(&CallbackCreate{})
-
-	return manager, nil
+func NewManager(logger logger.ILogger) *Manager {
+	return &Manager{logger: logger}
 }
 
 type Manager struct {
