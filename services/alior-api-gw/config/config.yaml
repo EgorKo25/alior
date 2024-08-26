@@ -1,0 +1,8 @@
+version: 1.0.0
+service-name: API-GW
+
+server-config:
+  host: 127.0.0.1
+  port: 8080
+  key-file: ""
+  cert-file: ""
