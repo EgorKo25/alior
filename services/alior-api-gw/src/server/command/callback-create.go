@@ -3,6 +3,7 @@ package command
 import (
 	"encoding/json"
 	"fmt"
+
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
 )
@@ -38,5 +39,27 @@ func (c *CallbackCreate) Parse(ctx *gin.Context) error {
 }
 
 func (c *CallbackCreate) Apply() (any, error) {
-	return nil, nil //TODO: дописать обработку
+	/*
+		body, err := json.Marshal(c)
+		if err != nil {
+			return nil, err
+		}
+
+		id := sha256.Sum256(body)
+		request := &amqp.Publishing{
+			CorrelationId: fmt.Sprintf("%x", id),
+			Timestamp:     time.Now(),
+			Type:          "create",
+			ReplyTo:       "ANS",
+			DeliveryMode:  1,
+			ContentType:   "callback",
+			Body:          body,
+		}
+	*/
+	// TODO:отправка в Rabbit
+	//
+	// TODO: и ожидание ответа
+	//
+	// responce :=
+	return nil, nil
 }
