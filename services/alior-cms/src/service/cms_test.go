@@ -10,49 +10,70 @@ import (
 	"errors"
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"testing"
+	"time"
 )
 
 func TestConvertToRepositoryAndValidate(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
 	tests := []struct {
-		name     string
-		input    []byte
-		wantErr  bool
-		expected *database.Callback
+		name          string
+		input         []byte
+		expected      *database.Callback
+		expectedError error
 	}{
 		{
-			name:    "Valid JSON",
-			input:   []byte(`{"Name":"Name","Phone":"Phone", "Type":"Type","Idea":"Idea"}`),
-			wantErr: false,
+			name: "success",
+			input: []byte(`{
+				"name": "John Doe",
+				"phone": "1234567890",
+				"type": "Inquiry",
+				"idea": "New project idea"
+			}`),
 			expected: &database.Callback{
-				Name:  "Name",
-				Phone: "Phone",
-				Type:  "Type",
-				Idea:  "Idea",
+				Name:      "John Doe",
+				Phone:     "1234567890",
+				Type:      "Inquiry",
+				Idea:      "New project idea",
+				CreatedAt: time.Now(),
 			},
+			expectedError: nil,
 		},
 		{
-			name:    "Invalid JSON",
-			input:   []byte(`{"field1":value1,"field2":"value2"}`),
-			wantErr: true,
+			name:          "invalid JSON",
+			input:         []byte(`invalid-json`),
+			expected:      nil,
+			expectedError: errors.New("invalid character 'i' looking for beginning of value"),
 		},
 		{
-			name:     "Empty JSON",
-			input:    []byte(`{}`),
-			wantErr:  false,
-			expected: &database.Callback{},
+			name: "missing required fields",
+			input: []byte(`{
+				"name": "John Doe",
+				"phone": "1234567890"
+			}`),
+			expected:      nil,
+			expectedError: errors.New("one or more required fields are empty"),
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			result, err := service.ConvertToRepositoryAndValidate(tt.input)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("convertToRepositoryAndValidate() error = %v, wantErr %v", err, tt.wantErr)
-				return
-			}
-			if !tt.wantErr && !compareCallbacks(result, tt.expected) {
-				t.Errorf("convertToRepositoryAndValidate() = %v, expected %v", result, tt.expected)
+
+			if tt.expectedError != nil {
+				require.Error(t, err)
+				require.Contains(t, err.Error(), tt.expectedError.Error())
+			} else {
+				require.NoError(t, err)
+				require.NotNil(t, result)
+				require.Equal(t, tt.expected.Name, result.Name)
+				require.Equal(t, tt.expected.Phone, result.Phone)
+				require.Equal(t, tt.expected.Type, result.Type)
+				require.Equal(t, tt.expected.Idea, result.Idea)
+				require.WithinDuration(t, tt.expected.CreatedAt, result.CreatedAt, time.Second)
 			}
 		})
 	}

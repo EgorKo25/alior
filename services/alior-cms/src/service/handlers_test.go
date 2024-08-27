@@ -1,14 +1,18 @@
 package service_test
 
 import (
-	mocksbroker "callback_service/src/broker/mocks"
+	"callback_service/src/broker"
+	brokerMocks "callback_service/src/broker/mocks"
 	"callback_service/src/database"
-	mocksdb "callback_service/src/database/mocks"
+	dbMocks "callback_service/src/database/mocks"
 	"callback_service/src/service"
 	"context"
+	"encoding/json"
 	"errors"
 	"github.com/golang/mock/gomock"
 	amqp "github.com/rabbitmq/amqp091-go"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"testing"
 )
 
@@ -16,8 +20,8 @@ func TestCreateCallbackHandler(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
-	mockStorage := mocksdb.NewMockICallback(ctrl)
-	mockLogger := mocksbroker.NewMockILogger(ctrl)
+	mockStorage := dbMocks.NewMockICallback(ctrl)
+	mockLogger := brokerMocks.NewMockILogger(ctrl)
 
 	tests := []struct {
 		name        string
@@ -81,9 +85,7 @@ func TestCreateCallbackHandler(t *testing.T) {
 			delivery := amqp.Delivery{Body: tt.inputBody}
 			err := c.CreateCallbackHandler(context.Background(), delivery)
 
-			if (err != nil) != tt.expectError {
-				t.Errorf("CreateCallbackHandler() error = %v, wantErr %v", err, tt.expectError)
-			}
+			require.Equal(t, tt.expectError, err != nil)
 		})
 	}
 }
@@ -92,79 +94,97 @@ func TestInitialCallbackHandler(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
-	mockStorage := mocksdb.NewMockICallback(ctrl)
-	mockLogger := mocksbroker.NewMockILogger(ctrl)
-	mockBroker := mocksbroker.NewMockIBroker(ctrl)
+	mockStorage := dbMocks.NewMockICallback(ctrl)
+	mockLogger := brokerMocks.NewMockILogger(ctrl)
+	mockBroker := brokerMocks.NewMockIBroker(ctrl)
+
+	ctx := context.Background()
+
+	cms := &service.CMS{
+		Storage: mockStorage,
+		Logger:  mockLogger,
+		Broker:  mockBroker,
+	}
 
 	tests := []struct {
 		name          string
-		setupMocks    func(*service.CMS)
-		expectedError bool
+		setupMocks    func()
+		expectedError error
 	}{
 		{
-			name: "Success",
-			setupMocks: func(c *service.CMS) {
-				callback := &database.Callback{ID: 1, Name: "test", Phone: "test", Idea: "test", Type: "test"}
+			name: "success",
+			setupMocks: func() {
+				callback := &database.Callback{ID: 1}
+				callbackJSON, _ := json.Marshal(callback)
 
 				mockStorage.EXPECT().
-					GetCallback(gomock.Any(), database.Limit, 0).
+					GetCallback(ctx, gomock.Any(), 0).
 					Return(callback, nil)
-
-				mockLogger.EXPECT().
-					Info("got initial callback: %s", callback).AnyTimes()
 
 				mockBroker.EXPECT().
 					Publish(gomock.Any()).
-					Return(nil).AnyTimes()
+					DoAndReturn(func(msg *broker.Message) error {
+						expectedMsg := broker.NewMessage(string(callbackJSON), "callback")
+						assert.Equal(t, expectedMsg, msg)
+						return nil
+					})
+
+				mockLogger.EXPECT().
+					Info(gomock.Any(), gomock.Any()).
+					Times(1)
 			},
-			expectedError: false,
+			expectedError: nil,
 		},
 		{
-			name: "Error Getting Callback",
-			setupMocks: func(c *service.CMS) {
+			name: "storage get error",
+			setupMocks: func() {
 				mockStorage.EXPECT().
-					GetCallback(gomock.Any(), database.Limit, 0).
+					GetCallback(ctx, gomock.Any(), 0).
 					Return(nil, errors.New("get callback error"))
+
 				mockLogger.EXPECT().
-					Error(gomock.Any(), gomock.Any())
+					Error(gomock.Any(), gomock.Any()).
+					Times(1)
 			},
-			expectedError: true,
+			expectedError: errors.New("get callback error"),
 		},
 		{
-			name: "Error Creating Response",
-			setupMocks: func(c *service.CMS) {
-				callback := &database.Callback{ID: 1, Name: "test", Phone: "test", Idea: "test", Type: "test"}
+			name: "broker publish error",
+			setupMocks: func() {
+				callback := &database.Callback{ID: 1}
+				callbackJSON, _ := json.Marshal(callback)
 
 				mockStorage.EXPECT().
-					GetCallback(gomock.Any(), database.Limit, 0).
+					GetCallback(ctx, gomock.Any(), 0).
 					Return(callback, nil)
-
-				mockLogger.EXPECT().
-					Info("got initial callback: %s", callback)
 
 				mockBroker.EXPECT().
 					Publish(gomock.Any()).
-					Return(errors.New("publish error"))
+					DoAndReturn(func(msg *broker.Message) error {
+						expectedMsg := broker.NewMessage(string(callbackJSON), "callback")
+						assert.Equal(t, expectedMsg, msg)
+						return errors.New("publish error")
+					})
 
 				mockLogger.EXPECT().
-					Error("error marshalling callback: %s", "publish error")
+					Error(gomock.Any(), gomock.Any()).
+					Times(1)
 			},
-			expectedError: true,
+			expectedError: errors.New("publish error"),
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			c := &service.CMS{
-				Storage: mockStorage,
-				Logger:  mockLogger,
-			}
+			tt.setupMocks()
 
-			tt.setupMocks(c)
+			err := cms.InitialCallbackHandler(ctx)
 
-			err := c.InitialCallbackHandler(context.Background())
-			if (err != nil) != tt.expectedError {
-				t.Errorf("InitialCallbackHandler() error = %v, wantErr %v", err, tt.expectedError)
+			if tt.expectedError != nil {
+				assert.Error(t, err)
+				assert.Equal(t, tt.expectedError.Error(), err.Error())
+			} else {
+				assert.NoError(t, err)
 			}
 		})
 	}
@@ -174,123 +194,109 @@ func TestNextCallbackHandler(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
-	mockStorage := mocksdb.NewMockICallback(ctrl)
-	mockLogger := mocksbroker.NewMockILogger(ctrl)
-	mockBroker := mocksbroker.NewMockIBroker(ctrl)
+	mockStorage := dbMocks.NewMockICallback(ctrl)
+	mockLogger := brokerMocks.NewMockILogger(ctrl)
+	mockBroker := brokerMocks.NewMockIBroker(ctrl)
+
+	ctx := context.Background()
+
+	cms := &service.CMS{
+		Storage: mockStorage,
+		Logger:  mockLogger,
+		Broker:  mockBroker,
+	}
 
 	tests := []struct {
 		name          string
-		total         int
-		offset        int
-		setupMocks    func(*service.CMS)
-		expectedError bool
+		setupMocks    func()
+		expectedError error
 	}{
 		{
-			name:   "Success",
-			total:  10,
-			offset: 1,
-			setupMocks: func(c *service.CMS) {
-				callback := &database.Callback{ID: 1, Name: "test", Phone: "test", Idea: "test", Type: "test"}
+			name: "success",
+			setupMocks: func() {
+				callback := &database.Callback{ID: 1}
+				callbackJSON, _ := json.Marshal(callback)
 
 				mockStorage.EXPECT().
-					GetTotalCallbacks(gomock.Any()).
-					Return(10, nil)
+					GetTotalCallbacks(ctx).
+					Return(5, nil)
 
 				mockStorage.EXPECT().
-					GetCallback(gomock.Any(), database.Limit, 1).
+					GetCallback(ctx, database.Limit, database.Offset+1).
 					Return(callback, nil)
 
-				mockLogger.EXPECT().
-					Info("got next callback: %s", callback)
-
 				mockBroker.EXPECT().
 					Publish(gomock.Any()).
-					Return(nil)
-			},
-			expectedError: false,
-		},
-		{
-			name:   "Error Getting Total Callbacks",
-			total:  0,
-			offset: 0,
-			setupMocks: func(c *service.CMS) {
-				mockStorage.EXPECT().
-					GetTotalCallbacks(gomock.Any()).
-					Return(0, errors.New("get total callbacks error"))
+					DoAndReturn(func(msg *broker.Message) error {
+						expectedMsg := broker.NewMessage(string(callbackJSON), "callback")
+						assert.Equal(t, expectedMsg, msg)
+						return nil
+					})
 
 				mockLogger.EXPECT().
-					Error("error getting total callbacks: %s", "get total callbacks error")
-
-				mockBroker.EXPECT().
-					Publish(gomock.Any()).
-					Return(nil).AnyTimes()
+					Info(gomock.Any(), gomock.Any()).
+					Times(1)
 			},
-			expectedError: true,
+			expectedError: nil,
 		},
 		{
-			name:   "Error Getting Callback",
-			total:  10,
-			offset: 1,
-			setupMocks: func(c *service.CMS) {
+			name: "storage get callback error",
+			setupMocks: func() {
 				mockStorage.EXPECT().
-					GetTotalCallbacks(gomock.Any()).
-					Return(10, nil)
+					GetTotalCallbacks(ctx).
+					Return(5, nil)
 
 				mockStorage.EXPECT().
-					GetCallback(gomock.Any(), database.Limit, 1).
+					GetCallback(ctx, database.Limit, database.Offset+1).
 					Return(nil, errors.New("get callback error"))
 
 				mockLogger.EXPECT().
-					Error("error fetching callback: %s", "get callback error")
-
-				mockBroker.EXPECT().
-					Publish(gomock.Any()).
-					Return(nil).AnyTimes()
+					Error(gomock.Any(), gomock.Any()).
+					Times(1)
 			},
-			expectedError: true,
+			expectedError: errors.New("get callback error"),
 		},
 		{
-			name:   "Error Creating Response",
-			total:  10,
-			offset: 1,
-			setupMocks: func(c *service.CMS) {
-				callback := &database.Callback{ID: 1, Name: "test", Phone: "test", Idea: "test", Type: "test"}
+			name: "broker publish error",
+			setupMocks: func() {
+				callback := &database.Callback{ID: 1}
+				callbackJSON, _ := json.Marshal(callback)
 
 				mockStorage.EXPECT().
-					GetTotalCallbacks(gomock.Any()).
-					Return(10, nil)
+					GetTotalCallbacks(ctx).
+					Return(5, nil)
 
 				mockStorage.EXPECT().
-					GetCallback(gomock.Any(), database.Limit, 1).
+					GetCallback(ctx, database.Limit, database.Offset+1).
 					Return(callback, nil)
-
-				mockLogger.EXPECT().
-					Info("got next callback: %s", callback)
 
 				mockBroker.EXPECT().
 					Publish(gomock.Any()).
-					Return(errors.New("publish error"))
+					DoAndReturn(func(msg *broker.Message) error {
+						expectedMsg := broker.NewMessage(string(callbackJSON), "callback")
+						assert.Equal(t, expectedMsg, msg)
+						return errors.New("publish error")
+					})
 
 				mockLogger.EXPECT().
-					Error("error processing callback: %s", "publish error")
+					Error(gomock.Any(), gomock.Any()).
+					Times(1)
 			},
-			expectedError: true,
+			expectedError: errors.New("publish error"),
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			c := &service.CMS{
-				Storage: mockStorage,
-				Logger:  mockLogger,
-				Broker:  mockBroker,
-			}
+			tt.setupMocks()
 
-			tt.setupMocks(c)
+			err := cms.NextCallbackHandler(ctx)
 
-			err := c.NextCallbackHandler(context.Background())
-			if (err != nil) != tt.expectedError {
-				t.Errorf("NextCallbackHandler() error = %v, wantErr %v", err, tt.expectedError)
+			if tt.expectedError != nil {
+				assert.Error(t, err)
+				assert.Equal(t, tt.expectedError.Error(), err.Error())
+			} else {
+				assert.NoError(t, err)
 			}
 		})
 	}
@@ -300,89 +306,97 @@ func TestPreviousCallbackHandler(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
-	mockStorage := mocksdb.NewMockICallback(ctrl)
-	mockLogger := mocksbroker.NewMockILogger(ctrl)
-	mockBroker := mocksbroker.NewMockIBroker(ctrl)
+	mockStorage := dbMocks.NewMockICallback(ctrl)
+	mockLogger := brokerMocks.NewMockILogger(ctrl)
+	mockBroker := brokerMocks.NewMockIBroker(ctrl)
+
+	ctx := context.Background()
+
+	cms := &service.CMS{
+		Storage: mockStorage,
+		Logger:  mockLogger,
+		Broker:  mockBroker,
+	}
 
 	tests := []struct {
 		name          string
-		offset        int
-		setupMocks    func(*service.CMS)
-		expectedError bool
+		setupMocks    func()
+		expectedError error
 	}{
 		{
-			name:   "Success",
-			offset: 1,
-			setupMocks: func(c *service.CMS) {
-				callback := &database.Callback{ID: 1, Name: "test", Phone: "test", Idea: "test", Type: "test"}
+			name: "success",
+			setupMocks: func() {
+				callback := &database.Callback{ID: 1}
+				callbackJSON, _ := json.Marshal(callback)
 
 				mockStorage.EXPECT().
-					GetCallback(gomock.Any(), database.Limit, 0).
+					GetCallback(ctx, database.Limit, database.Offset-1).
 					Return(callback, nil)
-
-				mockLogger.EXPECT().
-					Info("got previous callback: %s", callback)
 
 				mockBroker.EXPECT().
 					Publish(gomock.Any()).
-					Return(nil)
+					DoAndReturn(func(msg *broker.Message) error {
+						expectedMsg := broker.NewMessage(string(callbackJSON), "callback")
+						assert.Equal(t, expectedMsg, msg)
+						return nil
+					})
+
+				mockLogger.EXPECT().
+					Info(gomock.Any(), gomock.Any()).
+					Times(1)
 			},
-			expectedError: false,
+			expectedError: nil,
 		},
 		{
-			name:   "Error Getting Callback",
-			offset: 1,
-			setupMocks: func(c *service.CMS) {
+			name: "storage get callback error",
+			setupMocks: func() {
 				mockStorage.EXPECT().
-					GetCallback(gomock.Any(), database.Limit, 0).
+					GetCallback(ctx, database.Limit, database.Offset-1).
 					Return(nil, errors.New("get callback error"))
 
 				mockLogger.EXPECT().
-					Error("error fetching callback: %s", "get callback error")
-
-				mockBroker.EXPECT().
-					Publish(gomock.Any()).
-					Return(nil)
+					Error(gomock.Any(), gomock.Any()).
+					Times(1)
 			},
-			expectedError: true,
+			expectedError: errors.New("get callback error"),
 		},
 		{
-			name:   "Error Creating Response",
-			offset: 1,
-			setupMocks: func(c *service.CMS) {
-				callback := &database.Callback{ID: 1, Name: "test", Phone: "test", Idea: "test", Type: "test"}
+			name: "broker publish error",
+			setupMocks: func() {
+				callback := &database.Callback{ID: 1}
+				callbackJSON, _ := json.Marshal(callback)
 
 				mockStorage.EXPECT().
-					GetCallback(gomock.Any(), database.Limit, 0).
+					GetCallback(ctx, database.Limit, database.Offset-1).
 					Return(callback, nil)
-
-				mockLogger.EXPECT().
-					Info("got previous callback: %s", callback)
 
 				mockBroker.EXPECT().
 					Publish(gomock.Any()).
-					Return(errors.New("publish error"))
+					DoAndReturn(func(msg *broker.Message) error {
+						expectedMsg := broker.NewMessage(string(callbackJSON), "callback")
+						assert.Equal(t, expectedMsg, msg)
+						return errors.New("publish error")
+					})
 
 				mockLogger.EXPECT().
-					Error("error marshalling callback: %s", "publish error")
+					Error(gomock.Any(), gomock.Any()).
+					Times(1)
 			},
-			expectedError: true,
+			expectedError: errors.New("publish error"),
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			c := &service.CMS{
-				Storage: mockStorage,
-				Logger:  mockLogger,
-				Broker:  mockBroker,
-			}
+			tt.setupMocks()
 
-			tt.setupMocks(c)
+			err := cms.PreviousCallbackHandler(ctx)
 
-			err := c.PreviousCallbackHandler(context.Background())
-			if (err != nil) != tt.expectedError {
-				t.Errorf("PreviousCallbackHandler() error = %v, wantErr %v", err, tt.expectedError)
+			if tt.expectedError != nil {
+				assert.Error(t, err)
+				assert.Equal(t, tt.expectedError.Error(), err.Error())
+			} else {
+				assert.NoError(t, err)
 			}
 		})
 	}
@@ -392,81 +406,74 @@ func TestDeleteCallbackHandler(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
-	mockStorage := mocksdb.NewMockICallback(ctrl)
-	mockLogger := mocksbroker.NewMockILogger(ctrl)
-	mockBroker := mocksbroker.NewMockIBroker(ctrl)
+	mockStorage := dbMocks.NewMockICallback(ctrl)
+	mockLogger := brokerMocks.NewMockILogger(ctrl)
+
+	ctx := context.Background()
+
+	cms := &service.CMS{
+		Storage: mockStorage,
+		Logger:  mockLogger,
+	}
 
 	tests := []struct {
 		name          string
-		setupMocks    func(*service.CMS)
-		expectedError bool
+		inputBody     []byte
+		setupMocks    func()
+		expectedError error
 	}{
 		{
-			name: "Success",
-			setupMocks: func(c *service.CMS) {
-				callback := &database.Callback{ID: 1, Name: "test", Phone: "test", Idea: "test", Type: "test"}
-
+			name:      "success",
+			inputBody: []byte(`{"id":1}`),
+			setupMocks: func() {
 				mockStorage.EXPECT().
-					DeleteCallbackByID(gomock.Any(), 1).
+					DeleteCallbackByID(ctx, int32(1)).
 					Return(nil)
 
 				mockLogger.EXPECT().
-					Info("deleted callback: %s", callback).Times(1)
+					Info(gomock.Any(), gomock.Any()).
+					Times(1)
 			},
-			expectedError: false,
+			expectedError: nil,
 		},
 		{
-			name: "Error Deleting Callback",
-			setupMocks: func(c *service.CMS) {
-				mockStorage.EXPECT().
-					DeleteCallbackByID(gomock.Any(), 1).
-					Return(errors.New("delete callback error"))
-
+			name:      "unmarshal error",
+			inputBody: []byte(`invalid-json`),
+			setupMocks: func() {
 				mockLogger.EXPECT().
-					Error("error deleting callback: %s", "delete callback error")
-
-				mockBroker.EXPECT().
-					Publish(gomock.Any()).
-					Return(nil)
+					Error(gomock.Any(), gomock.Any()).
+					Times(1)
 			},
-			expectedError: true,
+			expectedError: errors.New("invalid character"),
 		},
 		{
-			name: "Error Publishing Deletion",
-			setupMocks: func(c *service.CMS) {
-				callback := &database.Callback{ID: 1, Name: "test", Phone: "test", Idea: "test", Type: "test"}
-
+			name:      "storage delete error",
+			inputBody: []byte(`{"id":1}`),
+			setupMocks: func() {
 				mockStorage.EXPECT().
-					DeleteCallbackByID(gomock.Any(), 1).
-					Return(nil)
+					DeleteCallbackByID(ctx, int32(1)).
+					Return(errors.New("delete error"))
 
 				mockLogger.EXPECT().
-					Info("callback deleted: %s", callback)
-
-				mockBroker.EXPECT().
-					Publish(gomock.Any()).
-					Return(errors.New("publish error"))
-
-				mockLogger.EXPECT().
-					Error("error marshalling callback: %s", "publish error")
+					Error(gomock.Any(), gomock.Any()).
+					Times(1)
 			},
-			expectedError: true,
+			expectedError: errors.New("delete error"),
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			c := &service.CMS{
-				Storage: mockStorage,
-				Logger:  mockLogger,
-				Broker:  mockBroker,
-			}
+			tt.setupMocks()
 
-			tt.setupMocks(c)
+			delivery := amqp.Delivery{Body: tt.inputBody}
+			err := cms.DeleteCallbackHandler(ctx, delivery)
 
-			err := c.DeleteCallbackHandler(context.Background(), amqp.Delivery{})
-			if (err != nil) != tt.expectedError {
-				t.Errorf("DeleteCallbackHandler() error = %v, wantErr %v", err, tt.expectedError)
+			if tt.expectedError != nil {
+				assert.Error(t, err)
+				assert.Contains(t, err.Error(), tt.expectedError.Error())
+			} else {
+				assert.NoError(t, err)
 			}
 		})
 	}

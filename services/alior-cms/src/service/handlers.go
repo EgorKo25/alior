@@ -119,6 +119,7 @@ func (c *CMS) NextCallbackHandler(ctx context.Context) error {
 	total, err := c.Storage.GetTotalCallbacks(ctx)
 	if err != nil {
 		c.Logger.Error("error getting total callbacks: %s", err.Error())
+		return err
 	}
 
 	if database.Offset+1 < total {

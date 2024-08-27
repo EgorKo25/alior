@@ -5,10 +5,9 @@ import (
 	"callback_service/src/config"
 	"callback_service/src/database"
 	"callback_service/src/service"
-	//"common/logger"
 	"context"
-	//"github.com/EgorKo25/common/logger"
-	"callback_service/src/logger"
+	"github.com/EgorKo25/common/logger"
+	l "log"
 )
 
 func main() {
@@ -22,7 +21,10 @@ func main() {
 	}
 
 	// Инициализация logger
-	log := logger.NewZapLogger()
+	log, err := logger.NewLogger(logger.PRODUCTION)
+	if err != nil {
+		l.Fatal(err)
+	}
 	log.Info("Config: ", cfg)
 
 	// Инициализация БД
