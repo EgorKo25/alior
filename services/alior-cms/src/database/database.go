@@ -31,7 +31,7 @@ type Database struct {
 
 // New is a function to create new db pool and run migrations
 func New(ctx context.Context, cfg *config.Config) (*Database, error) {
-	pool, err := pgxpool.New(ctx, cfg.Database.Url)
+	pool, err := pgxpool.New(ctx, cfg.Database.URL)
 	if err != nil {
 		return nil, fmt.Errorf("failed to connect to database: %w", err)
 	}

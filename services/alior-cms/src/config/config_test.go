@@ -20,17 +20,17 @@ func TestLoad(t *testing.T) {
 			mockSetup: func() {
 				config.ReadConfig = func(path string, cfg interface{}) error {
 					c := cfg.(*config.Config)
-					c.Database.Url = "postgresql://user:password@localhost:5432/dbname"
-					c.MsgBroker.Url = "amqp://guest:guest@localhost:5672/"
+					c.Database.URL = "postgresql://user:password@localhost:5432/dbname"
+					c.MsgBroker.URL = "amqp://guest:guest@localhost:5672/"
 					return nil
 				}
 			},
 			expectedCfg: &config.Config{
 				Database: config.DatabaseConfig{
-					Url: "postgresql://user:password@localhost:5432/dbname",
+					URL: "postgresql://user:password@localhost:5432/dbname",
 				},
 				MsgBroker: config.MsgBrokerConfig{
-					Url: "amqp://guest:guest@localhost:5672/",
+					URL: "amqp://guest:guest@localhost:5672/",
 				},
 			},
 			expectedErr: nil,
