@@ -27,13 +27,14 @@ type IBroker interface {
 }
 
 type ConnectionManager struct {
-	Url    string
+	URL    string
 	Logger ILogger
 	Conn   *amqp.Connection
 }
 
+// Connect is a ConnectionManager method to connect broker
 func (cm *ConnectionManager) Connect() (*amqp.Connection, error) {
-	conn, err := amqp.Dial(cm.Url)
+	conn, err := amqp.Dial(cm.URL)
 	if err != nil {
 		cm.Logger.Error("failed to connect to AMQP broker: %s", err)
 		return nil, err
@@ -43,6 +44,7 @@ func (cm *ConnectionManager) Connect() (*amqp.Connection, error) {
 	return conn, nil
 }
 
+// Close is a ConnectionManager method to close broker connection
 func (cm *ConnectionManager) Close() error {
 	if cm.Conn != nil {
 		err := cm.Conn.Close()
@@ -55,10 +57,12 @@ func (cm *ConnectionManager) Close() error {
 	return nil
 }
 
+// ChannelManager structure manage broker channel
 type ChannelManager struct {
 	Logger ILogger
 }
 
+// CreateChannel is a ChannelManager method to create broker channel
 func (cm *ChannelManager) CreateChannel(conn *amqp.Connection) (*amqp.Channel, error) {
 	channel, err := conn.Channel()
 	if err != nil {
@@ -69,6 +73,7 @@ func (cm *ChannelManager) CreateChannel(conn *amqp.Connection) (*amqp.Channel, e
 	return channel, nil
 }
 
+// Close is a ChannelManager method to close broker channel
 func (cm *ChannelManager) Close(channel *amqp.Channel) error {
 	if channel != nil {
 		err := channel.Close()
@@ -81,6 +86,7 @@ func (cm *ChannelManager) Close(channel *amqp.Channel) error {
 	return nil
 }
 
+// Broker structure to store connection, channel and their managers
 type Broker struct {
 	ConnManager    IConnectionManager
 	ChannelManager IChannelManager
@@ -89,9 +95,10 @@ type Broker struct {
 	Logger         ILogger
 }
 
-func NewBroker(Url string, logger ILogger) (*Broker, error) {
+// NewBroker is a Broker constructor
+func NewBroker(URL string, logger ILogger) (*Broker, error) {
 	connManager := &ConnectionManager{
-		Url:    Url,
+		URL:    URL,
 		Logger: logger,
 	}
 
@@ -122,6 +129,7 @@ func NewBroker(Url string, logger ILogger) (*Broker, error) {
 	}, nil
 }
 
+// Close is a Broker structure method to close channel and connections
 func (b *Broker) Close() {
 	if err := b.ChannelManager.Close(b.Channel); err != nil {
 		b.Logger.Error("failed to close channel: %v", err)
@@ -131,6 +139,7 @@ func (b *Broker) Close() {
 	}
 }
 
+// Publish is a Broker structure method to publish message to broker
 func (b *Broker) Publish(message *Message) error {
 	return b.Channel.Publish(
 		message.Headers.Exchange,   // exchange
@@ -143,6 +152,7 @@ func (b *Broker) Publish(message *Message) error {
 		})
 }
 
+// Subscribe is a Broker structure method to get messages from broker
 func (b *Broker) Subscribe(ctx context.Context, queue string, handler func(ctx context.Context, delivery amqp.Delivery) error) error {
 	messages, err := b.Channel.Consume(
 		queue, // queue

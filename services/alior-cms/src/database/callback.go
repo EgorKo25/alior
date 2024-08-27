@@ -6,8 +6,10 @@ import (
 	"time"
 )
 
+// Limit constant variable represents 1
 const Limit = 1
 
+// Offset variable represent global db offset to manage initial, next and previous requests from another services
 var Offset = 0
 
 // ICallback declare interaction methods for Callback structure
