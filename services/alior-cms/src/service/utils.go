@@ -15,6 +15,7 @@ func validateCallbackFields(callback *database.Callback) error {
 	return nil
 }
 
+// ConvertToRepositoryAndValidate is a function to convert data to callback structure and validate empty fields
 func ConvertToRepositoryAndValidate(callbackSrc []byte) (*database.Callback, error) {
 	callback := new(database.Callback)
 	err := json.Unmarshal(callbackSrc, callback)
@@ -30,6 +31,7 @@ func ConvertToRepositoryAndValidate(callbackSrc []byte) (*database.Callback, err
 	return callback, nil
 }
 
+// CreateResponse is a function to make a Message structured response for broker and publish it
 func (c *CMS) CreateResponse(callback *database.Callback) error {
 	callbackJSON, err := json.Marshal(callback)
 	if err != nil {

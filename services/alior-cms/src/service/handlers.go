@@ -8,6 +8,8 @@ import (
 	amqp "github.com/rabbitmq/amqp091-go"
 )
 
+// HandleMessage is a CMS method to handle all messages,
+// which delivery.ContentType == "callback" and delivery.Type in (create, initial, next, previous, delete)
 func (c *CMS) HandleMessage(ctx context.Context, delivery amqp.Delivery) error {
 	if delivery.ContentType == "callback" {
 		switch delivery.Type {
@@ -81,6 +83,7 @@ func (c *CMS) HandleMessage(ctx context.Context, delivery amqp.Delivery) error {
 	return nil
 }
 
+// CreateCallbackHandler is a CMS method to handle message with delivery.type = create
 func (c *CMS) CreateCallbackHandler(ctx context.Context, delivery amqp.Delivery) error {
 	callback, err := ConvertToRepositoryAndValidate(delivery.Body)
 	if err != nil {
@@ -97,6 +100,7 @@ func (c *CMS) CreateCallbackHandler(ctx context.Context, delivery amqp.Delivery)
 	return nil
 }
 
+// InitialCallbackHandler is a CMS method to handle message with delivery.type = initial
 func (c *CMS) InitialCallbackHandler(ctx context.Context) error {
 	database.Offset = 0
 	callback, err := c.Storage.GetCallback(ctx, database.Limit, 0)
@@ -115,6 +119,7 @@ func (c *CMS) InitialCallbackHandler(ctx context.Context) error {
 	return nil
 }
 
+// NextCallbackHandler is a CMS method to handle message with delivery.type = next
 func (c *CMS) NextCallbackHandler(ctx context.Context) error {
 	total, err := c.Storage.GetTotalCallbacks(ctx)
 	if err != nil {
@@ -123,7 +128,7 @@ func (c *CMS) NextCallbackHandler(ctx context.Context) error {
 	}
 
 	if database.Offset+1 < total {
-		database.Offset += 1
+		database.Offset++
 	}
 
 	callback, err := c.Storage.GetCallback(ctx, database.Limit, database.Offset)
@@ -142,9 +147,10 @@ func (c *CMS) NextCallbackHandler(ctx context.Context) error {
 	return nil
 }
 
+// PreviousCallbackHandler is a CMS method to handle message with delivery.type = previous
 func (c *CMS) PreviousCallbackHandler(ctx context.Context) error {
 	if database.Offset > 0 {
-		database.Offset -= 1
+		database.Offset--
 	}
 	callback, err := c.Storage.GetCallback(ctx, database.Limit, database.Offset)
 	if err != nil {
@@ -161,6 +167,7 @@ func (c *CMS) PreviousCallbackHandler(ctx context.Context) error {
 	return nil
 }
 
+// DeleteCallbackHandler is a CMS method to handle message with delivery.type = delete
 func (c *CMS) DeleteCallbackHandler(ctx context.Context, delivery amqp.Delivery) error {
 	var body database.Callback
 	err := json.Unmarshal(delivery.Body, &body)
@@ -176,7 +183,7 @@ func (c *CMS) DeleteCallbackHandler(ctx context.Context, delivery amqp.Delivery)
 	}
 
 	if database.Offset-1 >= 0 {
-		database.Offset -= 1
+		database.Offset--
 	}
 
 	c.Logger.Info("deleted callback: %s", body.ID)

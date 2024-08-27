@@ -10,6 +10,7 @@ const Limit = 1
 
 var Offset = 0
 
+// ICallback declare interaction methods for Callback structure
 type ICallback interface {
 	CreateCallback(ctx context.Context, data *Callback) error
 	GetCallback(ctx context.Context, limit int, offset int) (*Callback, error)
@@ -17,6 +18,7 @@ type ICallback interface {
 	DeleteCallbackByID(ctx context.Context, id int32) error
 }
 
+// Callback represents model structure
 type Callback struct {
 	ID        int32     `db:"id"`
 	Name      string    `db:"name"`
@@ -26,6 +28,7 @@ type Callback struct {
 	CreatedAt time.Time `db:"created_at"`
 }
 
+// CreateCallback implements ICallback method for callback creation
 func (d *Database) CreateCallback(ctx context.Context, data *Callback) error {
 	_, err := d.Pool.Exec(ctx, `
         INSERT INTO callbacks (name, phone, type, idea) 
@@ -34,6 +37,7 @@ func (d *Database) CreateCallback(ctx context.Context, data *Callback) error {
 	return err
 }
 
+// GetCallback implements ICallback method for getting callback with defined Limit and Offset variables
 func (d *Database) GetCallback(ctx context.Context, limit int, offset int) (*Callback, error) {
 	rows, err := d.Pool.Query(ctx, `
 		SELECT id, name, type, phone, idea, created_at
@@ -60,6 +64,7 @@ func (d *Database) GetCallback(ctx context.Context, limit int, offset int) (*Cal
 	return &callback, nil
 }
 
+// GetTotalCallbacks implements ICallback method for getting total callback rows count in db
 func (d *Database) GetTotalCallbacks(ctx context.Context) (int, error) {
 	row, err := d.Pool.Query(ctx, `
 		SELECT COUNT(*) as total
@@ -78,6 +83,7 @@ func (d *Database) GetTotalCallbacks(ctx context.Context) (int, error) {
 	return total, nil
 }
 
+// DeleteCallbackByID implements ICallback method for deleting callback by ID
 func (d *Database) DeleteCallbackByID(ctx context.Context, id int32) error {
 	query := `DELETE FROM callbacks WHERE id = $1`
 	commit, err := d.Pool.Exec(ctx, query, id)
