@@ -5,27 +5,32 @@ import (
 	amqp "github.com/rabbitmq/amqp091-go"
 )
 
+// ILogger local logger declare
 type ILogger interface {
 	Info(msg string, args ...interface{})
 	Error(msg string, args ...interface{})
 }
 
+// IConnectionManager to manage broker connection
 type IConnectionManager interface {
 	Connect() (*amqp.Connection, error)
 	Close() error
 }
 
+// IChannelManager to manage broker channel
 type IChannelManager interface {
 	CreateChannel(conn *amqp.Connection) (*amqp.Channel, error)
 	Close(channel *amqp.Channel) error
 }
 
+// IBroker to manage broker operations
 type IBroker interface {
 	Publish(message *Message) error
 	Subscribe(ctx context.Context, queue string, handler func(ctx context.Context, delivery amqp.Delivery) error) error
 	Close()
 }
 
+// ConnectionManager structure to store connection and URL to connect
 type ConnectionManager struct {
 	URL    string
 	Logger ILogger
