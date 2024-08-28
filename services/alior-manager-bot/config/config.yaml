@@ -1,0 +1,4 @@
+broker:
+  rabbitmq_url: amqp://guest:guest@localhost:5672/
+bot:
+  token: '6853105885:AAE0JA44brPTqd5iPQ5f2GN0L-jNQYi8E2A'
