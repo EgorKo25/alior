@@ -17,7 +17,7 @@ func main() {
 	// Инициализация config
 	cfg, err := config.Load()
 	if err != nil {
-		panic(err)
+		l.Fatal(err)
 	}
 
 	// Инициализация logger
@@ -25,7 +25,6 @@ func main() {
 	if err != nil {
 		l.Fatal(err)
 	}
-	log.Info("Config: ", cfg)
 
 	// Инициализация БД
 	db, err := database.New(ctx, cfg)
