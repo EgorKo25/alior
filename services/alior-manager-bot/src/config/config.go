@@ -12,7 +12,8 @@ var ReadConfig = func(path string, cfg interface{}) error {
 
 // BotConfig is a structure to store db config
 type BotConfig struct {
-	BotToken string `yaml:"token"`
+	BotToken    string `yaml:"token"`
+	BotPolingTO int    `yaml:"poling_to"`
 }
 
 // Config is a structure to store bot settings
