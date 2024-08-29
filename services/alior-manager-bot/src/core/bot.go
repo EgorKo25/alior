@@ -10,10 +10,14 @@ const (
 	PRODUCTION
 )
 
+type HandlerFunc func(update *tgbotapi.Update)
+
 type Bot struct {
-	API          *tgbotapi.BotAPI
-	UpdateConfig tgbotapi.UpdateConfig
-	logger       logger.ILogger
+	API           *tgbotapi.BotAPI
+	CommandConfig tgbotapi.SetMyCommandsConfig
+	UpdateConfig  tgbotapi.UpdateConfig
+	logger        logger.ILogger
+	handlers      map[string]HandlerFunc
 }
 
 func New(token string, pollingTO int, mode int, l *logger.Logger) (*Bot, error) {
@@ -29,8 +33,22 @@ func New(token string, pollingTO int, mode int, l *logger.Logger) (*Bot, error) 
 		botAPI.Debug = false
 	}
 
-	u := tgbotapi.NewUpdate(0)
-	u.Timeout = pollingTO
+	bot := &Bot{
+		API:          botAPI,
+		UpdateConfig: tgbotapi.NewUpdate(0),
+		logger:       l,
+		handlers:     make(map[string]HandlerFunc),
+	}
 
-	return &Bot{API: botAPI, UpdateConfig: u, logger: l}, nil
+	bot.UpdateConfig.Timeout = pollingTO
+
+	bot.CommandConfig, _ = SetupCommands()
+
+	if _, err := bot.API.Request(bot.CommandConfig); err != nil {
+		return nil, err
+	}
+
+	bot.initHandlers()
+
+	return bot, nil
 }

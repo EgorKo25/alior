@@ -24,7 +24,12 @@ func main() {
 	// Инициализация бота
 	b, err := bot.New(cfg.Bot.BotToken, cfg.Bot.BotPolingTO, bot.DEBUG, log)
 	if err != nil {
-		log.Fatal(err.Error())
+		log.Fatal("Failed to initialize bot")
+	}
+
+	commands := b.CommandConfig.Commands
+	for _, command := range commands {
+		l.Printf("command: %s", command)
 	}
 
 	// Запуск бота
