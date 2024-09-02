@@ -1,6 +1,7 @@
 package bot
 
 import (
+	"context"
 	"github.com/EgorKo25/common/logger"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 )
@@ -10,7 +11,7 @@ const (
 	PRODUCTION
 )
 
-type HandlerFunc func(update *tgbotapi.Update)
+type HandlerFunc func(ctx context.Context, update *tgbotapi.Update) error
 
 type Bot struct {
 	API           *tgbotapi.BotAPI
@@ -42,7 +43,7 @@ func New(token string, pollingTO int, mode int, l *logger.Logger) (*Bot, error) 
 
 	bot.UpdateConfig.Timeout = pollingTO
 
-	bot.CommandConfig, _ = SetupCommands()
+	bot.CommandConfig, _ = setupCommands()
 
 	if _, err := bot.API.Request(bot.CommandConfig); err != nil {
 		return nil, err

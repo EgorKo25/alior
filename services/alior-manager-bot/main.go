@@ -27,11 +27,6 @@ func main() {
 		log.Fatal("Failed to initialize bot")
 	}
 
-	commands := b.CommandConfig.Commands
-	for _, command := range commands {
-		l.Printf("command: %s", command)
-	}
-
 	// Запуск бота
 	if err := b.Run(); err != nil {
 		log.Fatal(err.Error())

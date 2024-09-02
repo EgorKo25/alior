@@ -1,7 +1,12 @@
 package bot
 
+import "context"
+
 func (b *Bot) Run() error {
 	errCh := make(chan error, 1)
+	defer close(errCh)
+
+	ctx := context.Background()
 
 	go func() {
 		updates := b.API.GetUpdatesChan(b.UpdateConfig)
@@ -15,12 +20,20 @@ func (b *Bot) Run() error {
 			command := update.Message.Command()
 
 			if handler, exists := b.handlers[command]; exists {
-				handler(&update)
+				if err := handler(ctx, &update); err != nil {
+					b.logger.Error("handler error: %v", err)
+					errCh <- err
+				}
 			} else {
-				b.unknownCommandHandler(&update)
+				b.unknownCommandHandler(ctx, &update)
 			}
 		}
 	}()
 
-	return <-errCh
+	for {
+		select {
+		case err := <-errCh:
+			b.logger.Error("Error from handler: %v", err)
+		}
+	}
 }
