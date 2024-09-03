@@ -1,16 +1,21 @@
-FROM golang:1.22-alpine
+FROM golang:1.22
 
-RUN apk add --no-cache git openssh-client
+ENV GONOPROXY=github.com \
+    GONOSUMDB=github.com \
+    GOPRIVATE=github.com \
+    CGO_ENABLED=0
 
-WORKDIR /app
+RUN mkdir -p /go/src/app
+WORKDIR /go/src/app
 
-COPY .ssh/egorko25_private /root/.ssh/egorko25_private
-COPY .ssh/config /root/.ssh/config
+COPY go.mod .
 
-RUN chmod 600 /root/.ssh/egorko25_private && \
-    ssh-keyscan -t rsa github.com >> /root/.ssh/known_hosts
+COPY .ssh/* /root/.ssh/
 
-COPY go.mod go.sum ./
+RUN git config --global url."ssh://git@github.com".insteadOf "https://github.com"
+
+RUN mkdir -p /root/.ssh && \
+    ssh-keyscan github.com >> /root/.ssh/known_hosts
 
 RUN go mod download
 
