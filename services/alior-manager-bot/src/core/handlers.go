@@ -10,7 +10,16 @@ func (b *Bot) initHandlers() {
 }
 
 func (b *Bot) getInitialCallbackHandler(ctx context.Context, update *tgbotapi.Update) error {
-	msg := tgbotapi.NewMessage(update.Message.Chat.ID, "я пока в разработке")
+	//TODO: все это вынести в отдельную функцию
+
+	//TODO: broker.publish() -> content_type=callback, type=create
+	//TODO: определить стурктуру сообщения rabbitmq(взять из cms)
+	//TODO: msg := broker.consume()
+	//TODO: return msg
+
+	//TODO: конец функции
+
+	msg := tgbotapi.NewMessage(update.Message.Chat.ID, "я пока в разработке") //TODO: в text отправить (returned msg)
 	if _, err := b.API.Send(msg); err != nil {
 		b.logger.Error("failed to send message: %s", err)
 		return err

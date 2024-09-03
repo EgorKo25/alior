@@ -2,11 +2,9 @@ package bot
 
 import "context"
 
-func (b *Bot) Run() error {
+func (b *Bot) Run(ctx context.Context) error {
 	errCh := make(chan error, 1)
 	defer close(errCh)
-
-	ctx := context.Background()
 
 	go func() {
 		updates := b.API.GetUpdatesChan(b.UpdateConfig)
