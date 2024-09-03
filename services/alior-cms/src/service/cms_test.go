@@ -1,56 +1,79 @@
 package service_test
 
 import (
+	"callback_service/src/broker"
+	brokertest "callback_service/src/broker/mocks"
 	"callback_service/src/database"
 	"callback_service/src/service"
-	mocks "callback_service/src/service/mocks"
-	"context"
+	loggertest "callback_service/src/service/mocks"
 	"encoding/json"
 	"errors"
 	"github.com/golang/mock/gomock"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"testing"
+	"time"
 )
 
 func TestConvertToRepositoryAndValidate(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
 	tests := []struct {
-		name     string
-		input    []byte
-		wantErr  bool
-		expected *database.Callback
+		name          string
+		input         []byte
+		expected      *database.Callback
+		expectedError error
 	}{
 		{
-			name:    "Valid JSON",
-			input:   []byte(`{"Name":"Name","Phone":"Phone", "Type":"Type","Idea":"Idea"}`),
-			wantErr: false,
+			name: "success",
+			input: []byte(`{
+				"name": "John Doe",
+				"phone": "1234567890",
+				"type": "Inquiry",
+				"idea": "New project idea"
+			}`),
 			expected: &database.Callback{
-				Name:  "Name",
-				Phone: "Phone",
-				Type:  "Type",
-				Idea:  "Idea",
+				Name:      "John Doe",
+				Phone:     "1234567890",
+				Type:      "Inquiry",
+				Idea:      "New project idea",
+				CreatedAt: time.Now(),
 			},
+			expectedError: nil,
 		},
 		{
-			name:    "Invalid JSON",
-			input:   []byte(`{"field1":value1,"field2":"value2"}`),
-			wantErr: true,
+			name:          "invalid JSON",
+			input:         []byte(`invalid-json`),
+			expected:      nil,
+			expectedError: errors.New("invalid character 'i' looking for beginning of value"),
 		},
 		{
-			name:     "Empty JSON",
-			input:    []byte(`{}`),
-			wantErr:  false,
-			expected: &database.Callback{},
+			name: "missing required fields",
+			input: []byte(`{
+				"name": "John Doe",
+				"phone": "1234567890"
+			}`),
+			expected:      nil,
+			expectedError: errors.New("one or more required fields are empty"),
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			result, err := service.ConvertToRepositoryAndValidate(tt.input)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("convertToRepositoryAndValidate() error = %v, wantErr %v", err, tt.wantErr)
-				return
-			}
-			if !tt.wantErr && !compareCallbacks(result, tt.expected) {
-				t.Errorf("convertToRepositoryAndValidate() = %v, expected %v", result, tt.expected)
+
+			if tt.expectedError != nil {
+				require.Error(t, err)
+				require.Contains(t, err.Error(), tt.expectedError.Error())
+			} else {
+				require.NoError(t, err)
+				require.NotNil(t, result)
+				require.Equal(t, tt.expected.Name, result.Name)
+				require.Equal(t, tt.expected.Phone, result.Phone)
+				require.Equal(t, tt.expected.Type, result.Type)
+				require.Equal(t, tt.expected.Idea, result.Idea)
+				require.WithinDuration(t, tt.expected.CreatedAt, result.CreatedAt, time.Second)
 			}
 		})
 	}
@@ -62,56 +85,61 @@ func compareCallbacks(a, b *database.Callback) bool {
 	return string(aj) == string(bj)
 }
 
-func TestHandleMessage(t *testing.T) {
+func TestCreateResponse(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
-	mockBroker := mocks.NewMockIBroker(ctrl)
-	mockStorage := mocks.NewMockICallback(ctrl)
-	mockLogger := mocks.NewMockILogger(ctrl)
+	mockBroker := brokertest.NewMockIBroker(ctrl)
+	mockLogger := loggertest.NewMockILogger(ctrl)
 
-	cms := service.NewCMS(mockBroker, mockStorage, mockLogger)
+	cms := &service.CMS{
+		Broker: mockBroker,
+		Logger: mockLogger,
+	}
 
 	tests := []struct {
 		name       string
-		body       []byte
+		input      *database.Callback
 		setupMocks func()
 		wantErr    bool
 	}{
 		{
-			name: "Successful case",
-			body: []byte(`{"Name":"testName","Phone":"123456","Type":"testType","Idea":"testIdea"}`),
+			name: "success",
+			input: &database.Callback{
+				Name:  "John Doe",
+				Phone: "+1234567890",
+				Type:  "Inquiry",
+				Idea:  "New Feature",
+			},
 			setupMocks: func() {
-				mockStorage.EXPECT().CreateCallback(gomock.Any(), gomock.Any()).Return(nil)
-				mockBroker.EXPECT().Produce(gomock.Any(), "success", []byte("Callback created successfully")).Return(nil)
+				callbackJSON, _ := json.Marshal(&database.Callback{
+					Name:  "John Doe",
+					Phone: "+1234567890",
+					Type:  "Inquiry",
+					Idea:  "New Feature",
+				})
+				msg := broker.NewMessage(string(callbackJSON), "callback")
+				mockBroker.EXPECT().Publish(msg).Return(nil)
 			},
 			wantErr: false,
 		},
 		{
-			name: "Validation error",
-			body: []byte(`{"Name":testName,"Phone":"123456","Type":"testType","Idea":"testIdea"}`),
-			setupMocks: func() {
-				mockLogger.EXPECT().Error("error during validation or conversion: %s", gomock.Any())
-				mockBroker.EXPECT().Produce(gomock.Any(), "error", gomock.Any()).Return(nil)
+			name: "broker publish error",
+			input: &database.Callback{
+				Name:  "John Doe",
+				Phone: "+1234567890",
+				Type:  "Inquiry",
+				Idea:  "New Feature",
 			},
-			wantErr: false,
-		},
-		{
-			name: "Storage error",
-			body: []byte(`{"Name":"testName","Phone":"123456","Type":"testType","Idea":"testIdea"}`),
 			setupMocks: func() {
-				mockStorage.EXPECT().CreateCallback(gomock.Any(), gomock.Any()).Return(errors.New("insert error"))
-				mockLogger.EXPECT().Error("error inserting callback: %s", gomock.Any())
-				mockBroker.EXPECT().Produce(gomock.Any(), "error", gomock.Any()).Return(nil)
-			},
-			wantErr: false,
-		},
-		{
-			name: "Broker produce error on success",
-			body: []byte(`{"Name":"testName","Phone":"123456","Type":"testType","Idea":"testIdea"}`),
-			setupMocks: func() {
-				mockStorage.EXPECT().CreateCallback(gomock.Any(), gomock.Any()).Return(nil)
-				mockBroker.EXPECT().Produce(gomock.Any(), "success", []byte("Callback created successfully")).Return(errors.New("produce error"))
+				callbackJSON, _ := json.Marshal(&database.Callback{
+					Name:  "John Doe",
+					Phone: "+1234567890",
+					Type:  "Inquiry",
+					Idea:  "New Feature",
+				})
+				msg := broker.NewMessage(string(callbackJSON), "callback")
+				mockBroker.EXPECT().Publish(msg).Return(errors.New("broker error"))
 			},
 			wantErr: true,
 		},
@@ -120,9 +148,12 @@ func TestHandleMessage(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			tt.setupMocks()
-			err := cms.HandleMessage(context.Background(), tt.body)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("handleMessage() error = %v, wantErr %v", err, tt.wantErr)
+
+			err := cms.CreateResponse(tt.input)
+			if tt.wantErr {
+				assert.Error(t, err)
+			} else {
+				assert.NoError(t, err)
 			}
 		})
 	}

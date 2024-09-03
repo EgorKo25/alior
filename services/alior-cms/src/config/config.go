@@ -5,23 +5,28 @@ import (
 	"github.com/ilyakaznacheev/cleanenv"
 )
 
+// ReadConfig variable to store ReadConfig result
 var ReadConfig = func(path string, cfg interface{}) error {
 	return cleanenv.ReadConfig(path, cfg)
 }
 
+// DatabaseConfig is a structure to store db config
 type DatabaseConfig struct {
-	Url string `yaml:"postgresql_url"`
+	URL string `yaml:"postgresql_url"`
 }
 
+// MsgBrokerConfig is a structure to store broker config
 type MsgBrokerConfig struct {
-	Url string `yaml:"rabbitmq_url"`
+	URL string `yaml:"rabbitmq_url"`
 }
 
+// Config is a structure to store db and broker configs
 type Config struct {
 	Database  DatabaseConfig  `yaml:"db"`
 	MsgBroker MsgBrokerConfig `yaml:"msgBroker"`
 }
 
+// Load is a function to load config from file
 func Load() (*Config, error) {
 	var cfg Config
 
