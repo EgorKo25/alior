@@ -6,3 +6,5 @@ services/tn_service/venv/
 .isort.cfg
 alembic/versions/*.pyc
 .idea/
+services/alior-cms/logs
+services/alior-cms/.ssh
