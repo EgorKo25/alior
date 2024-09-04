@@ -2,6 +2,16 @@ package broker
 
 import "time"
 
+// Callback represents model structure
+type Callback struct {
+	ID        int32     `db:"id"`
+	Name      string    `db:"name"`
+	Phone     string    `db:"phone"`
+	Type      string    `db:"type"`
+	Idea      string    `db:"idea"`
+	CreatedAt time.Time `db:"created_at"`
+}
+
 // Message structure of broker delivery
 type Message struct {
 	Properties MessageProperties `json:"properties"`

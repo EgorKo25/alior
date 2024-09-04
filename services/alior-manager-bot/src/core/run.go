@@ -1,6 +1,8 @@
 package bot
 
-import "context"
+import (
+	"context"
+)
 
 func (b *Bot) Run(ctx context.Context) error {
 	errCh := make(chan error, 1)
@@ -23,7 +25,7 @@ func (b *Bot) Run(ctx context.Context) error {
 					errCh <- err
 				}
 			} else {
-				b.unknownCommandHandler(ctx, &update)
+				b.unknownCommandHandler(&update)
 			}
 		}
 	}()

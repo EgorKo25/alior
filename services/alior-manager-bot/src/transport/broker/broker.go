@@ -1,12 +1,17 @@
 package broker
 
 import (
+	"context"
 	"errors"
 	"github.com/EgorKo25/common/broker"
 	"github.com/EgorKo25/common/logger"
 	amqp "github.com/rabbitmq/amqp091-go"
-	"time"
 )
+
+type IBroker interface {
+	Produce(body string, msgType string) error
+	Consume(ctx context.Context) (*amqp.Delivery, error)
+}
 
 type Broker struct {
 	broker *broker.Broker
@@ -38,7 +43,8 @@ func (b *Broker) Produce(body string, msgType string) error {
 	message := NewMessage(body, msgType)
 
 	err := b.broker.Publish(amqp.Publishing{
-		ContentType: "callback",
+		ContentType: message.Properties.ContentType,
+		Type:        message.Properties.Type,
 		Body:        []byte(message.Body),
 	})
 	if err != nil {
@@ -48,17 +54,25 @@ func (b *Broker) Produce(body string, msgType string) error {
 	return nil
 }
 
-func (b *Broker) Consume(timeout time.Duration) (string, error) {
+func (b *Broker) Consume(ctx context.Context) (*amqp.Delivery, error) {
 	delivery, err := b.broker.Consume()
 	if err != nil {
 		b.logger.Error("failed to consume message: %s", err)
-		return "", err
+		return nil, err
 	}
 
-	select {
-	case msg := <-delivery:
-		return string(msg.Body), nil
-	case <-time.After(timeout):
-		return "", errors.New("exit with timeout")
+	for {
+		select {
+		case msg := <-delivery:
+			if msg.ContentType == "callback" {
+				return &msg, nil
+			}
+			b.logger.Warn("skipped message with ContentType: %s", msg.ContentType)
+		case <-ctx.Done():
+			if errors.Is(ctx.Err(), context.DeadlineExceeded) {
+				return nil, errors.New("exit with timeout")
+			}
+			return nil, ctx.Err()
+		}
 	}
 }

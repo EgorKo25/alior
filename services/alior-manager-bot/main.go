@@ -39,7 +39,7 @@ func main() {
 	}
 
 	// Инициализация бота
-	tgBot, err := bot.New(cfg.Bot.BotToken, cfg.Bot.BotPolingTO, bot.DEBUG, log)
+	tgBot, err := bot.New(cfg.Bot.BotToken, cfg.Bot.BotPolingTO, bot.DEBUG, log, b)
 	if err != nil {
 		log.Fatal("Failed to initialize bot")
 	}
