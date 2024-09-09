@@ -28,7 +28,7 @@ export const Carousel = () => {
     loadProjects();
   }, []);
 
-  let settings = {
+  const settings = {
     dots: false,
     infinite: false,
     speed: 500,

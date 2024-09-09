@@ -1,6 +1,6 @@
 import { RouterProvider } from "react-router-dom";
 import { router } from "./Router";
-import "./outputTW.css";
+import "./App.css";
 
 export const App = () => {
   return (

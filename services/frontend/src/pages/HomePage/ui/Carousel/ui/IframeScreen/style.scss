@@ -1,0 +1,38 @@
+.screen-wrapper {
+  perspective: 1000px;
+}
+
+.screen-parent {
+  transform: rotateY(-5deg) rotateX(2deg) rotateZ(1deg);
+  transform-style: preserve-3d;
+}
+
+@media screen and (min-width: 768px) {
+  .screen-parent {
+    transform: rotateY(-15deg) rotateX(5deg) rotateZ(2deg);
+    transform-style: preserve-3d;
+  }
+}
+
+// .screen-slice {
+//   @apply absolute left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2;
+// }
+
+@for $i from 1 through 26 {
+  .screen-slice-#{$i} {
+    border-radius: 20px;
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translateX(-50%) translateY(-50%) translateZ($i * 0.5px);
+    background-color: rgb($i * 9, $i * 9, $i * 9);
+
+    @if $i < 13 {
+      width: 100% - (13-$i) * 0.2%;
+      height: 100% - (13-$i) * 0.2%;
+    } @else {
+      width: 100% - ($i - 13) * 0.2%;
+      height: 100% - ($i - 13) * 0.2%;
+    }
+  }
+}

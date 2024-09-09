@@ -1,6 +1,7 @@
 import { ButtonColorSchema, MainButton } from "src/shared/ui/MainButton";
-import { TabletsCanvas } from "./TabletsCanvas";
-import { Placeholders } from "./Placeholders";
+// import { TabletsCanvas } from "./TabletsCanvas";
+// import { Placeholders } from "./Placeholders";
+import { IframeScreen } from "./IframeScreen";
 
 const COLOR_SCHEMA_CONFIG: Record<
   string,
@@ -33,16 +34,19 @@ export const Slide: React.FC<{
   description: string;
   projectUrl: string;
   isActive: boolean;
-}> = ({ ColorSchema, title, description, projectUrl, isActive }) => {
+}> = ({ ColorSchema, title, description, projectUrl }) => {
   return (
     <div
       className={
-        `slide px-5 lg:px-20 py-12 xl:py-20 rounded-40 relative mx-2.5 xl:mx-5` +
+        `slide px-5 lg:px-20 pb-12 pt-5 xl:py-20 rounded-40 relative mx-2.5 xl:mx-5` +
         COLOR_SCHEMA_CONFIG[ColorSchema].background
       }
     >
-      <div className="canvas-wrapper w-full h-500 md:w-[350px] lg:w-[500px] lg:h-598 xl:w-[700px] 2xl:w-[950px] 2xl:h-[700px] md:absolute md:-right-5 md:-top-[15%] 2xl:-top-[20%]">
+      {/* <div className="canvas-wrapper w-full h-500 md:w-[350px] lg:w-[500px] lg:h-598 xl:w-[700px] 2xl:w-[950px] 2xl:h-[700px] md:absolute md:-right-5 md:-top-[15%] 2xl:-top-[20%]">
         {isActive ? <TabletsCanvas url={projectUrl} /> : <Placeholders />}
+      </div> */}
+      <div className="tablet-wrapper h-full md:w-[40%] lg:w-[45%] xl:w-1/2 md:absolute right-0 xl:right-10 top-0 mb-8 md:mb-0 ">
+        <IframeScreen url={projectUrl} />
       </div>
 
       <div className={` flex flex-col gap-10 md:w-[53%] md:mt-10 xl:w-[45%]`}>

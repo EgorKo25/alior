@@ -2363,8 +2363,8 @@ body {
     width: 350px;
   }
 
-  .md\:w-\[50\%\] {
-    width: 50%;
+  .md\:w-\[53\%\] {
+    width: 53%;
   }
 
   .md\:w-\[55\%\] {
@@ -2373,10 +2373,6 @@ body {
 
   .md\:w-auto {
     width: auto;
-  }
-
-  .md\:w-\[53\%\] {
-    width: 53%;
   }
 
   .md\:max-w-688 {
