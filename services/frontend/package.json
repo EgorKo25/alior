@@ -1,7 +1,7 @@
 {
   "name": "alior",
   "private": true,
-  "version": "0.9.1",
+  "version": "0.9.9",
   "type": "module",
   "homepage": ".",
   "scripts": {
