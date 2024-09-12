@@ -1,53 +1,27 @@
-name: CI Pipeline for Develop Branch
+name: CI Pipeline for Main Branch
 
 on:
-  push:
+  pull_request:
     branches:
       - main
-  pull_request:
+  push:
     branches:
       - main
 
 jobs:
-  build:
+  build-alior-cms:
     runs-on: ubuntu-latest
-
-    services:
-      postgres:
-        image: postgres:13
-        ports:
-          - 5432:5432
-        options: >-
-          --health-cmd "pg_isready -U auth"
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-        env:
-          POSTGRES_DB: auth
-          POSTGRES_USER: auth
-          POSTGRES_PASSWORD: aliorAuth
-
-    env:
-      DB_HOST: postgres
-      DB_PORT: 5432
-      DB_DATABASE: auth
-      DB_USER: auth
-      DB_PASSWORD: aliorAuth
-
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-
-      - name: Set up Go
-        uses: actions/setup-go@v3
+      - name: Клонирование репозитория
+        uses: actions/checkout@v4
+      - name: Установка Go
+        uses: actions/setup-go@v5
         with:
           go-version: '1.22.4'
-
-      - name: Display Go version
+      - name: Проверка версии Go
         run: go version
-
-      - name: Set up dependencies cache
-        uses: actions/cache@v2
+      - name: Установка кэша зависимостей
+        uses: actions/cache@v4
         with:
           path: |
             ~/.cache/go-build
@@ -55,50 +29,261 @@ jobs:
           key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
           restore-keys: |
             ${{ runner.os }}-go-
+      - name: Установка зависимостей
+        run: go mod tidy
+        working-directory: ./services/alior-cms
+      - name: Сборка проекта
+        run: go build -o /dev/null ./...
+        working-directory: ./services/alior-cms
 
-      - name: Wait for PostgreSQL to be ready
-        run: |
-          until pg_isready -h localhost -p 5432 -U auth; do
-            echo "Waiting for PostgreSQL to be ready..."
-            sleep 10
-          done
-          echo "PostgreSQL is ready"
+  build-alior-sms:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Клонирование репозитория
+        uses: actions/checkout@v4
+      - name: Установка Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.22.4'
+      - name: Проверка версии Go
+        run: go version
+      - name: Установка кэша зависимостей
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cache/go-build
+            /go/pkg/mod
+          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+          restore-keys: |
+            ${{ runner.os }}-go-
+      - name: Установка зависимостей
+        run: go mod tidy
+        working-directory: ./services/alior-sms
+      - name: Сборка проекта
+        run: go build -o /dev/null ./...
+        working-directory: ./services/alior-sms
 
-      - name: Install dependencies
+  build-alior-auth:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Клонирование репозитория
+        uses: actions/checkout@v4
+      - name: Установка Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.22.4'
+      - name: Проверка версии Go
+        run: go version
+      - name: Установка кэша зависимостей
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cache/go-build
+            /go/pkg/mod
+          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+          restore-keys: |
+            ${{ runner.os }}-go-
+      - name: Установка зависимостей
         run: go mod tidy
         working-directory: ./services/alior-auth
-
-      - name: Pre-build the project
+      - name: Сборка проекта
         run: go build -o /dev/null ./...
         working-directory: ./services/alior-auth
 
-      - name: Install golangci-lint
-        run: |
-          curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s latest
-          sudo cp ./bin/golangci-lint /usr/local/bin/
+  build-alior-api-gw:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Клонирование репозитория
+        uses: actions/checkout@v4
+      - name: Установка Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.22.4'
+      - name: Проверка версии Go
+        run: go version
+      - name: Установка кэша зависимостей
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cache/go-build
+            /go/pkg/mod
+          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+          restore-keys: |
+            ${{ runner.os }}-go-
+      - name: Установка зависимостей
+        run: go mod tidy
+        working-directory: ./services/alior-api-gw
+      - name: Сборка проекта
+        run: go build -o /dev/null ./...
+        working-directory: ./services/alior-api-gw
 
-      - name: Run golangci-lint
-        run: golangci-lint run ./...
+  check-tests-alior-cms:
+    defaults:
+      run:
+        working-directory: ./services/alior-cms
+    needs:
+      - build-alior-cms
+    runs-on: ubuntu-latest
+    steps:
+      - name: Клонирование репозитория
+        uses: actions/checkout@v4
+
+      - name: Установка Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: 1.22.4
+
+      - name: Проверка зависимостей
+        run: go mod verify
+
+      - name: Сборка
+        run: go build -v ./...
+
+      - name: Запуск go vet
+        run: go vet ./...
+
+      - name: Установка staticcheck
+        run: go install honnef.co/go/tools/cmd/staticcheck@latest
+
+      - name: Запуск staticcheck
+        run: staticcheck ./...
+
+      - name: Установка golint
+        run: go install golang.org/x/lint/golint@latest
+
+      - name: Запуск golint
+        run: golint ./...
+
+      - name: Запуск тестов
+        run: go test -race -vet=off ./...
+
+  check-tests-alior-sms:
+    defaults:
+      run:
+        working-directory: ./services/alior-sms
+    needs:
+      - build-alior-sms
+    runs-on: ubuntu-latest
+    steps:
+      - name: Клонирование репозитория
+        uses: actions/checkout@v4
+
+      - name: Установка Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: 1.22.4
+
+      - name: Проверка зависимостей
+        run: go mod verify
+
+      - name: Сборка
+        run: go build -v ./...
+
+      - name: Запуск go vet
+        run: go vet ./...
+
+      - name: Установка staticcheck
+        run: go install honnef.co/go/tools/cmd/staticcheck@latest
+
+      - name: Запуск staticcheck
+        run: staticcheck ./...
+
+      - name: Установка golint
+        run: go install golang.org/x/lint/golint@latest
+
+      - name: Запуск golint
+        run: golint ./...
+
+      - name: Запуск тестов
+        run: go test -race -vet=off ./...
+
+  check-tests-alior-auth:
+    defaults:
+      run:
         working-directory: ./services/alior-auth
+    needs:
+      - build-alior-auth
+    runs-on: ubuntu-latest
+    steps:
+      - name: Клонирование репозитория
+        uses: actions/checkout@v4
 
-      - name: Build the project
-        run: go build -o start.auth main.go
-        working-directory: ./services/alior-auth
+      - name: Установка Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: 1.22.4
 
-      - name: Run tests
-        run: go test ./...
-        working-directory: ./services/alior-auth
+      - name: Проверка зависимостей
+        run: go mod verify
 
-      - name: Build Docker image
-        run: docker build -t alior-auth .
-        working-directory: ./services/alior-auth
+      - name: Сборка
+        run: go build -v ./...
 
-      - name: Create .env file
-        run: |
-          echo DB_HOST=${{ env.DB_HOST }} > .env
-          echo DB_PORT=${{ env.DB_PORT }} >> .env
-          echo DB_DATABASE=${{ env.DB_DATABASE }} >> .env
-          echo DB_USER=${{ env.DB_USER }} >> .env
-          echo DB_PASSWORD=${{ env.DB_PASSWORD }} >> .env
-        working-directory: ./services/alior-auth
+      - name: Запуск go vet
+        run: go vet ./...
 
+      - name: Установка staticcheck
+        run: go install honnef.co/go/tools/cmd/staticcheck@latest
+
+      - name: Запуск staticcheck
+        run: staticcheck ./...
+
+      - name: Установка golint
+        run: go install golang.org/x/lint/golint@latest
+
+      - name: Запуск golint
+        run: golint ./...
+
+      - name: Запуск тестов
+        run: go test -race -vet=off ./...
+
+  check-tests-alior-api-gw:
+    defaults:
+      run:
+        working-directory: ./services/alior-api-gw
+    needs: build-alior-api-gw
+    runs-on: ubuntu-latest
+    steps:
+      - name: Клонирование репозитория
+        uses: actions/checkout@v4
+
+      - name: Установка Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: 1.22.4
+
+      - name: Проверка зависимостей
+        run: go mod verify
+
+      - name: Сборка
+        run: go build -v ./...
+
+      - name: Запуск go vet
+        run: go vet ./...
+
+      - name: Установка staticcheck
+        run: go install honnef.co/go/tools/cmd/staticcheck@latest
+
+      - name: Запуск staticcheck
+        run: staticcheck ./...
+
+      - name: Установка golint
+        run: go install golang.org/x/lint/golint@latest
+
+      - name: Запуск golint
+        run: golint ./...
+
+      - name: Запуск тестов
+        run: go test -race -vet=off ./...
+
+  start-qa-test:
+    needs:
+      - check-tests-alior-api-gw
+      - check-tests-alior-auth
+      - check-tests-alior-sms
+      - check-tests-alior-cms
+      - deploy-front
+    runs-on: ubuntu-latest
+    steps:
+      - name: Здесь должны быть твои тесты Кирилл
+        run: echo "Добавь запуск своих тестов сюда"

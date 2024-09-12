@@ -2,27 +2,27 @@ import { MainButton } from "src/shared/ui/MainButton";
 import { ServiceCard } from "./ui/ServiceCard";
 import styles from "./Servicies.module.scss";
 import { useEffect, useState } from "react";
+import { HashLink } from "react-router-hash-link";
 export const Services = () => {
   const [activeCard, setActiveCard] = useState<number | null>(null);
 
   const handleScroll = () => {
     const cards = document.querySelectorAll("[data-card-index]");
-    let newActiveCard = null;
 
     cards.forEach((card, index) => {
       const cardRect = card.getBoundingClientRect();
-      const isFullyVisible =
-        cardRect.top >= 0 && cardRect.bottom <= window.innerHeight;
+      const isMiddle =
+        cardRect.top <= window.innerHeight / 2 &&
+        cardRect.bottom >= window.innerHeight / 2 - 17;
 
-      if (isFullyVisible) {
-        newActiveCard = index;
+      if (isMiddle && index != activeCard) {
+        setActiveCard(index);
       }
     });
-
-    setActiveCard(newActiveCard);
   };
 
   useEffect(() => {
+    setActiveCard(0);
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
@@ -46,36 +46,13 @@ export const Services = () => {
           </h2>
           <div className={styles.parallelogram}></div>
         </div>
-        <MainButton
-          className={styles.button}
-          title="Уже знаю, что хочу"
-          colorSchema={" btn-accent-white"}
-        />
-        {/* <MainButton
-          className={styles.button}
-          title="Уже знаю, что хочу"
-          colorSchema={" btn-white-accent"}
-        />
-        <MainButton
-          className={styles.button}
-          title="Уже знаю, что хочу"
-          colorSchema={" btn-orange-white"}
-        />
-        <MainButton
-          className={styles.button}
-          title="Уже знаю, что хочу"
-          colorSchema={" btn-blue-white"}
-        />
-        <MainButton
-          className={styles.button}
-          title="Уже знаю, что хочу"
-          colorSchema={" btn-black-white"}
-        />
-        <MainButton
-          className={styles.button}
-          title="Уже знаю, что хочу"
-          colorSchema={" btn-white-black"}
-        /> */}
+        <HashLink smooth to={"#consult"}>
+          <MainButton
+            className={styles.button}
+            title="Уже знаю, что хочу"
+            colorSchema={" btn-accent-white"}
+          />
+        </HashLink>
       </div>
     </section>
   );

@@ -1,1 +1,0 @@
-export { QuestionIcon } from "./QuestionIcon";
