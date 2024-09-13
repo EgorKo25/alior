@@ -6,7 +6,7 @@ import { ArrowSVG } from "./ui/ArrowSVG";
 
 export const Hero = () => {
   return (
-    <section className=" mt-24 mx-5 sm:mx-10 xl:mx-28 ">
+    <section className=" mt-10 md:mt-24 mx-5 sm:mx-10 xl:mx-28 ">
       <MainTitle />
       <div className=" relative flex justify-end items-end w-fit ml-auto gap-3 sm:gap-4 mt-4 sm:mt-12 lg:mt-24 2xl:mr-[5vw]">
         <span className=" absolute left-0 sm:-left-12 -translate-x-[70%] translate-y-2 text-lg sm:static sm:translate-x-0 sm:translate-y-0 sm:mb-4">

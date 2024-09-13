@@ -3,7 +3,7 @@ import { PhoneGuySVG } from "./ui/PhoneGuySVG";
 
 export const Guys = () => {
   return (
-    <div className="guys flex flex-col mt-64 gap-20 md:grid md:grid-cols-2 md:gap-4 lg:w-[60vw] lg:mt-40 xl:w-[42vw] xl:mt-32">
+    <div className="guys flex flex-col mt-48 gap-20 md:grid md:grid-cols-2 md:gap-4 lg:w-[60vw] lg:mt-40 xl:w-[42vw] xl:mt-32">
       <div className="selfie-guy flex flex-col items-center border relative rounded-3xl w-64 h-56 md:w-auto md:h-[330px] lg:h-[295px]">
         <PhoneGuySVG className="absolute top-0 -translate-y-1/2 w-48 md:w-72 lg:w-64" />
         <h4 className="mt-auto mb-7 font-bold text-xl md:mb-11">

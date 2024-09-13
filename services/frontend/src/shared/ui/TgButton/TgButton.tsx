@@ -14,11 +14,11 @@ export const TgButton = ({
 }) => {
   return (
     <button
-      className={clsx(styles.button, className)}
+      className={clsx(styles.button, className) + ` md:w-20 md:h-20`}
       type={type}
       onClick={onClick}
     >
-      <TgIcon color="#FFFFFF" size={48} />
+      <TgIcon color="#FFFFFF" className=" w-10 h-10 md:w-12 md:h-12" />
     </button>
   );
 };

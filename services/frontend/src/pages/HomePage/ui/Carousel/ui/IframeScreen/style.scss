@@ -18,7 +18,7 @@
 //   @apply absolute left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2;
 // }
 
-@for $i from 1 through 26 {
+@for $i from 13 through 26 {
   .screen-slice-#{$i} {
     border-radius: 20px;
     position: absolute;
