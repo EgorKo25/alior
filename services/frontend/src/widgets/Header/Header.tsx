@@ -34,16 +34,17 @@ export const Header = () => {
       scale: 1,
       left: "5%",
       top: "28px",
-      delay: 1,
-      duration: 1.25,
+      ease: "back.out(1.005)",
+      delay: 0.7,
+      duration: 0.6,
       transform: "translate(0,0)",
     });
 
     gsap.to(".white-bg-under-logo", {
       opacity: 0,
       backgroundColor: "transparent",
-      delay: 1,
-      duration: 1.5,
+      delay: 0.7,
+      duration: 0.6,
     });
   }, []);
 
@@ -52,10 +53,10 @@ export const Header = () => {
       className={clsx(styles.header) + ` sm:justify-normal  lg:justify-between`}
     >
       <div className="white-bg-under-logo fixed top-0 left-0 w-screen h-screen bg-white pointer-events-none select-none z-40"></div>
-      <div className="w-[111px]">
+      <div className="w-16 md:w-[111px] h-10 md:h-16">
         <LogoSVG
           className={
-            "header-logo absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 scale-[3] md:scale-[4.5] lg:scale-[6] z-50"
+            "header-logo absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-16 md:w-[111px] h-10 md:h-16  scale-[3] md:scale-[4.5] lg:scale-[6] z-50"
           }
         />
       </div>
