@@ -28,10 +28,10 @@ func main() {
 	// Создаем новый экземпляр брокера
 	b, err := broker.NewBroker(
 		"amqp://guest:guest@localhost:5672/", // URI подключения
-		"test-exchange",                      // Имя Exchange
+		"ansask",                             // Имя Exchange
 		"direct",                             // Тип Exchange
-		"test-key",                           // Routing Key
-		"testin-queue",                       // Имя очереди
+		"",                                   // Routing Key
+		"ans",                                // Имя очереди
 		log,                                  // Логгер
 	)
 	if err != nil {

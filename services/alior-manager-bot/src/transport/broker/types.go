@@ -22,6 +22,7 @@ type Message struct {
 // MessageProperties structure of delivery properties
 type MessageProperties struct {
 	ContentType   string `json:"content-type"`
+	Content       string `json:"content"`
 	DeliveryMode  int    `json:"delivery-mode"`
 	CorrelationID string `json:"correlation-id"`
 	ReplyTo       string `json:"reply-to"`
@@ -43,7 +44,8 @@ type MessageHeaders struct {
 func NewMessage(body string, msgType string) *Message {
 	return &Message{
 		Properties: MessageProperties{
-			ContentType:   "callback",
+			ContentType:   "text/plain",
+			Content:       "callback",
 			DeliveryMode:  1,
 			CorrelationID: "123",
 			ReplyTo:       "ans",

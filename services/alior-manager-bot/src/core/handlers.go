@@ -12,7 +12,7 @@ func (b *Bot) initHandlers() {
 }
 
 func (b *Bot) getInitialCallbackHandler(ctx context.Context, update *tgbotapi.Update) error {
-	response, err := b.broker.CMSMessageExchange(ctx, "", "initial")
+	response, err := b.broker.CMSMessageExchange(ctx, "привет галава", "initial")
 	if err != nil {
 		b.logger.Error("error getting initial callback response", err)
 		return err

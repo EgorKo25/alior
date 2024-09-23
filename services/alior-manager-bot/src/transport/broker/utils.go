@@ -13,8 +13,11 @@ func (b *Broker) CMSMessageExchange(ctx context.Context, body string, msgType st
 		b.logger.Error("failed to produce request", "error", err)
 		return nil, err
 	}
+	b.logger.Info("successfully produced request: %s", body)
 
-	ctx, cancel := context.WithTimeout(ctx, time.Second)
+	time.Sleep(20 * time.Second)
+
+	ctx, cancel := context.WithTimeout(ctx, 10*time.Second)
 	defer cancel()
 
 	msg, err := b.Consume(ctx)
@@ -29,7 +32,7 @@ func (b *Broker) CMSMessageExchange(ctx context.Context, body string, msgType st
 		return msg, nil
 	case "error":
 		b.logger.Warn("Failed to get initial callback response", "error", msg)
-		return msg, errors.New("ailed to get initial callback response")
+		return msg, errors.New("failed to get initial callback response")
 	default:
 		return nil, errors.New("unknown response type")
 	}

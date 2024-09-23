@@ -20,6 +20,7 @@ type Broker struct {
 
 func NewBroker(uri, exchangeName, exchangeKind, routingKey, queueName string, logger logger.ILogger) (*Broker, error) {
 	brokerConfig := broker.NewDialConfig(uri, exchangeName, exchangeKind, routingKey, queueName)
+	brokerConfig.ExchangeCfg.Durable = true
 
 	_, err := broker.Init(brokerConfig, logger)
 	if err != nil {
