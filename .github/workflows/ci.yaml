@@ -55,7 +55,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-go-
       - name: Установка зависимостей
-        run: go mod tidy
+        run: go mod download
         working-directory: ./services/alior-cms
       - name: Сборка проекта
         run: go build -o /dev/null ./...
