@@ -147,13 +147,16 @@ func (b *Broker) Close() {
 // Publish is a Broker structure method to publish message to broker
 func (b *Broker) Publish(message *Message) error {
 	return b.Channel.Publish(
-		message.Headers.Exchange,   // exchange
-		message.Headers.RoutingKey, // routing key
-		false,                      // mandatory
-		false,                      // immediate
+		message.Headers.Exchange,
+		message.Headers.RoutingKey,
+		false,
+		false,
 		amqp.Publishing{
 			ContentType: "text/plain",
 			Body:        []byte(message.Body),
+			Headers: amqp.Table{
+				"msg_type": message.Properties.Type,
+			},
 		})
 }
 

@@ -35,7 +35,7 @@ type MessageHeaders struct {
 func NewMessage(body string, msgType string) *Message {
 	return &Message{
 		Properties: MessageProperties{
-			ContentType:   "callback",
+			ContentType:   "text/plain",
 			DeliveryMode:  1,
 			CorrelationID: "123",
 			ReplyTo:       "ans",

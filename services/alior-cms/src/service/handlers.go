@@ -8,82 +8,60 @@ import (
 	amqp "github.com/rabbitmq/amqp091-go"
 )
 
-// HandleMessage is a CMS method to handle all messages,
-// which delivery.ContentType == "callback" and delivery.Type in (create, initial, next, previous, delete)
-func (c *CMS) HandleMessage(ctx context.Context, delivery amqp.Delivery) error {
-	if delivery.ContentType == "callback" {
-		switch delivery.Type {
-		case "create":
-			err := c.CreateCallbackHandler(ctx, delivery)
-			if err != nil {
-				c.Logger.Error("error creating callback: %s", err)
-				response := broker.NewMessage("error creating callback", "error")
-				return c.Broker.Publish(response)
-			}
-			c.Logger.Info("callback created")
+func (c *CMS) handleError(errMsg string) error {
+	c.Logger.Error(errMsg)
+	response := broker.NewMessage(errMsg, "error")
+	return c.Broker.Publish(response)
+}
 
-			response := broker.NewMessage("created successfully", "success")
-			return c.Broker.Publish(response)
+// HandleMessage is a CMS method to handle all messages,
+// with delivery.Headers contains "action_type" and delivery.Type in (create, initial, next, previous, delete)
+func (c *CMS) HandleMessage(ctx context.Context, delivery amqp.Delivery) error {
+	actionType, ok := delivery.Headers["action_type"].(string)
+	if !ok {
+		return c.handleError("invalid or missing action_type header")
+	}
+
+	if delivery.Type == "callback" {
+		switch actionType {
+		case "create":
+			if err := c.CreateCallbackHandler(ctx, delivery); err != nil {
+				return c.handleError("error creating callback: " + err.Error())
+			}
+			return c.Broker.Publish(broker.NewMessage("created callback", "success"))
 
 		case "initial":
-			err := c.InitialCallbackHandler(ctx)
-			if err != nil {
-				c.Logger.Error("error getting init callback: %s", err)
-				response := broker.NewMessage("error getting init callback", "error")
-				return c.Broker.Publish(response)
+			if err := c.InitialCallbackHandler(ctx); err != nil {
+				return c.handleError("error getting initial callback: " + err.Error())
 			}
-			c.Logger.Info("got initial callback")
-
-			response := broker.NewMessage("got initial callback", "success")
-			return c.Broker.Publish(response)
+			return nil
 
 		case "next":
-			err := c.NextCallbackHandler(ctx)
-			if err != nil {
-				c.Logger.Error("error getting next callback: %s", err)
-				response := broker.NewMessage("error getting next callback", "error")
-				return c.Broker.Publish(response)
+			if err := c.NextCallbackHandler(ctx); err != nil {
+				return c.handleError("error getting next callback: " + err.Error())
 			}
-			c.Logger.Info("got next callback")
-
-			response := broker.NewMessage("got next callback", "success")
-			return c.Broker.Publish(response)
+			return nil
 
 		case "previous":
-			err := c.PreviousCallbackHandler(ctx)
-			if err != nil {
-				c.Logger.Error("error getting previous callback: %s", err)
-				response := broker.NewMessage("error getting previous callback", "error")
-				return c.Broker.Publish(response)
+			if err := c.PreviousCallbackHandler(ctx); err != nil {
+				return c.handleError("error getting previous callback: " + err.Error())
 			}
-			c.Logger.Info("got previous callback")
-
-			response := broker.NewMessage("got previous callback", "success")
-			return c.Broker.Publish(response)
+			return nil
 
 		case "delete":
-			err := c.DeleteCallbackHandler(ctx, delivery)
-			if err != nil {
-				c.Logger.Error("error deleting callback: %s", err)
-				response := broker.NewMessage("error deleting callback", "error")
-				return c.Broker.Publish(response)
+			if err := c.DeleteCallbackHandler(ctx, delivery); err != nil {
+				return c.handleError("error deleting callback: " + err.Error())
 			}
-			c.Logger.Info("got delete callback")
-
-			response := broker.NewMessage("deleted successfully", "success")
-			return c.Broker.Publish(response)
+			return nil
 
 		default:
-			c.Logger.Error("unknown message type: %s", delivery.Type)
-
-			response := broker.NewMessage("unknown message type", "error")
-			return c.Broker.Publish(response)
+			return c.handleError("unknown action type: " + actionType)
 		}
 	}
 	return nil
 }
 
-// CreateCallbackHandler is a CMS method to handle message with delivery.type = create
+// CreateCallbackHandler is a CMS method to handle message with delivery.Headers "action_type" = "create"
 func (c *CMS) CreateCallbackHandler(ctx context.Context, delivery amqp.Delivery) error {
 	callback, err := ConvertToRepositoryAndValidate(delivery.Body)
 	if err != nil {
@@ -100,31 +78,35 @@ func (c *CMS) CreateCallbackHandler(ctx context.Context, delivery amqp.Delivery)
 	return nil
 }
 
-// InitialCallbackHandler is a CMS method to handle message with delivery.type = initial
+// InitialCallbackHandler is a CMS method to handle message with delivery.Headers "action_type" = "initial"
 func (c *CMS) InitialCallbackHandler(ctx context.Context) error {
 	database.Offset = 0
 	callback, err := c.Storage.GetCallback(ctx, database.Limit, 0)
 	if err != nil {
-		c.Logger.Error("error getting init callback: %s", err.Error())
-		return err
+		c.Logger.Error("error getting initial callback: %s", err.Error())
+		response := broker.NewMessage("error getting initial callback", "error")
+		return c.Broker.Publish(response)
 	}
 
-	err = c.CreateResponse(callback)
+	callbackJSON, err := json.Marshal(callback)
 	if err != nil {
-		c.Logger.Error("error processing rabbit response: %s", err.Error())
-		return err
+		c.Logger.Error("error marshalling callback: %s", err.Error())
+		response := broker.NewMessage("error marshalling callback", "error")
+		return c.Broker.Publish(response)
 	}
 
 	c.Logger.Info("got initial callback: %s", callback)
-	return nil
+	response := broker.NewMessage(string(callbackJSON), "success")
+	return c.Broker.Publish(response)
 }
 
-// NextCallbackHandler is a CMS method to handle message with delivery.type = next
+// NextCallbackHandler is a CMS method to handle message with delivery.Headers "action_type" = "next"
 func (c *CMS) NextCallbackHandler(ctx context.Context) error {
 	total, err := c.Storage.GetTotalCallbacks(ctx)
 	if err != nil {
 		c.Logger.Error("error getting total callbacks: %s", err.Error())
-		return err
+		response := broker.NewMessage("error getting total callbacks", "error")
+		return c.Broker.Publish(response)
 	}
 
 	if database.Offset+1 < total {
@@ -133,59 +115,70 @@ func (c *CMS) NextCallbackHandler(ctx context.Context) error {
 
 	callback, err := c.Storage.GetCallback(ctx, database.Limit, database.Offset)
 	if err != nil {
-		c.Logger.Error("error fetching callback: %s", err.Error())
-		return err
+		c.Logger.Error("error fetching next callback: %s", err.Error())
+		response := broker.NewMessage("error fetching next callback", "error")
+		return c.Broker.Publish(response)
 	}
 
-	err = c.CreateResponse(callback)
+	callbackJSON, err := json.Marshal(callback)
 	if err != nil {
-		c.Logger.Error("error processing rabbit response: %s", err.Error())
-		return err
+		c.Logger.Error("error marshalling callback: %s", err.Error())
+		response := broker.NewMessage("error marshalling callback", "error")
+		return c.Broker.Publish(response)
 	}
 
 	c.Logger.Info("got next callback: %s", callback)
-	return nil
+	response := broker.NewMessage(string(callbackJSON), "success")
+	return c.Broker.Publish(response)
 }
 
-// PreviousCallbackHandler is a CMS method to handle message with delivery.type = previous
+// PreviousCallbackHandler is a CMS method to handle message with delivery.Headers "action_type" = "previous"
 func (c *CMS) PreviousCallbackHandler(ctx context.Context) error {
 	if database.Offset > 0 {
 		database.Offset--
 	}
+
 	callback, err := c.Storage.GetCallback(ctx, database.Limit, database.Offset)
 	if err != nil {
-		c.Logger.Error("error fetching callback: %s", err.Error())
-		return err
+		c.Logger.Error("error fetching previous callback: %s", err.Error())
+		response := broker.NewMessage("error fetching previous callback", "error")
+		return c.Broker.Publish(response)
 	}
-	err = c.CreateResponse(callback)
+
+	callbackJSON, err := json.Marshal(callback)
 	if err != nil {
-		c.Logger.Error("error processing rabbit response: %s", err.Error())
-		return err
+		c.Logger.Error("error marshalling callback: %s", err.Error())
+		response := broker.NewMessage("error marshalling callback", "error")
+		return c.Broker.Publish(response)
 	}
 
 	c.Logger.Info("got previous callback: %s", callback)
-	return nil
+	response := broker.NewMessage(string(callbackJSON), "success")
+	return c.Broker.Publish(response)
 }
 
-// DeleteCallbackHandler is a CMS method to handle message with delivery.type = delete
+// DeleteCallbackHandler is a CMS method to handle message with delivery.Headers "action_type" = "delete"
 func (c *CMS) DeleteCallbackHandler(ctx context.Context, delivery amqp.Delivery) error {
 	var body database.Callback
 	err := json.Unmarshal(delivery.Body, &body)
 	if err != nil {
 		c.Logger.Error("error unmarshalling message body: %s", err.Error())
-		return err
+		response := broker.NewMessage("error unmarshalling delete message", "error")
+		return c.Broker.Publish(response)
 	}
 
 	err = c.Storage.DeleteCallbackByID(ctx, body.ID)
 	if err != nil {
 		c.Logger.Error("error deleting callback: %s", err.Error())
-		return err
+		response := broker.NewMessage("error deleting callback", "error")
+		return c.Broker.Publish(response)
 	}
 
-	if database.Offset-1 >= 0 {
+	if database.Offset > 0 {
 		database.Offset--
 	}
 
 	c.Logger.Info("deleted callback: %s", body.ID)
-	return nil
+	response := broker.NewMessage("deleted callback", "success")
+	return c.Broker.Publish(response)
 }

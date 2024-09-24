@@ -53,5 +53,11 @@ func (c *CMS) Run(ctx context.Context) error {
 		}
 	}()
 
-	return <-errCh
+	select {
+	case err := <-errCh:
+		return err
+	case <-ctx.Done():
+		c.Logger.Info("context cancelled")
+		return ctx.Err()
+	}
 }
