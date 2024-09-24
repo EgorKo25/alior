@@ -4,7 +4,7 @@ import { FormGuySVG } from "./ui/FormGuySVG";
 
 export const Consultation = () => {
   return (
-    <section id="consult" className=" mt-48 mb-20">
+    <section id="consult" className="mt-20 lg:mt-48 mb-10 lg:mb-20">
       <div
         className={` flex flex-col md:flex-row md:justify-between gap-8 w-90% mx-auto`}
       >
@@ -30,7 +30,7 @@ export const Consultation = () => {
             className=" rounded-bl-none sm:min-w-72 sm:w-72 lg:text-base max-w-[65%] ml-auto hidden md:block xl:hidden md:mt-4"
             title="Расскажете детали, а мы поможем составить ТЗ"
           />
-          <FormGuySVG className="mx-auto w-80 md:mt-16 lg:w-96" />
+          <FormGuySVG className="mx-auto w-80 mt-10 md:mt-16 lg:w-96" />
         </div>
       </div>
     </section>
