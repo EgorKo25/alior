@@ -8,9 +8,7 @@ import { CasesIcon } from "./ui/CasesIcon";
 interface NavigationItemProps {
   item: string;
   index: number;
-  isActive: boolean;
   onItemClicked: (index: number) => void;
-  activeIndex: number;
 }
 
 const menuItems = [
@@ -22,26 +20,12 @@ const menuItems = [
 export const NavbarItem: React.FC<NavigationItemProps> = ({
   item,
   index,
-  activeIndex,
-  isActive,
   onItemClicked,
 }) => {
   const icons = [
-    <AboutIcon
-      className={clsx(styles.icon, {
-        [styles.icon_active]: index === activeIndex,
-      })}
-    />,
-    <ServicesIcon
-      className={clsx(styles.icon, {
-        [styles.icon_active]: index === activeIndex,
-      })}
-    />,
-    <CasesIcon
-      className={clsx(styles.icon, {
-        [styles.icon_active]: index === activeIndex,
-      })}
-    />,
+    <AboutIcon className={clsx(styles.icon)} />,
+    <ServicesIcon className={clsx(styles.icon)} />,
+    <CasesIcon className={clsx(styles.icon)} />,
   ];
   return (
     <li
@@ -50,13 +34,7 @@ export const NavbarItem: React.FC<NavigationItemProps> = ({
     >
       <div className={clsx(styles.decoration_container)}>
         {icons[index]}
-        <div
-          className={clsx(styles.decoration, {
-            " bg-black sm:bg-black md:bg-black lg:bg-white": !isActive,
-            " bg-transparent sm:fill-black md:fill-black": isActive,
-            [styles.decoration_active]: index === activeIndex,
-          })}
-        ></div>
+        <div className={clsx(styles.decoration)}></div>
       </div>
       <Link
         to={{ pathname: "/", hash: `#${menuItems[index].sectionId}` }}
