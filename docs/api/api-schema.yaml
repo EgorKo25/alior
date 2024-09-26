@@ -22,20 +22,14 @@ components:
         phone:
           type: string
           description: Номер телефона
-        callbackType:
+        type:
           type: string
           description: Тип колбэка ("call" | "whatsapp" | "telegram")
-          
-    generalResponseType:
-      type: object
-      properties:
-        success:
-          type: boolean
-          description: Успешен ли запрос
-        message:
-          type: string
-          description: Сообщение о статусе запроса
-
+          enum: 
+            - "call"
+            - "whatsapp"
+            - "telegram"
+         
     generalErrorType:
       type: object
       properties:
@@ -58,10 +52,6 @@ paths:
       responses:
         '200':
           description: Запрос на обратный звонок успешно отправлен
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/generalResponseType'
         '400':
           description: Ошибка валидации
           content:
