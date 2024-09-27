@@ -1,79 +1,60 @@
 package broker
 
 import (
-	"context"
-	"errors"
+	"alior-manager-bot/src/config"
 	"github.com/EgorKo25/common/broker"
 	"github.com/EgorKo25/common/logger"
-	amqp "github.com/rabbitmq/amqp091-go"
 )
 
-type IBroker interface {
-	Produce(body string, msgType string) error
-	Consume(ctx context.Context) (*amqp.Delivery, error)
-}
-
-type Broker struct {
-	broker *broker.Broker
-	logger logger.ILogger
-}
-
-func NewBroker(uri, exchangeName, exchangeKind, routingKey, queueName string, logger logger.ILogger) (*Broker, error) {
-	brokerConfig := broker.NewDialConfig(uri, exchangeName, exchangeKind, routingKey, queueName)
-	brokerConfig.ExchangeCfg.Durable = true
-
-	_, err := broker.Init(brokerConfig, logger)
+func InitBroker(brokerCfg config.BrokerConfig, log logger.ILogger) error {
+	err := broker.InitBroker(brokerCfg.URL)
 	if err != nil {
-		logger.Error("failed to initialize broker: %s", err)
-		return nil, err
+		log.Fatal(err.Error())
 	}
 
-	b, err := broker.GetBroker()
-	if err != nil {
-		logger.Error("failed to get broker: %s", err)
-		return nil, err
+	// паблишер для отправки ответов
+	//pubConfig := broker.NewPublisherConfig(brokerCfg.Exchange.Name, brokerCfg.Exchange.Kind, "ans")
+	//if pubConfig == nil {
+	//	log.Fatal("publisher config not created")
+	//}
+	//
+	//err = broker.CreatePublisher("ans_publisher", pubConfig)
+	//if err != nil {
+	//	log.Fatal(err.Error())
+	//}
+
+	// паблишер для отправки запросов
+	pubConfig := broker.NewPublisherConfig(brokerCfg.Exchange.Name, brokerCfg.Exchange.Kind, "ask")
+	if pubConfig == nil {
+		log.Fatal("publisher config not created")
 	}
 
-	return &Broker{
-		broker: b,
-		logger: logger,
-	}, nil
-}
-
-func (b *Broker) Produce(body string, msgType string) error {
-	message := NewMessage(body, msgType)
-
-	err := b.broker.Publish(amqp.Publishing{
-		ContentType: message.Properties.ContentType,
-		Type:        message.Properties.Type,
-		Body:        []byte(message.Body),
-	})
+	err = broker.CreatePublisher("ask_publisher", pubConfig)
 	if err != nil {
-		b.logger.Error("failed to publish message: %s", err)
-		return err
+		log.Fatal(err.Error())
 	}
+
+	// читатель ответов
+	consConfig := broker.NewConsumerConfig(brokerCfg.Exchange.Name, "ans", "ans", "")
+	if consConfig == nil {
+		log.Fatal("Consumer config not created")
+	}
+
+	err = broker.CreateConsumer("ans_consumer", consConfig)
+	if err != nil {
+		log.Fatal(err.Error())
+	}
+
+	// читатель запросов
+	consConfig = broker.NewConsumerConfig(brokerCfg.Exchange.Name, "ask", "ask", "")
+	if consConfig == nil {
+		log.Fatal("Consumer config not created")
+	}
+
+	err = broker.CreateConsumer("ask_consumer", consConfig)
+	if err != nil {
+		log.Fatal(err.Error())
+	}
+
 	return nil
-}
-
-func (b *Broker) Consume(ctx context.Context) (*amqp.Delivery, error) {
-	delivery, err := b.broker.Consume()
-	if err != nil {
-		b.logger.Error("failed to consume message: %s", err)
-		return nil, err
-	}
-
-	for {
-		select {
-		case msg := <-delivery:
-			if msg.ContentType == "callback" {
-				return &msg, nil
-			}
-			b.logger.Warn("skipped message with ContentType: %s", msg.ContentType)
-		case <-ctx.Done():
-			if errors.Is(ctx.Err(), context.DeadlineExceeded) {
-				return nil, errors.New("exit with timeout")
-			}
-			return nil, ctx.Err()
-		}
-	}
 }

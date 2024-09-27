@@ -25,21 +25,14 @@ func main() {
 		log.Fatal(err.Error())
 	}
 
-	// Создаем новый экземпляр брокера
-	b, err := broker.NewBroker(
-		"amqp://guest:guest@localhost:5672/", // URI подключения
-		"ansask",                             // Имя Exchange
-		"direct",                             // Тип Exchange
-		"",                                   // Routing Key
-		"ans",                                // Имя очереди
-		log,                                  // Логгер
-	)
+	// Инициализация брокера
+	err = broker.InitBroker(cfg.Broker, log)
 	if err != nil {
-		log.Error("failed to create broker service: %s", err)
+		log.Fatal(err.Error())
 	}
 
 	// Инициализация бота
-	tgBot, err := bot.New(cfg.Bot.BotToken, cfg.Bot.BotPolingTO, bot.DEBUG, log, b)
+	tgBot, err := bot.New(cfg.Bot.BotToken, cfg.Bot.BotPolingTO, bot.DEBUG, log)
 	if err != nil {
 		log.Fatal("Failed to initialize bot")
 	}

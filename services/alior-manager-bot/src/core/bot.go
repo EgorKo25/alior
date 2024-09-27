@@ -1,8 +1,8 @@
 package bot
 
 import (
-	"alior-manager-bot/src/transport/broker"
 	"context"
+	"github.com/EgorKo25/common/broker"
 	"github.com/EgorKo25/common/logger"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 )
@@ -20,10 +20,10 @@ type Bot struct {
 	UpdateConfig  tgbotapi.UpdateConfig
 	logger        logger.ILogger
 	handlers      map[string]HandlerFunc
-	broker        *broker.Broker
+	Publisher     broker.PublisherConfig
 }
 
-func New(token string, pollingTO int, mode int, l *logger.Logger, br *broker.Broker) (*Bot, error) {
+func New(token string, pollingTO int, mode int, l *logger.Logger) (*Bot, error) {
 	botAPI, err := tgbotapi.NewBotAPI(token)
 	if err != nil {
 		return nil, err
@@ -41,7 +41,6 @@ func New(token string, pollingTO int, mode int, l *logger.Logger, br *broker.Bro
 		UpdateConfig: tgbotapi.NewUpdate(0),
 		logger:       l,
 		handlers:     make(map[string]HandlerFunc),
-		broker:       br,
 	}
 
 	bot.UpdateConfig.Timeout = pollingTO

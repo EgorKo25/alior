@@ -7,4 +7,6 @@ services/tn_service/venv/
 alembic/versions/*.pyc
 .idea/
 services/alior-cms/logs
+services/alior-manager-bot/logs
 services/alior-cms/.ssh
+services/alior-manager-bot/.ssh
