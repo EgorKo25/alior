@@ -8,3 +8,5 @@ alembic/versions/*.pyc
 .idea/
 services/alior-cms/logs
 services/alior-cms/.ssh
+services/alior-manager-bot/logs
+services/alior-manager-bot/.ssh
