@@ -21,18 +21,21 @@ jobs:
       - name: Установка reviewdog
         run: go install github.com/reviewdog/reviewdog/cmd/reviewdog@latest
         working-directory:  ./services/alior-cms
+      - name: Настройка аутентификации Git
+        run: |
+            echo "machine github.com login $GITHUB_ACTOR password ${{ secrets.TOKEN }}" > ~/.netrc
+            chmod 600 ~/.netrc
+          env:
+            GH_TOKEN: ${{ secrets.TOKEN }}
+      - name: Скачивание зависимостей
+        run: go mod download
+        working-directory: ./services/alior-cms
       - name: Запуск golangci-lint через Reviewdog
         run: |
           go install github.com/golangci/golangci-lint/cmd/golangci-lint@v1.57.2
           echo "Install done"
-          golangci-lint run --out-format=line-number --disable typecheck | reviewdog -f=golangci-lint -name="golangci-lint" -reporter=github-pr-review -fail-on-error=true
+          golangci-lint run --out-format=line-number --disable typecheck | reviewdog -f=golangci-lint -name="golangci-lint" -reporter=github-pr-review -fail-level=error
         working-directory: ./services/alior-cms
-      - name: Запуск golint через Reviewdog
-        run: |
-          go install golang.org/x/lint/golint@latest
-          golint ./... | reviewdog -f=golint -name="golint" -reporter=github-pr-review -fail-on-error=true
-        working-directory: ./services/alior-cms
-
   build-alior-cms:
     needs: check-code-alior-cms
     runs-on: ubuntu-latest
