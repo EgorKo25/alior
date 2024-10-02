@@ -39,7 +39,7 @@ func InitBroker(brokerCfg config.BrokerConfig, log logger.ILogger) error {
 	if consConfig == nil {
 		log.Fatal("Consumer config not created")
 	}
-
+	consConfig.AutoAck = true
 	err = broker.CreateConsumer("ans_consumer", consConfig)
 	if err != nil {
 		log.Fatal(err.Error())

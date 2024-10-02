@@ -6,6 +6,7 @@ import (
 	"github.com/EgorKo25/common/broker"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"github.com/rabbitmq/amqp091-go"
+	"time"
 )
 
 func (b *Bot) initHandlers() {
@@ -34,38 +35,34 @@ func (b *Bot) getInitialCallbackHandler(ctx context.Context, update *tgbotapi.Up
 		return err
 	}
 
-	msg, ok := <-response
-	if !ok {
-		b.logger.Error("error getting initial callback response")
-		return fmt.Errorf("error getting initial callback response")
+	ctx, cancel := context.WithTimeout(ctx, 3*time.Second)
+	defer cancel()
+
+	select {
+	case msg, ok := <-response:
+		if !ok {
+			b.logger.Error("error getting initial callback response: channel closed")
+			return fmt.Errorf("error getting initial callback response: channel closed")
+		}
+		b.logger.Info("Получено сообщение: %s", msg.Body)
+
+		if err := msg.Ack(false); err != nil {
+			b.logger.Error("Ошибка при подтверждении сообщения: %v", err)
+			return err
+		}
+
+		message := tgbotapi.NewMessage(update.Message.Chat.ID, string(msg.Body))
+		message.ReplyMarkup = createKeyboardMarkup()
+
+		if _, err := b.API.Send(message); err != nil {
+			b.logger.Error("Ошибка при отправке сообщения: %v", err)
+			return err
+		}
+
+	case <-ctx.Done():
+		b.logger.Error("Timeout waiting for initial callback response")
+		return ctx.Err()
 	}
-	b.logger.Info("Получено сообщение: %s", msg.Body)
-
-	err = msg.Ack(false)
-	if err != nil {
-		b.logger.Error("Ошибка при подтверждении сообщения: %v", err)
-		return err
-	}
-
-	message := tgbotapi.NewMessage(update.Message.Chat.ID, string(msg.Body))
-
-	buttonPrev := tgbotapi.NewInlineKeyboardButtonData("Предыдущее", "previous_callback")
-	buttonNext := tgbotapi.NewInlineKeyboardButtonData("Следующее", "next_callback")
-	buttonDelete := tgbotapi.NewInlineKeyboardButtonData("Удалить", "delete_callback")
-
-	keyboard := tgbotapi.NewInlineKeyboardMarkup(
-		tgbotapi.NewInlineKeyboardRow(buttonPrev, buttonNext),
-		tgbotapi.NewInlineKeyboardRow(buttonDelete),
-	)
-
-	message.ReplyMarkup = keyboard
-
-	_, err = b.API.Send(message)
-	if err != nil {
-		b.logger.Error("Ошибка при отправке сообщения: %v", err)
-		return err
-	}
-
 	return nil
 }
 
@@ -82,42 +79,39 @@ func (b *Bot) getNextCallbackHandler(ctx context.Context, update *tgbotapi.Updat
 		return err
 	}
 
+	ctx, cancel := context.WithTimeout(ctx, 3*time.Second)
+	defer cancel()
+
 	response, err := broker.Consume("ans_consumer")
 	if err != nil {
 		b.logger.Error("error consuming next callback response", err)
 		return err
 	}
 
-	msg, ok := <-response
-	if !ok {
-		b.logger.Error("error getting next callback response")
-		return fmt.Errorf("error getting next callback response")
-	}
-	b.logger.Info("Получено сообщение: %s", msg.Body)
+	select {
+	case msg, ok := <-response:
+		if !ok {
+			b.logger.Error("error getting next callback response: channel closed")
+			return fmt.Errorf("error getting next callback response: channel closed")
+		}
+		b.logger.Info("Получено сообщение: %s", msg.Body)
 
-	err = msg.Ack(false)
-	if err != nil {
-		b.logger.Error("Ошибка при подтверждении сообщения: %v", err)
-		return err
-	}
+		if err := msg.Ack(false); err != nil {
+			b.logger.Error("Ошибка при подтверждении сообщения: %v", err)
+			return err
+		}
 
-	edit := tgbotapi.NewEditMessageText(update.CallbackQuery.Message.Chat.ID, update.CallbackQuery.Message.MessageID, string(msg.Body))
+		edit := tgbotapi.NewEditMessageText(update.CallbackQuery.Message.Chat.ID, update.CallbackQuery.Message.MessageID, string(msg.Body))
+		edit.ReplyMarkup = createKeyboardMarkup()
 
-	buttonPrev := tgbotapi.NewInlineKeyboardButtonData("Предыдущее", "previous_callback")
-	buttonNext := tgbotapi.NewInlineKeyboardButtonData("Следующее", "next_callback")
-	buttonDelete := tgbotapi.NewInlineKeyboardButtonData("Удалить", "delete_callback")
+		if _, err := b.API.Send(edit); err != nil {
+			b.logger.Error("Ошибка при редактировании сообщения: %v", err)
+			return err
+		}
 
-	keyboard := tgbotapi.NewInlineKeyboardMarkup(
-		tgbotapi.NewInlineKeyboardRow(buttonPrev, buttonNext),
-		tgbotapi.NewInlineKeyboardRow(buttonDelete),
-	)
-
-	edit.ReplyMarkup = &keyboard
-
-	_, err = b.API.Send(edit)
-	if err != nil {
-		b.logger.Error("Ошибка при редактировании сообщения: %v", err)
-		return err
+	case <-ctx.Done():
+		b.logger.Error("Timeout waiting for next callback response")
+		return ctx.Err()
 	}
 
 	return nil
@@ -181,4 +175,17 @@ func (b *Bot) unknownCommandHandler(update *tgbotapi.Update) error {
 		return err
 	}
 	return nil
+}
+
+func createKeyboardMarkup() *tgbotapi.InlineKeyboardMarkup {
+	buttonPrev := tgbotapi.NewInlineKeyboardButtonData("Предыдущее", "previous_callback")
+	buttonNext := tgbotapi.NewInlineKeyboardButtonData("Следующее", "next_callback")
+	buttonDelete := tgbotapi.NewInlineKeyboardButtonData("Удалить", "delete_callback")
+
+	keyboard := tgbotapi.NewInlineKeyboardMarkup(
+		tgbotapi.NewInlineKeyboardRow(buttonPrev, buttonNext),
+		tgbotapi.NewInlineKeyboardRow(buttonDelete),
+	)
+
+	return &keyboard
 }
