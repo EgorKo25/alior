@@ -79,12 +79,6 @@ func TestConvertToRepositoryAndValidate(t *testing.T) {
 	}
 }
 
-func compareCallbacks(a, b *database.Callback) bool {
-	aj, _ := json.Marshal(a)
-	bj, _ := json.Marshal(b)
-	return string(aj) == string(bj)
-}
-
 func TestCreateResponse(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
