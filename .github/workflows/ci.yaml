@@ -12,24 +12,22 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-
       - name: Установка Go
         uses: actions/setup-go@v5
         with:
           go-version: '1.22.4'
-
-      - name: Установка reviewdog
-        run: go install github.com/reviewdog/reviewdog/cmd/reviewdog@latest
-        working-directory:  ./services/alior-cms
       - name: Настройка аутентификации Git
         run: |
-            echo "machine github.com login $GITHUB_ACTOR password ${{ secrets.TOKEN }}" > ~/.netrc
-            chmod 600 ~/.netrc
+          echo "machine github.com login $GITHUB_ACTOR password ${{ secrets.TOKEN }}" > ~/.netrc
+          chmod 600 ~/.netrc
           env:
-            GH_TOKEN: ${{ secrets.TOKEN }}
+          GH_TOKEN: ${{ secrets.TOKEN }}
       - name: Скачивание зависимостей
         run: go mod download
         working-directory: ./services/alior-cms
+      - name: Установка reviewdog
+        run: go install github.com/reviewdog/reviewdog/cmd/reviewdog@latest
+        working-directory:  ./services/alior-cms
       - name: Запуск golangci-lint через Reviewdog
         run: |
           go install github.com/golangci/golangci-lint/cmd/golangci-lint@v1.57.2
