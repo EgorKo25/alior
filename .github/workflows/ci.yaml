@@ -65,6 +65,12 @@ jobs:
   build-alior-auth:
     runs-on: ubuntu-latest
     steps:
+      - name: Настройка аутентификации Git
+        run: |
+            echo "machine github.com login $GITHUB_ACTOR password ${{ secrets.TOKEN }}" > ~/.netrc
+            chmod 600 ~/.netrc
+        env:
+            GH_TOKEN: ${{ secrets.TOKEN }}
       - name: Клонирование репозитория
         uses: actions/checkout@v4
       - name: Установка Go
@@ -97,6 +103,13 @@ jobs:
       - build-alior-cms
     runs-on: ubuntu-latest
     steps:
+      - name: Настройка аутентификации Git
+        run: |
+          echo "machine github.com login $GITHUB_ACTOR password ${{ secrets.TOKEN }}" > ~/.netrc
+          chmod 600 ~/.netrc
+        env:
+          GH_TOKEN: ${{ secrets.TOKEN }}
+
       - name: Клонирование репозитория
         uses: actions/checkout@v4
 
