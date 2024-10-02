@@ -20,7 +20,7 @@ jobs:
         run: |
           echo "machine github.com login $GITHUB_ACTOR password ${{ secrets.TOKEN }}" > ~/.netrc
           chmod 600 ~/.netrc
-          env:
+        env:
           GH_TOKEN: ${{ secrets.TOKEN }}
       - name: Скачивание зависимостей
         run: go mod download
