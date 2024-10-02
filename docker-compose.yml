@@ -16,22 +16,45 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+    hostname: postgres
 
-  tn_service:
-    build: ./services/tn_service
+  pgadmin:
+    container_name: pgadmin4_container
+    image: dpage/pgadmin4:7
+    restart: always
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@admin.com
+      PGADMIN_DEFAULT_PASSWORD: admin
     ports:
-      - "50051:50051"
+      - "5050:80"
+    volumes:
+      - pgadmin:/var/lib/pgadmin
+
+#  frontend:
+#    build: ./services/frontend
+#    ports:
+#      - "80:80"
+
+  cms:
+    build: services/alior-cms
+    restart: on-failure
     depends_on:
       postgres:
         condition: service_healthy
+    volumes:
+      - ./services/alior-cms/logs:/app/logs
 
+#  tg_bot:
+#    build: ./services/tg_bot
+#    depends_on:
+#      - alior-cms
 
-  frontend:
-    build: ./services/frontend
+  rabbitmq:
+    image: rabbitmq:3.10.7-management
     ports:
-      - "80:80"
-
-
+      - "15672:15672"
+      - "5672:5672"
 
 volumes:
   pgdata:
+  pgadmin:

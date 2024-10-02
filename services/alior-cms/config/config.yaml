@@ -1,0 +1,5 @@
+env: "local"
+db:
+  postgresql_url: postgres://user:password@postgres:5432/db?sslmode=disable
+msgBroker:
+  rabbitmq_url: amqp://guest:guest@rabbitmq:5672
