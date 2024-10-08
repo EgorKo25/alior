@@ -1,0 +1,1 @@
+{"level":"info","timestamp":"2024-08-16T18:40:22.044+0300","caller":"logger/logging.go:42","msg":"subscribed to queue: \"testin-queue\"..."}

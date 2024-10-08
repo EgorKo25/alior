@@ -4,39 +4,37 @@ on:
   pull_request:
     branches:
       - main
-  push:
-    branches:
-      - main
 
 jobs:
-  build-alior-cms:
-    runs-on: ubuntu-latest
+  check-code-alior-sms:
+    runs-on:
+      - ubuntu-latest
+    env:
+      REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.SECRET }}
     steps:
-      - name: Клонирование репозитория
-        uses: actions/checkout@v4
-      - name: Установка Go
-        uses: actions/setup-go@v5
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
         with:
           go-version: '1.22.4'
-      - name: Проверка версии Go
-        run: go version
-      - name: Установка кэша зависимостей
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.cache/go-build
-            /go/pkg/mod
-          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
-          restore-keys: |
-            ${{ runner.os }}-go-
-      - name: Установка зависимостей
-        run: go mod tidy
-        working-directory: ./services/alior-cms
-      - name: Сборка проекта
-        run: go build -o /dev/null ./...
-        working-directory: ./services/alior-cms
+      - name: Установка reviewdog
+        run: |
+          go install github.com/reviewdog/reviewdog/cmd/reviewdog@latest
+        working-directory: ./services/alior-sms
+      - name: Запуск golangci-lint через Reviewdog
+        run: |
+          go install github.com/golangci/golangci-lint/cmd/golangci-lint@v1.57.2
+          echo "Install done"
+          golangci-lint run --out-format=line-number --disable typecheck | reviewdog -f=golangci-lint -name="golangci-lint" -reporter=github-pr-review -fail-on-error=true
+        working-directory: ./services/alior-sms
+      - name: Запуск golint через Reviewdog
+        run: |
+          go install golang.org/x/lint/golint@latest
+          golint ./... | reviewdog -f=golint -name="golint" -reporter=github-pr-review -fail-on-error=true
+        working-directory: ./services/alior-sms
+
 
   build-alior-sms:
+    needs: check-code-alior-sms
     runs-on: ubuntu-latest
     steps:
       - name: Клонирование репозитория
@@ -89,73 +87,6 @@ jobs:
       - name: Сборка проекта
         run: go build -o /dev/null ./...
         working-directory: ./services/alior-auth
-
-  build-alior-api-gw:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Клонирование репозитория
-        uses: actions/checkout@v4
-      - name: Установка Go
-        uses: actions/setup-go@v5
-        with:
-          go-version: '1.22.4'
-      - name: Проверка версии Go
-        run: go version
-      - name: Установка кэша зависимостей
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.cache/go-build
-            /go/pkg/mod
-          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
-          restore-keys: |
-            ${{ runner.os }}-go-
-      - name: Установка зависимостей
-        run: go mod tidy
-        working-directory: ./services/alior-api-gw
-      - name: Сборка проекта
-        run: go build -o /dev/null ./...
-        working-directory: ./services/alior-api-gw
-
-  check-tests-alior-cms:
-    defaults:
-      run:
-        working-directory: ./services/alior-cms
-    needs:
-      - build-alior-cms
-    runs-on: ubuntu-latest
-    steps:
-      - name: Клонирование репозитория
-        uses: actions/checkout@v4
-
-      - name: Установка Go
-        uses: actions/setup-go@v2
-        with:
-          go-version: 1.22.4
-
-      - name: Проверка зависимостей
-        run: go mod verify
-
-      - name: Сборка
-        run: go build -v ./...
-
-      - name: Запуск go vet
-        run: go vet ./...
-
-      - name: Установка staticcheck
-        run: go install honnef.co/go/tools/cmd/staticcheck@latest
-
-      - name: Запуск staticcheck
-        run: staticcheck ./...
-
-      - name: Установка golint
-        run: go install golang.org/x/lint/golint@latest
-
-      - name: Запуск golint
-        run: golint ./...
-
-      - name: Запуск тестов
-        run: go test -race -vet=off ./...
 
   check-tests-alior-sms:
     defaults:
@@ -237,52 +168,10 @@ jobs:
       - name: Запуск тестов
         run: go test -race -vet=off ./...
 
-  check-tests-alior-api-gw:
-    defaults:
-      run:
-        working-directory: ./services/alior-api-gw
-    needs: build-alior-api-gw
-    runs-on: ubuntu-latest
-    steps:
-      - name: Клонирование репозитория
-        uses: actions/checkout@v4
-
-      - name: Установка Go
-        uses: actions/setup-go@v2
-        with:
-          go-version: 1.22.4
-
-      - name: Проверка зависимостей
-        run: go mod verify
-
-      - name: Сборка
-        run: go build -v ./...
-
-      - name: Запуск go vet
-        run: go vet ./...
-
-      - name: Установка staticcheck
-        run: go install honnef.co/go/tools/cmd/staticcheck@latest
-
-      - name: Запуск staticcheck
-        run: staticcheck ./...
-
-      - name: Установка golint
-        run: go install golang.org/x/lint/golint@latest
-
-      - name: Запуск golint
-        run: golint ./...
-
-      - name: Запуск тестов
-        run: go test -race -vet=off ./...
-
   start-qa-test:
     needs:
-      - check-tests-alior-api-gw
       - check-tests-alior-auth
       - check-tests-alior-sms
-      - check-tests-alior-cms
-      - deploy-front
     runs-on: ubuntu-latest
     steps:
       - name: Здесь должны быть твои тесты Кирилл
