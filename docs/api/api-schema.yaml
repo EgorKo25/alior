@@ -1,254 +1,67 @@
 openapi: 3.0.3
+
 info:
   title: Alior Digital API
   description: API для сайта Alior Digital
   version: 1.0.0
+
 servers:
   - url: https://alior-didgital.com
+  
 components:
-  securitySchemes:
-    BearerAuth:
-      type: http
-      scheme: bearer
-      bearerFormat: JWT
   schemas:
-    UserRegistration:
+    Callback:
       type: object
       properties:
-        fullName:
+        idea:
           type: string
-          example: "Иван Иванов"
-        phone:
-          type: string
-          example: "+7 (000) 00-00"
-        email:
-          type: string
-          example: "ivan@example.com"
-        password:
-          type: string
-          example: "password123"
-    UserLogin:
-      type: object
-      properties:
-        email:
-          type: string
-          example: "ivan@example.com"
-        password:
-          type: string
-          example: "password123"
-    CallbackRequest:
-      type: object
-      properties:
+          description: Идея
         name:
           type: string
-          example: "Иван Иванов"
+          description: Имя
         phone:
           type: string
-          example: "+7 (000) 00-00"
-        preferredTime:
+          description: Номер телефона
+        type:
           type: string
-          example: "15:00"
-    Order:
-      type: object
-      properties:
-        orderId:
-          type: string
-        orderDate:
-          type: string
-          format: date-time
-        status:
-          type: string
-        items:
-          type: array
-          items:
-            $ref: '#/components/schemas/OrderItem'
-        totalAmount:
-          type: number
-          minimum: 0
-      required:
-        - orderId
-        - orderDate
-        - status
-        - items
-        - totalAmount
-
-    OrderItem:
-      type: object
-      properties:
-        productId:
-          type: string
-        productName:
-          type: string
-        quantity:
-          type: integer
-          minimum: 1
-      required:
-        - productId
-        - productName
-        - quantity
-    Service:
-      type: object
-      properties:
-        name:
-          type: string
-          example: "Консультация"
-        description:
-          type: string
-          example: "Консультация по вопросам программирования"
-        price:
-          type: number
-          example: 1500
-    RegistrationResponse:
-      type: object
-      properties:
-        id:
-          type: integer
-          example: 1
-        message:
-          type: string
-          example: "Пользователь успешно зарегистрирован"
-    ErrorResponse:
+          description: Тип колбэка ("call" | "whatsapp" | "telegram")
+          enum: 
+            - "call"
+            - "whatsapp"
+            - "telegram"
+         
+    generalErrorType:
       type: object
       properties:
         error:
           type: string
-          example: "Текст ошибки"
-    LoginResponse:
-      type: object
-      properties:
-        token:
-          type: string
-          example: "jwt_token"
-    CallbackResponse:
-      type: object
-      properties:
-        message:
-          type: string
-          example: "Ваш запрос на обратный звонок успешно отправлен"
+          description: Текст ошибки
+    
 paths:
-  /api/user/orders:
-    get:
-      summary: Получить список заказов пользователя
-      description: >
-        Этот эндпоинт позволяет авторизованному пользователю получить список его заказов.
-      responses:
-        '200':
-          description: Успешный ответ
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  orders:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/Order'
-                required:
-                  - orders
-        '401':
-          description: Пользователь не авторизован
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '403':
-          description:
-            Доступ запрещен (например, пользователь не имеет прав на просмотр заказов)
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '500':
-          description:
-            Ошибка на стороне сервера
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-
-  /register:
+  /v1/service/callback:
     post:
-      summary: Регистрация нового пользователя
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/UserRegistration'
-      responses:
-        '201':
-          description: Пользователь успешно создан
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/RegistrationResponse'
-        '400':
-          description: Ошибка валидации
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '500':
-          description: Внутренняя ошибка сервера
-  /login:
-    post:
-      summary: Авторизация пользователя
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/UserLogin'
-      responses:
-        '200':
-          description: Успешный вход
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/LoginResponse'
-        '401':
-          description: Неверные учетные данные
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '500':
-          description: Внутренняя ошибка сервера
-  /callback:
-    post:
+      tags:
+        - service
       summary: Запрос на обратный звонок
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CallbackRequest'
+              $ref: '#/components/schemas/Callback'
       responses:
         '200':
           description: Запрос на обратный звонок успешно отправлен
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/CallbackResponse'
         '400':
           description: Ошибка валидации
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: '#/components/schemas/generalErrorType'
         '500':
           description: Внутренняя ошибка сервера
-  /services:
-    get:
-      summary: Получение списка услуг
-      responses:
-        '200':
-          description: Список услуг успешно получен
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Service'
-        '500':
-          description: Внутренняя ошибка сервера
+                $ref: '#/components/schemas/generalErrorType'
+                
