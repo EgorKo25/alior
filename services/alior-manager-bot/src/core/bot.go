@@ -2,7 +2,6 @@ package bot
 
 import (
 	"context"
-	"github.com/EgorKo25/common/broker"
 	"github.com/EgorKo25/common/logger"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 )
@@ -20,10 +19,11 @@ type Bot struct {
 	UpdateConfig  tgbotapi.UpdateConfig
 	logger        logger.ILogger
 	handlers      map[string]HandlerFunc
-	Publisher     broker.PublisherConfig
+	PublisherName string
+	ConsumerName  string
 }
 
-func New(token string, pollingTO int, mode int, l *logger.Logger) (*Bot, error) {
+func New(token string, pollingTO int, mode int, l *logger.Logger, publisherName, consumerName string) (*Bot, error) {
 	botAPI, err := tgbotapi.NewBotAPI(token)
 	if err != nil {
 		return nil, err
@@ -37,10 +37,12 @@ func New(token string, pollingTO int, mode int, l *logger.Logger) (*Bot, error) 
 	}
 
 	bot := &Bot{
-		API:          botAPI,
-		UpdateConfig: tgbotapi.NewUpdate(0),
-		logger:       l,
-		handlers:     make(map[string]HandlerFunc),
+		API:           botAPI,
+		UpdateConfig:  tgbotapi.NewUpdate(0),
+		logger:        l,
+		handlers:      make(map[string]HandlerFunc),
+		PublisherName: publisherName,
+		ConsumerName:  consumerName,
 	}
 
 	bot.UpdateConfig.Timeout = pollingTO

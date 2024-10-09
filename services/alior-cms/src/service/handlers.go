@@ -28,30 +28,35 @@ func (c *CMS) HandleMessage(ctx context.Context, delivery amqp.Delivery) error {
 			if err := c.CreateCallbackHandler(ctx, delivery); err != nil {
 				return c.handleError("error creating callback: " + err.Error())
 			}
+			c.Logger.Info("callback created successfully")
 			return c.Broker.Publish(broker.NewMessage("created callback", "success"))
 
 		case "initial":
 			if err := c.InitialCallbackHandler(ctx); err != nil {
 				return c.handleError("error getting initial callback: " + err.Error())
 			}
+			c.Logger.Info("got initial callback")
 			return nil
 
 		case "next":
 			if err := c.NextCallbackHandler(ctx); err != nil {
 				return c.handleError("error getting next callback: " + err.Error())
 			}
+			c.Logger.Info("got next callback")
 			return nil
 
 		case "previous":
 			if err := c.PreviousCallbackHandler(ctx); err != nil {
 				return c.handleError("error getting previous callback: " + err.Error())
 			}
+			c.Logger.Info("got previous callback")
 			return nil
 
 		case "delete":
 			if err := c.DeleteCallbackHandler(ctx, delivery); err != nil {
 				return c.handleError("error deleting callback: " + err.Error())
 			}
+			c.Logger.Info("deleted callback")
 			return nil
 
 		default:
