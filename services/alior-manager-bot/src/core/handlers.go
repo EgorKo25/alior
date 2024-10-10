@@ -9,6 +9,14 @@ import (
 	"time"
 )
 
+type Consumer interface {
+	Consume(name string) (<-chan amqp091.Delivery, error)
+}
+
+type Publisher interface {
+	Publish(name string, msg amqp091.Publishing) error
+}
+
 func (b *Bot) initHandlers() {
 	b.handlers["get_initial_callback"] = b.getInitialCallbackHandler
 	b.handlers["previous_callback"] = b.getPreviousCallbackHandler

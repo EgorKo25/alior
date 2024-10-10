@@ -2,7 +2,6 @@ package bot
 
 import (
 	"context"
-	"github.com/EgorKo25/common/broker"
 	"github.com/EgorKo25/common/logger"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 )
@@ -20,7 +19,6 @@ type Bot struct {
 	UpdateConfig  tgbotapi.UpdateConfig
 	logger        logger.ILogger
 	handlers      map[string]HandlerFunc
-	Publisher     broker.PublisherConfig
 }
 
 func New(token string, pollingTO int, mode int, l *logger.Logger) (*Bot, error) {

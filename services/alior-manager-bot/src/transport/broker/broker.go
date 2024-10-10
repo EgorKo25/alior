@@ -12,17 +12,6 @@ func InitBroker(brokerCfg config.BrokerConfig, log logger.ILogger) error {
 		log.Fatal(err.Error())
 	}
 
-	// паблишер для отправки ответов
-	//pubConfig := broker.NewPublisherConfig(brokerCfg.Exchange.Name, brokerCfg.Exchange.Kind, "ans")
-	//if pubConfig == nil {
-	//	log.Fatal("publisher config not created")
-	//}
-	//
-	//err = broker.CreatePublisher("ans_publisher", pubConfig)
-	//if err != nil {
-	//	log.Fatal(err.Error())
-	//}
-
 	// паблишер для отправки запросов
 	pubConfig := broker.NewPublisherConfig(brokerCfg.Exchange.Name, brokerCfg.Exchange.Kind, "ask")
 	if pubConfig == nil {
