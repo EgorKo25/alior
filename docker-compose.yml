@@ -28,15 +28,6 @@ services:
     environment:
       - name=value
 
-  tn_service:
-    build: ./services/tn_service
-    ports:
-      - "50051:50051"
-    depends_on:
-      postgres:
-        condition: service_healthy
-
-
   frontend:
     build: ./services/frontend
     ports:
