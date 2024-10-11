@@ -5,10 +5,10 @@ broker:
     kind: direct
   publisher:
     name: publisher
-    routing_key: ans
+    routing_key: ask
   consumer:
     name: consumer
-    queue: ask
+    queue: ans
 bot:
   token: '6853105885:AAE0JA44brPTqd5iPQ5f2GN0L-jNQYi8E2A'
   poling_to: 60  

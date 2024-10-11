@@ -22,19 +22,26 @@ func main() {
 	// Загрузка конфига
 	cfg, err := config.Load()
 	if err != nil {
-		log.Fatal(err.Error())
+		l.Fatal(err.Error())
 	}
 
 	// Инициализация брокера
-	err = broker.InitBroker(cfg.Broker, log)
+	err = broker.NewBroker(cfg.Broker)
 	if err != nil {
-		log.Fatal(err.Error())
+		l.Fatal(err.Error())
 	}
 
 	// Инициализация бота
-	tgBot, err := bot.New(cfg.Bot.BotToken, cfg.Bot.BotPolingTO, bot.DEBUG, log)
+	tgBot, err := bot.New(
+		cfg.Bot.BotToken,
+		cfg.Bot.BotPolingTO,
+		bot.DEBUG,
+		log,
+		bot.WithPublisherName("ask_publisher"),
+		bot.WithConsumerName("ans_consumer"),
+	)
 	if err != nil {
-		log.Fatal("Failed to initialize bot")
+		log.Fatal("Failed to initialize bot: ", err)
 	}
 
 	// Запуск бота
