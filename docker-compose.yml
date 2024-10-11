@@ -17,6 +17,17 @@ services:
       timeout: 5s
       retries: 5
 
+  rabbitmq:
+    image: rabbitmq:3.13-management
+    ports:
+      - 5672:5672
+      - 15672:15672
+    volumes:
+      - ./rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf
+      - ./definitions.json:/etc/rabbitmq/definitions.json
+    environment:
+      - name=value
+
   tn_service:
     build: ./services/tn_service
     ports:
@@ -30,7 +41,6 @@ services:
     build: ./services/frontend
     ports:
       - "80:80"
-
 
 
 volumes:
