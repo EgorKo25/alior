@@ -11,6 +11,8 @@ const (
 	PRODUCTION
 )
 
+type Option func(*Bot)
+
 type HandlerFunc func(ctx context.Context, update *tgbotapi.Update) error
 
 type Bot struct {
@@ -23,7 +25,7 @@ type Bot struct {
 	ConsumerName  string
 }
 
-func New(token string, pollingTO int, mode int, l *logger.Logger, publisherName, consumerName string) (*Bot, error) {
+func New(token string, pollingTO int, mode int, l *logger.Logger, opts ...Option) (*Bot, error) {
 	botAPI, err := tgbotapi.NewBotAPI(token)
 	if err != nil {
 		return nil, err
@@ -37,12 +39,10 @@ func New(token string, pollingTO int, mode int, l *logger.Logger, publisherName,
 	}
 
 	bot := &Bot{
-		API:           botAPI,
-		UpdateConfig:  tgbotapi.NewUpdate(0),
-		logger:        l,
-		handlers:      make(map[string]HandlerFunc),
-		PublisherName: publisherName,
-		ConsumerName:  consumerName,
+		API:          botAPI,
+		UpdateConfig: tgbotapi.NewUpdate(0),
+		logger:       l,
+		handlers:     make(map[string]HandlerFunc),
 	}
 
 	bot.UpdateConfig.Timeout = pollingTO
@@ -53,7 +53,23 @@ func New(token string, pollingTO int, mode int, l *logger.Logger, publisherName,
 		return nil, err
 	}
 
+	for _, opt := range opts {
+		opt(bot)
+	}
+
 	bot.initHandlers()
 
 	return bot, nil
+}
+
+func WithPublisherName(publisherName string) Option {
+	return func(b *Bot) {
+		b.PublisherName = publisherName
+	}
+}
+
+func WithConsumerName(consumerName string) Option {
+	return func(b *Bot) {
+		b.ConsumerName = consumerName
+	}
 }

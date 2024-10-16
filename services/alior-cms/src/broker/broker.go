@@ -163,13 +163,13 @@ func (b *Broker) Publish(message *Message) error {
 // Subscribe is a Broker structure method to get messages from broker
 func (b *Broker) Subscribe(ctx context.Context, queue string, handler func(ctx context.Context, delivery amqp.Delivery) error) error {
 	messages, err := b.Channel.Consume(
-		queue, // queue
-		"",    // consumer
-		true,  // auto-ack
-		false, // exclusive
-		false, // no-local
-		false, // no-wait
-		nil,   // args
+		queue,
+		"",
+		true,
+		false,
+		false,
+		false,
+		nil,
 	)
 	if err != nil {
 		return err

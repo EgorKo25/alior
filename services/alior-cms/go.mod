@@ -5,6 +5,7 @@ go 1.22.5
 require (
 	github.com/EgorKo25/common v0.0.0-20240902211924-417f70f734c7
 	github.com/golang/mock v1.6.0
+	github.com/google/uuid v1.6.0
 	github.com/ilyakaznacheev/cleanenv v1.5.0
 	github.com/jackc/pgx/v5 v5.6.0
 	github.com/pressly/goose/v3 v3.21.1
