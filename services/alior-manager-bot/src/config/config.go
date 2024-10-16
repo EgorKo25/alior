@@ -3,6 +3,7 @@ package config
 import (
 	"errors"
 	"github.com/ilyakaznacheev/cleanenv"
+	"os"
 )
 
 // ReadConfig variable to store ReadConfig result
@@ -47,11 +48,20 @@ type Config struct {
 // Load is a function to load config from file
 func Load() (*Config, error) {
 	var cfg Config
-
 	path := "./config/config.yaml"
 
-	if err := ReadConfig(path, &cfg); err != nil {
+	if err := cleanenv.ReadConfig(path, &cfg); err != nil {
 		return nil, errors.New("failed to load config: " + err.Error())
 	}
+
+	envBotToken := os.Getenv("TOKEN")
+	if envBotToken != "" {
+		cfg.Bot.BotToken = envBotToken
+	}
+
+	if cfg.Bot.BotToken == "" {
+		return nil, errors.New("bot token is not provided")
+	}
+
 	return &cfg, nil
 }
