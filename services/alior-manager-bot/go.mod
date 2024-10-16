@@ -8,6 +8,8 @@ require (
 	github.com/rabbitmq/amqp091-go v1.10.0
 )
 
+require github.com/google/uuid v1.6.0 // indirect
+
 require (
 	github.com/BurntSushi/toml v1.2.1 // indirect
 	github.com/EgorKo25/common v0.0.0-20240913094115-70b7e1c7764b

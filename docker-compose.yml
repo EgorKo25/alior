@@ -44,10 +44,12 @@ services:
     volumes:
       - ./services/alior-cms/logs:/app/logs
 
-#  tg_bot:
-#    build: ./services/tg_bot
-#    depends_on:
-#      - alior-cms
+  manager_bot:
+    build: ./services/alior-manager-bot
+    environment:
+      - TOKEN=${TOKEN}
+    depends_on:
+      - alior-cms
 
   rabbitmq:
     image: rabbitmq:3.10.7-management
