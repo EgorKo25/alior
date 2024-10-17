@@ -97,7 +97,7 @@ export const Header = () => {
         <HashLink smooth to={"#consult"}>
           <MainButton
             className={` btn-accent`}
-            title="Консультация"
+            title="На консультацию"
             type="submit"
             colorSchema=" btn-accent-white"
           />
