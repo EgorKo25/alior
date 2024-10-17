@@ -47,7 +47,7 @@ export const Carousel = () => {
         SLIDE_BG_GRADIENTS_CONFIG[activeSlide % 3].bg
       } via-[percentage:20%_70%] to-transparent`}
     >
-      <div className="slider-wrapper mt-28 mb-40 md:mx-[30px] xl:mx-24">
+      <div className="slider-wrapper mt-20 mb-20 md:mt-28 md:mb-40 md:mx-[30px] xl:mx-24">
         <Slider {...settings}>
           {projects.map((project, index) => {
             return (

@@ -1,7 +1,7 @@
-export const SecondArrow = () => {
+export const SecondArrow: React.FC<{ className: string }> = ({ className }) => {
   return (
     <svg
-      className={" absolute left-25% top-7% md:top-10%"}
+      className={className}
       width="241"
       height="199"
       viewBox="0 0 241 199"
