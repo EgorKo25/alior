@@ -19,7 +19,7 @@ export const FAQ = () => {
         start: "top 500",
         end: "+=400",
       },
-      opacity: 1,
+      filter: "opacity(1)",
     });
 
     // Самый популярный
@@ -30,7 +30,7 @@ export const FAQ = () => {
         start: "top 700",
         end: "+=400",
       },
-      opacity: 1,
+      filter: "opacity(1)",
     });
 
     // Вопрос стрелка и текст вопроса
@@ -41,7 +41,7 @@ export const FAQ = () => {
         start: "top 600",
         end: "+=400",
       },
-      opacity: 1,
+      filter: "opacity(1)",
     });
 
     // Отвечаем
@@ -52,7 +52,7 @@ export const FAQ = () => {
         start: "top 600",
         end: "+=400",
       },
-      opacity: 1,
+      filter: "opacity(1)",
     });
 
     // стрелка после отвечаем
@@ -63,7 +63,7 @@ export const FAQ = () => {
         start: "top 600",
         end: "+=400",
       },
-      opacity: 1,
+      filter: "opacity(1)",
     });
 
     // сам ответ
@@ -74,7 +74,7 @@ export const FAQ = () => {
         start: "top 600",
         end: "+=400",
       },
-      opacity: 1,
+      filter: "opacity(1)",
     });
 
     //медитирует сидит
@@ -85,7 +85,7 @@ export const FAQ = () => {
         start: "top 550",
         end: "+=400",
       },
-      opacity: 1,
+      filter: "opacity(1)",
     });
   }, []);
 
@@ -98,8 +98,9 @@ export const FAQ = () => {
       <SendForConsult />
       <div
         className={
-          "book-guy w-56 h-56  relative md:self-start md:ml-24 lg:w-72 lg:h-72 2xl:ml-40 2xl:w-540 2xl:h-500 opacity-0"
+          "book-guy w-56 h-56  relative md:self-start md:ml-24 lg:w-72 lg:h-72 2xl:ml-40 2xl:w-540 2xl:h-500"
         }
+        style={{ filter: "opacity(0)" }}
       >
         <BookGuySVG
           className={

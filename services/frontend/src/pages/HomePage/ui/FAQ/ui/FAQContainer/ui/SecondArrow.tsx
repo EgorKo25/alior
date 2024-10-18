@@ -4,6 +4,7 @@ export const SecondArrow: React.FC<{ className: string }> = ({ className }) => {
       className={className}
       width="241"
       height="199"
+      style={{ filter: "opacity(0)" }}
       viewBox="0 0 241 199"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"

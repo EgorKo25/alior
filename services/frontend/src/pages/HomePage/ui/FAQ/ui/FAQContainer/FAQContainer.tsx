@@ -12,13 +12,15 @@ export const FAQContainer = () => {
     >
       <div className={"question-block ml-auto flex flex-col items-end mb-40"}>
         <h2
-          className={
-            " most-popular font-bold clamp-h2 leading-[1] text-right opacity-0"
-          }
+          className={" most-popular font-bold clamp-h2 leading-[1] text-right"}
+          style={{ filter: "opacity(0)" }}
         >
           Самый популярный
         </h2>
-        <span className=" question font-caveat font-normal clamp-span relative opacity-0">
+        <span
+          className=" question font-caveat font-normal clamp-span relative"
+          style={{ filter: "opacity(0)" }}
+        >
           Вопрос
           <FirstArrow
             className={
@@ -34,15 +36,21 @@ export const FAQContainer = () => {
         </span>
       </div>
       <div className={" flex flex-col items-start self-start relative"}>
-        <span className=" answering font-caveat font-normal clamp-span opacity-0 ">
+        <span
+          className=" answering font-caveat font-normal clamp-span"
+          style={{ filter: "opacity(0)" }}
+        >
           Отвечаем
         </span>
         <SecondArrow
           className={
-            " answer-arrow absolute left-24 top-14 md:left-32 md:top-16 lg:left-40 lg:top-[4.5rem] xl:left-48 xl:scale-[1.4] xl:top-[7.5rem] opacity-0"
+            " answer-arrow absolute left-24 top-14 md:left-32 md:top-16 lg:left-40 lg:top-[4.5rem] xl:left-48 xl:scale-[1.4] xl:top-[7.5rem]"
           }
         />
-        <div className={" answer-text mt-40 xl:mt-60 mb-12 md:mb-20 opacity-0"}>
+        <div
+          className={" answer-text mt-40 xl:mt-60 mb-12 md:mb-20"}
+          style={{ filter: "opacity(0)" }}
+        >
           <Message
             className={
               " border-blue-900 text-blue-900 text-nowrap rounded-bl-none max-w-335 font-medium text-xl lg:max-w-96 lg:text-2xl 2xl:max-w-lg 2xl:text-3xl"
@@ -64,8 +72,9 @@ export const FAQContainer = () => {
         </div>
         <div
           className={
-            "meditation-girl w-80 h-64 mb-12 md:absolute md:-right-5 bottom-28  lg:-right-10 lg:bottom-32 xl:right-10 2xl:-right-5 self-center lg:w-431 lg:h-96 2xl:w-540 2xl:h-440 opacity-0"
+            "meditation-girl w-80 h-64 mb-12 md:absolute md:-right-5 bottom-28  lg:-right-10 lg:bottom-32 xl:right-10 2xl:-right-5 self-center lg:w-431 lg:h-96 2xl:w-540 2xl:h-440"
           }
+          style={{ filter: "opacity(0)" }}
         >
           <MeditationSVG
             className={
