@@ -130,7 +130,7 @@ export const Form = () => {
             <h4 className=" text-center text-white text-sm sm:text-base font-light lg:text-right mt-6">
               {formMessage.length > 0
                 ? formMessage
-                : "Обещием, что ваши данные в безопасности"}
+                : "Обещaем, что ваши данные в безопасности"}
             </h4>
             <MainButton
               title={"На консультацию"}
