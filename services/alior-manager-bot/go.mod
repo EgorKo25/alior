@@ -8,9 +8,11 @@ require (
 	github.com/rabbitmq/amqp091-go v1.10.0
 )
 
+require github.com/google/uuid v1.6.0 // indirect
+
 require (
 	github.com/BurntSushi/toml v1.2.1 // indirect
-	github.com/EgorKo25/common v0.0.0-20240902211924-417f70f734c7
+	github.com/EgorKo25/common v0.0.0-20240913094115-70b7e1c7764b
 	github.com/joho/godotenv v1.5.1 // indirect
 	go.uber.org/multierr v1.10.0 // indirect
 	go.uber.org/zap v1.27.0 // indirect

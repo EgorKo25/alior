@@ -1,6 +1,7 @@
 package broker
 
 import (
+	"github.com/google/uuid"
 	"time"
 )
 
@@ -20,6 +21,7 @@ type MessageProperties struct {
 	Timestamp     int64  `json:"timestamp"`
 	Type          string `json:"type"`
 	AppID         string `json:"app-id"`
+	MessageID     string `json:"message-id"`
 }
 
 // MessageHeaders structure of delivery headers
@@ -33,15 +35,19 @@ type MessageHeaders struct {
 
 // NewMessage is a broker message constructor
 func NewMessage(body string, msgType string) *Message {
+	correlationID := uuid.New().String()
+	messageID := uuid.New().String()
+
 	return &Message{
 		Properties: MessageProperties{
 			ContentType:   "text/plain",
 			DeliveryMode:  1,
-			CorrelationID: "123",
+			CorrelationID: correlationID,
 			ReplyTo:       "ans",
 			Timestamp:     time.Now().Unix(),
 			Type:          msgType,
 			AppID:         "cms",
+			MessageID:     messageID,
 		},
 		Body: body,
 		Headers: MessageHeaders{
@@ -49,7 +55,7 @@ func NewMessage(body string, msgType string) *Message {
 			RoutingKey:  "ans",
 			Mandatory:   true,
 			Immediate:   false,
-			DeliveryTag: 123,
+			DeliveryTag: 0,
 		},
 	}
 }

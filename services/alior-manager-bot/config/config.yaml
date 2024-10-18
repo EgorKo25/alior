@@ -1,5 +1,13 @@
 broker:
-  rabbitmq_url: amqp://guest:guest@localhost:5672/
+  url: amqp://guest:guest@localhost:5672/
+  exchange:
+    name: ansask
+    kind: direct
+  publisher:
+    name: publisher
+    routing_key: ask
+  consumer:
+    name: consumer
+    queue: ans
 bot:
-  token: '6853105885:AAE0JA44brPTqd5iPQ5f2GN0L-jNQYi8E2A'
   poling_to: 60  
