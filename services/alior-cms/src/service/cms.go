@@ -9,8 +9,10 @@ import (
 
 // IBroker declare methods to interact with broker queues
 type IBroker interface {
-	Subscribe(ctx context.Context, queue string, handler func(ctx context.Context, delivery amqp.Delivery) error) error
 	Publish(message *broker.Message) error
+	Subscribe(ctx context.Context, handler func(ctx context.Context, delivery amqp.Delivery) error) error
+	NewMessage(body string, msgType string) *broker.Message
+	Close()
 }
 
 // ICallback declare interaction methods for Callback structure
@@ -48,7 +50,7 @@ func (c *CMS) Run(ctx context.Context) error {
 	errCh := make(chan error, 1)
 
 	go func() {
-		if err := c.Broker.Subscribe(ctx, "ask", c.HandleMessage); err != nil {
+		if err := c.Broker.Subscribe(ctx, c.HandleMessage); err != nil {
 			errCh <- err
 		}
 	}()

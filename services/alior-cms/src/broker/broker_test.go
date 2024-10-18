@@ -85,12 +85,10 @@ func TestBroker_Subscribe(t *testing.T) {
 		expectedError error
 	}{
 		{
-			name:  "successful subscribe",
-			queue: "test-queue",
+			name: "successful subscribe",
 			setupMocks: func(broker *mocks.MockIBroker) {
 				broker.EXPECT().Subscribe(
 					gomock.Any(),
-					"test-queue",
 					gomock.Any(),
 				).Return(nil)
 			},
@@ -100,12 +98,10 @@ func TestBroker_Subscribe(t *testing.T) {
 			expectedError: nil,
 		},
 		{
-			name:  "subscribe error",
-			queue: "test-queue",
+			name: "subscribe error",
 			setupMocks: func(broker *mocks.MockIBroker) {
 				broker.EXPECT().Subscribe(
 					gomock.Any(),
-					"test-queue",
 					gomock.Any(),
 				).Return(errors.New("subscribe error"))
 			},
@@ -122,7 +118,7 @@ func TestBroker_Subscribe(t *testing.T) {
 
 			tt.setupMocks(mockBroker)
 
-			err := mockBroker.Subscribe(context.Background(), tt.queue, tt.handlerFunc)
+			err := mockBroker.Subscribe(context.Background(), tt.handlerFunc)
 			if tt.expectedError != nil {
 				assert.Error(t, err)
 				assert.Equal(t, tt.expectedError, err)

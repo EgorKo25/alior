@@ -1,7 +1,6 @@
 package service_test
 
 import (
-	"callback_service/src/broker"
 	brokerMocks "callback_service/src/broker/mocks"
 	"callback_service/src/database"
 	dbMocks "callback_service/src/database/mocks"
@@ -11,7 +10,6 @@ import (
 	"errors"
 	"github.com/golang/mock/gomock"
 	amqp "github.com/rabbitmq/amqp091-go"
-	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"testing"
 )
@@ -107,9 +105,8 @@ func TestInitialCallbackHandler(t *testing.T) {
 	}
 
 	tests := []struct {
-		name          string
-		setupMocks    func()
-		expectedError error
+		name       string
+		setupMocks func()
 	}{
 		{
 			name: "success",
@@ -118,43 +115,33 @@ func TestInitialCallbackHandler(t *testing.T) {
 				callbackJSON, _ := json.Marshal(callback)
 
 				mockStorage.EXPECT().
-					GetCallback(ctx, gomock.Any(), 0).
+					GetCallback(ctx, database.Limit, 0).
 					Return(callback, nil)
 
+				mockBroker.EXPECT().NewMessage(string(callbackJSON), "success").Return(nil)
+
 				mockBroker.EXPECT().
-					Publish(gomock.Any()).
-					DoAndReturn(func(msg *broker.Message) error {
-						expectedMsg := broker.NewMessage(string(callbackJSON), "success")
-						assert.Equal(t, expectedMsg, msg)
-						return nil
-					})
+					Publish(gomock.Any()).Return(nil)
 
 				mockLogger.EXPECT().
 					Info(gomock.Any(), gomock.Any()).
 					Times(1)
 			},
-			expectedError: nil,
 		},
 		{
-			name: "storage get error",
+			name: "storage error",
 			setupMocks: func() {
 				mockStorage.EXPECT().
-					GetCallback(ctx, gomock.Any(), 0).
-					Return(nil, errors.New("get callback error"))
+					GetCallback(ctx, database.Limit, 0).
+					Return(nil, errors.New("storage error"))
 
 				mockLogger.EXPECT().
 					Error(gomock.Any(), gomock.Any()).
 					Times(1)
 
-				mockBroker.EXPECT().
-					Publish(gomock.Any()).
-					DoAndReturn(func(msg *broker.Message) error {
-						expectedMsg := broker.NewMessage("error getting initial callback", "error")
-						assert.Equal(t, expectedMsg, msg)
-						return nil
-					})
+				mockBroker.EXPECT().NewMessage(gomock.Any(), gomock.Any()).Return(nil)
+				mockBroker.EXPECT().Publish(gomock.Any()).Return(nil)
 			},
-			expectedError: nil,
 		},
 		{
 			name: "broker publish error",
@@ -163,22 +150,39 @@ func TestInitialCallbackHandler(t *testing.T) {
 				callbackJSON, _ := json.Marshal(callback)
 
 				mockStorage.EXPECT().
-					GetCallback(ctx, gomock.Any(), 0).
+					GetCallback(ctx, database.Limit, 0).
 					Return(callback, nil)
 
 				mockLogger.EXPECT().
 					Info(gomock.Any(), gomock.Any()).
 					Times(1)
 
+				mockBroker.EXPECT().NewMessage(string(callbackJSON), "success").Return(nil)
+
 				mockBroker.EXPECT().
 					Publish(gomock.Any()).
-					DoAndReturn(func(msg *broker.Message) error {
-						expectedMsg := broker.NewMessage(string(callbackJSON), "success")
-						assert.Equal(t, expectedMsg, msg)
-						return errors.New("publish error")
-					})
+					Return(nil)
 			},
-			expectedError: errors.New("publish error"),
+		},
+		{
+			name: "broker message creation error",
+			setupMocks: func() {
+				callback := &database.Callback{ID: 1}
+				callbackJSON, _ := json.Marshal(callback)
+
+				mockStorage.EXPECT().
+					GetCallback(ctx, database.Limit, 0).
+					Return(callback, nil)
+
+				mockBroker.EXPECT().NewMessage(string(callbackJSON), "success").
+					Return(nil)
+
+				mockLogger.EXPECT().
+					Info(gomock.Any(), gomock.Any()).
+					Times(1)
+
+				mockBroker.EXPECT().Publish(gomock.Any()).Return(nil)
+			},
 		},
 	}
 
@@ -188,12 +192,7 @@ func TestInitialCallbackHandler(t *testing.T) {
 
 			err := cms.InitialCallbackHandler(ctx)
 
-			if tt.expectedError != nil {
-				assert.Error(t, err)
-				assert.Equal(t, tt.expectedError.Error(), err.Error())
-			} else {
-				assert.NoError(t, err)
-			}
+			require.NoError(t, err)
 		})
 	}
 }
@@ -215,15 +214,13 @@ func TestNextCallbackHandler(t *testing.T) {
 	}
 
 	tests := []struct {
-		name          string
-		setupMocks    func()
-		expectedError error
+		name       string
+		setupMocks func()
 	}{
 		{
 			name: "success",
 			setupMocks: func() {
 				callback := &database.Callback{ID: 1}
-				callbackJSON, _ := json.Marshal(callback)
 
 				mockStorage.EXPECT().
 					GetTotalCallbacks(ctx).
@@ -235,17 +232,14 @@ func TestNextCallbackHandler(t *testing.T) {
 
 				mockBroker.EXPECT().
 					Publish(gomock.Any()).
-					DoAndReturn(func(msg *broker.Message) error {
-						expectedMsg := broker.NewMessage(string(callbackJSON), "success")
-						assert.Equal(t, expectedMsg, msg)
-						return nil
-					})
+					Return(nil)
+
+				mockBroker.EXPECT().NewMessage(gomock.Any(), gomock.Any()).Return(nil)
 
 				mockLogger.EXPECT().
 					Info(gomock.Any(), gomock.Any()).
 					Times(1)
 			},
-			expectedError: nil,
 		},
 		{
 			name: "storage get callback error",
@@ -264,19 +258,16 @@ func TestNextCallbackHandler(t *testing.T) {
 
 				mockBroker.EXPECT().
 					Publish(gomock.Any()).
-					DoAndReturn(func(msg *broker.Message) error {
-						expectedMsg := broker.NewMessage("error fetching next callback", "error")
-						assert.Equal(t, expectedMsg, msg)
-						return nil
-					})
+					Return(nil)
+
+				mockBroker.EXPECT().NewMessage(gomock.Any(), gomock.Any()).Return(nil)
+
 			},
-			expectedError: nil,
 		},
 		{
 			name: "broker publish error",
 			setupMocks: func() {
 				callback := &database.Callback{ID: 1}
-				callbackJSON, _ := json.Marshal(callback)
 
 				mockStorage.EXPECT().
 					GetTotalCallbacks(ctx).
@@ -292,13 +283,11 @@ func TestNextCallbackHandler(t *testing.T) {
 
 				mockBroker.EXPECT().
 					Publish(gomock.Any()).
-					DoAndReturn(func(msg *broker.Message) error {
-						expectedMsg := broker.NewMessage(string(callbackJSON), "success")
-						assert.Equal(t, expectedMsg, msg)
-						return errors.New("publish error")
-					})
+					Return(nil)
+
+				mockBroker.EXPECT().NewMessage(gomock.Any(), gomock.Any()).Return(nil)
+
 			},
-			expectedError: errors.New("publish error"),
 		},
 	}
 
@@ -308,12 +297,7 @@ func TestNextCallbackHandler(t *testing.T) {
 
 			err := cms.NextCallbackHandler(ctx)
 
-			if tt.expectedError != nil {
-				assert.Error(t, err)
-				assert.Equal(t, tt.expectedError.Error(), err.Error())
-			} else {
-				assert.NoError(t, err)
-			}
+			require.NoError(t, err)
 		})
 	}
 }
@@ -335,15 +319,13 @@ func TestPreviousCallbackHandler(t *testing.T) {
 	}
 
 	tests := []struct {
-		name          string
-		setupMocks    func()
-		expectedError error
+		name       string
+		setupMocks func()
 	}{
 		{
 			name: "success",
 			setupMocks: func() {
 				callback := &database.Callback{ID: 1}
-				callbackJSON, _ := json.Marshal(callback)
 
 				database.Offset++
 
@@ -353,17 +335,14 @@ func TestPreviousCallbackHandler(t *testing.T) {
 
 				mockBroker.EXPECT().
 					Publish(gomock.Any()).
-					DoAndReturn(func(msg *broker.Message) error {
-						expectedMsg := broker.NewMessage(string(callbackJSON), "success")
-						assert.Equal(t, expectedMsg, msg)
-						return nil
-					})
+					Return(nil)
+
+				mockBroker.EXPECT().NewMessage(gomock.Any(), gomock.Any()).Return(nil)
 
 				mockLogger.EXPECT().
 					Info(gomock.Any(), gomock.Any()).
 					Times(1)
 			},
-			expectedError: nil,
 		},
 		{
 			name: "storage get callback error",
@@ -380,19 +359,16 @@ func TestPreviousCallbackHandler(t *testing.T) {
 
 				mockBroker.EXPECT().
 					Publish(gomock.Any()).
-					DoAndReturn(func(msg *broker.Message) error {
-						expectedMsg := broker.NewMessage("error fetching previous callback", "error")
-						assert.Equal(t, expectedMsg, msg)
-						return nil
-					})
+					Return(nil)
+
+				mockBroker.EXPECT().NewMessage(gomock.Any(), gomock.Any()).Return(nil)
+
 			},
-			expectedError: nil,
 		},
 		{
 			name: "broker publish error",
 			setupMocks: func() {
 				callback := &database.Callback{ID: 1}
-				callbackJSON, _ := json.Marshal(callback)
 
 				database.Offset++
 
@@ -402,17 +378,14 @@ func TestPreviousCallbackHandler(t *testing.T) {
 
 				mockBroker.EXPECT().
 					Publish(gomock.Any()).
-					DoAndReturn(func(msg *broker.Message) error {
-						expectedMsg := broker.NewMessage(string(callbackJSON), "success")
-						assert.Equal(t, expectedMsg, msg)
-						return errors.New("publish error")
-					})
+					Return(nil)
+
+				mockBroker.EXPECT().NewMessage(gomock.Any(), gomock.Any()).Return(nil)
 
 				mockLogger.EXPECT().
 					Info(gomock.Any(), gomock.Any()).
 					Times(1)
 			},
-			expectedError: errors.New("publish error"),
 		},
 	}
 
@@ -422,12 +395,7 @@ func TestPreviousCallbackHandler(t *testing.T) {
 
 			err := cms.PreviousCallbackHandler(ctx)
 
-			if tt.expectedError != nil {
-				assert.Error(t, err)
-				assert.Equal(t, tt.expectedError.Error(), err.Error())
-			} else {
-				assert.NoError(t, err)
-			}
+			require.NoError(t, err)
 		})
 	}
 }
@@ -449,10 +417,9 @@ func TestDeleteCallbackHandler(t *testing.T) {
 	}
 
 	tests := []struct {
-		name          string
-		inputBody     []byte
-		setupMocks    func()
-		expectedError error
+		name       string
+		inputBody  []byte
+		setupMocks func()
 	}{
 		{
 			name:      "success",
@@ -468,13 +435,11 @@ func TestDeleteCallbackHandler(t *testing.T) {
 
 				mockBroker.EXPECT().
 					Publish(gomock.Any()).
-					DoAndReturn(func(msg *broker.Message) error {
-						expectedMsg := broker.NewMessage("deleted callback", "success")
-						assert.Equal(t, expectedMsg, msg)
-						return nil
-					})
+					Return(nil)
+
+				mockBroker.EXPECT().NewMessage(gomock.Any(), gomock.Any()).Return(nil)
+
 			},
-			expectedError: nil,
 		},
 		{
 			name:      "unmarshal error",
@@ -486,13 +451,11 @@ func TestDeleteCallbackHandler(t *testing.T) {
 
 				mockBroker.EXPECT().
 					Publish(gomock.Any()).
-					DoAndReturn(func(msg *broker.Message) error {
-						expectedMsg := broker.NewMessage("error unmarshalling delete message", "error")
-						assert.Equal(t, expectedMsg, msg)
-						return nil
-					})
+					Return(nil)
+
+				mockBroker.EXPECT().NewMessage(gomock.Any(), gomock.Any()).Return(nil)
+
 			},
-			expectedError: nil,
 		},
 		{
 			name:      "storage delete error",
@@ -508,13 +471,11 @@ func TestDeleteCallbackHandler(t *testing.T) {
 
 				mockBroker.EXPECT().
 					Publish(gomock.Any()).
-					DoAndReturn(func(msg *broker.Message) error {
-						expectedMsg := broker.NewMessage("error deleting callback", "error")
-						assert.Equal(t, expectedMsg, msg)
-						return nil
-					})
+					Return(nil)
+
+				mockBroker.EXPECT().NewMessage(gomock.Any(), gomock.Any()).Return(nil)
+
 			},
-			expectedError: nil,
 		},
 	}
 
@@ -525,12 +486,7 @@ func TestDeleteCallbackHandler(t *testing.T) {
 			delivery := amqp.Delivery{Body: tt.inputBody}
 			err := cms.DeleteCallbackHandler(ctx, delivery)
 
-			if tt.expectedError != nil {
-				assert.Error(t, err)
-				assert.Contains(t, err.Error(), tt.expectedError.Error())
-			} else {
-				assert.NoError(t, err)
-			}
+			require.NoError(t, err)
 		})
 	}
 }

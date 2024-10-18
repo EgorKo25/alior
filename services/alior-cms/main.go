@@ -34,7 +34,7 @@ func main() {
 	defer db.Close()
 
 	// Инициализация брокера
-	b, err := broker.NewBroker(cfg.MsgBroker.URL, log)
+	b, err := broker.NewBroker(&cfg.Broker, log)
 	if err != nil {
 		log.Fatal("failed to initialize broker: %v", err)
 	}

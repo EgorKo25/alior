@@ -1,7 +1,6 @@
 package service
 
 import (
-	"callback_service/src/broker"
 	"callback_service/src/database"
 	"encoding/json"
 	"errors"
@@ -39,7 +38,7 @@ func (c *CMS) CreateResponse(callback *database.Callback) error {
 		return err
 	}
 
-	msg := broker.NewMessage(string(callbackJSON), "callback")
+	msg := c.Broker.NewMessage(string(callbackJSON), "callback")
 	if err := c.Broker.Publish(msg); err != nil {
 		return err
 	}

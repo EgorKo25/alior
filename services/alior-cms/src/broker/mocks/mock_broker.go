@@ -174,6 +174,48 @@ func (mr *MockIChannelManagerMockRecorder) CreateChannel(conn interface{}) *gomo
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateChannel", reflect.TypeOf((*MockIChannelManager)(nil).CreateChannel), conn)
 }
 
+// GetExchange mocks base method.
+func (m *MockIChannelManager) GetExchange() string {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetExchange")
+	ret0, _ := ret[0].(string)
+	return ret0
+}
+
+// GetExchange indicates an expected call of GetExchange.
+func (mr *MockIChannelManagerMockRecorder) GetExchange() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetExchange", reflect.TypeOf((*MockIChannelManager)(nil).GetExchange))
+}
+
+// GetQueue mocks base method.
+func (m *MockIChannelManager) GetQueue() string {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetQueue")
+	ret0, _ := ret[0].(string)
+	return ret0
+}
+
+// GetQueue indicates an expected call of GetQueue.
+func (mr *MockIChannelManagerMockRecorder) GetQueue() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetQueue", reflect.TypeOf((*MockIChannelManager)(nil).GetQueue))
+}
+
+// GetRoutingKey mocks base method.
+func (m *MockIChannelManager) GetRoutingKey() string {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetRoutingKey")
+	ret0, _ := ret[0].(string)
+	return ret0
+}
+
+// GetRoutingKey indicates an expected call of GetRoutingKey.
+func (mr *MockIChannelManagerMockRecorder) GetRoutingKey() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetRoutingKey", reflect.TypeOf((*MockIChannelManager)(nil).GetRoutingKey))
+}
+
 // MockIBroker is a mock of IBroker interface.
 type MockIBroker struct {
 	ctrl     *gomock.Controller
@@ -209,6 +251,20 @@ func (mr *MockIBrokerMockRecorder) Close() *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Close", reflect.TypeOf((*MockIBroker)(nil).Close))
 }
 
+// NewMessage mocks base method.
+func (m *MockIBroker) NewMessage(body, msgType string) *broker.Message {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "NewMessage", body, msgType)
+	ret0, _ := ret[0].(*broker.Message)
+	return ret0
+}
+
+// NewMessage indicates an expected call of NewMessage.
+func (mr *MockIBrokerMockRecorder) NewMessage(body, msgType interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "NewMessage", reflect.TypeOf((*MockIBroker)(nil).NewMessage), body, msgType)
+}
+
 // Publish mocks base method.
 func (m *MockIBroker) Publish(message *broker.Message) error {
 	m.ctrl.T.Helper()
@@ -224,15 +280,15 @@ func (mr *MockIBrokerMockRecorder) Publish(message interface{}) *gomock.Call {
 }
 
 // Subscribe mocks base method.
-func (m *MockIBroker) Subscribe(ctx context.Context, queue string, handler func(context.Context, amqp091.Delivery) error) error {
+func (m *MockIBroker) Subscribe(ctx context.Context, handler func(context.Context, amqp091.Delivery) error) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Subscribe", ctx, queue, handler)
+	ret := m.ctrl.Call(m, "Subscribe", ctx, handler)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // Subscribe indicates an expected call of Subscribe.
-func (mr *MockIBrokerMockRecorder) Subscribe(ctx, queue, handler interface{}) *gomock.Call {
+func (mr *MockIBrokerMockRecorder) Subscribe(ctx, handler interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Subscribe", reflect.TypeOf((*MockIBroker)(nil).Subscribe), ctx, queue, handler)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Subscribe", reflect.TypeOf((*MockIBroker)(nil).Subscribe), ctx, handler)
 }

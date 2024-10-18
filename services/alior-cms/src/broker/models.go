@@ -34,7 +34,7 @@ type MessageHeaders struct {
 }
 
 // NewMessage is a broker message constructor
-func NewMessage(body string, msgType string) *Message {
+func (b *Broker) NewMessage(body string, msgType string) *Message {
 	correlationID := uuid.New().String()
 	messageID := uuid.New().String()
 
@@ -51,8 +51,8 @@ func NewMessage(body string, msgType string) *Message {
 		},
 		Body: body,
 		Headers: MessageHeaders{
-			Exchange:    "ansask",
-			RoutingKey:  "ans",
+			Exchange:    b.ChannelManager.GetExchange(),
+			RoutingKey:  b.ChannelManager.GetRoutingKey(),
 			Mandatory:   true,
 			Immediate:   false,
 			DeliveryTag: 0,

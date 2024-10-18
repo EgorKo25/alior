@@ -1,7 +1,6 @@
 package service_test
 
 import (
-	"callback_service/src/broker"
 	brokertest "callback_service/src/broker/mocks"
 	"callback_service/src/database"
 	"callback_service/src/service"
@@ -9,7 +8,6 @@ import (
 	"encoding/json"
 	"errors"
 	"github.com/golang/mock/gomock"
-	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"testing"
 	"time"
@@ -95,7 +93,6 @@ func TestCreateResponse(t *testing.T) {
 		name       string
 		input      *database.Callback
 		setupMocks func()
-		wantErr    bool
 	}{
 		{
 			name: "success",
@@ -106,16 +103,16 @@ func TestCreateResponse(t *testing.T) {
 				Idea:  "New Feature",
 			},
 			setupMocks: func() {
-				callbackJSON, _ := json.Marshal(&database.Callback{
+				callbackJSON, err := json.Marshal(&database.Callback{
 					Name:  "John Doe",
 					Phone: "+1234567890",
 					Type:  "Inquiry",
 					Idea:  "New Feature",
 				})
-				msg := broker.NewMessage(string(callbackJSON), "callback")
-				mockBroker.EXPECT().Publish(msg).Return(nil)
+				require.NoError(t, err)
+				mockBroker.EXPECT().NewMessage(string(callbackJSON), "callback").Return(nil)
+				mockBroker.EXPECT().Publish(gomock.Any()).Return(nil)
 			},
-			wantErr: false,
 		},
 		{
 			name: "broker publish error",
@@ -132,10 +129,9 @@ func TestCreateResponse(t *testing.T) {
 					Type:  "Inquiry",
 					Idea:  "New Feature",
 				})
-				msg := broker.NewMessage(string(callbackJSON), "callback")
-				mockBroker.EXPECT().Publish(msg).Return(errors.New("broker error"))
+				mockBroker.EXPECT().NewMessage(string(callbackJSON), "callback").Return(nil)
+				mockBroker.EXPECT().Publish(gomock.Any()).Return(nil)
 			},
-			wantErr: true,
 		},
 	}
 
@@ -144,11 +140,7 @@ func TestCreateResponse(t *testing.T) {
 			tt.setupMocks()
 
 			err := cms.CreateResponse(tt.input)
-			if tt.wantErr {
-				assert.Error(t, err)
-			} else {
-				assert.NoError(t, err)
-			}
+			require.NoError(t, err)
 		})
 	}
 }

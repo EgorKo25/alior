@@ -1,6 +1,7 @@
 package broker
 
 import (
+	"callback_service/src/config"
 	"context"
 	amqp "github.com/rabbitmq/amqp091-go"
 )
@@ -21,12 +22,16 @@ type IConnectionManager interface {
 type IChannelManager interface {
 	CreateChannel(conn *amqp.Connection) (*amqp.Channel, error)
 	Close(channel *amqp.Channel) error
+	GetExchange() string
+	GetQueue() string
+	GetRoutingKey() string
 }
 
 // IBroker to manage broker operations
 type IBroker interface {
 	Publish(message *Message) error
-	Subscribe(ctx context.Context, queue string, handler func(ctx context.Context, delivery amqp.Delivery) error) error
+	Subscribe(ctx context.Context, handler func(ctx context.Context, delivery amqp.Delivery) error) error
+	NewMessage(body string, msgType string) *Message
 	Close()
 }
 
@@ -64,7 +69,10 @@ func (cm *ConnectionManager) Close() error {
 
 // ChannelManager structure manage broker channel
 type ChannelManager struct {
-	Logger ILogger
+	Exchange   string
+	RoutingKey string
+	Queue      string
+	Logger     ILogger
 }
 
 // CreateChannel is a ChannelManager method to create broker channel
@@ -91,6 +99,18 @@ func (cm *ChannelManager) Close(channel *amqp.Channel) error {
 	return nil
 }
 
+func (cm *ChannelManager) GetExchange() string {
+	return cm.Exchange
+}
+
+func (cm *ChannelManager) GetQueue() string {
+	return cm.Queue
+}
+
+func (cm *ChannelManager) GetRoutingKey() string {
+	return cm.RoutingKey
+}
+
 // Broker structure to store connection, channel and their managers
 type Broker struct {
 	ConnManager    IConnectionManager
@@ -101,14 +121,17 @@ type Broker struct {
 }
 
 // NewBroker is a Broker constructor
-func NewBroker(URL string, logger ILogger) (*Broker, error) {
+func NewBroker(cfg *config.BrokerConfig, logger ILogger) (*Broker, error) {
 	connManager := &ConnectionManager{
-		URL:    URL,
+		URL:    cfg.URL,
 		Logger: logger,
 	}
 
 	channelManager := &ChannelManager{
-		Logger: logger,
+		Exchange:   cfg.Exchange,
+		RoutingKey: cfg.RoutingKey,
+		Queue:      cfg.Queue,
+		Logger:     logger,
 	}
 
 	conn, err := connManager.Connect()
@@ -161,9 +184,9 @@ func (b *Broker) Publish(message *Message) error {
 }
 
 // Subscribe is a Broker structure method to get messages from broker
-func (b *Broker) Subscribe(ctx context.Context, queue string, handler func(ctx context.Context, delivery amqp.Delivery) error) error {
+func (b *Broker) Subscribe(ctx context.Context, handler func(ctx context.Context, delivery amqp.Delivery) error) error {
 	messages, err := b.Channel.Consume(
-		queue,
+		b.ChannelManager.GetQueue(),
 		"",
 		true,
 		false,

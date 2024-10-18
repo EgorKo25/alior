@@ -1,7 +1,6 @@
 package service
 
 import (
-	"callback_service/src/broker"
 	"callback_service/src/database"
 	"context"
 	"encoding/json"
@@ -10,7 +9,7 @@ import (
 
 func (c *CMS) handleError(errMsg string) error {
 	c.Logger.Error(errMsg)
-	response := broker.NewMessage(errMsg, "error")
+	response := c.Broker.NewMessage(errMsg, "error")
 	return c.Broker.Publish(response)
 }
 
@@ -29,7 +28,7 @@ func (c *CMS) HandleMessage(ctx context.Context, delivery amqp.Delivery) error {
 				return c.handleError("error creating callback: " + err.Error())
 			}
 			c.Logger.Info("callback created successfully")
-			return c.Broker.Publish(broker.NewMessage("created callback", "success"))
+			return c.Broker.Publish(c.Broker.NewMessage("created callback", "success"))
 
 		case "initial":
 			if err := c.InitialCallbackHandler(ctx); err != nil {
@@ -89,19 +88,19 @@ func (c *CMS) InitialCallbackHandler(ctx context.Context) error {
 	callback, err := c.Storage.GetCallback(ctx, database.Limit, 0)
 	if err != nil {
 		c.Logger.Error("error getting initial callback: %s", err.Error())
-		response := broker.NewMessage("error getting initial callback", "error")
+		response := c.Broker.NewMessage("error getting initial callback", "error")
 		return c.Broker.Publish(response)
 	}
 
 	callbackJSON, err := json.Marshal(callback)
 	if err != nil {
 		c.Logger.Error("error marshalling callback: %s", err.Error())
-		response := broker.NewMessage("error marshalling callback", "error")
+		response := c.Broker.NewMessage("error marshalling callback", "error")
 		return c.Broker.Publish(response)
 	}
 
 	c.Logger.Info("got initial callback: %s", callback)
-	response := broker.NewMessage(string(callbackJSON), "success")
+	response := c.Broker.NewMessage(string(callbackJSON), "success")
 	return c.Broker.Publish(response)
 }
 
@@ -110,7 +109,7 @@ func (c *CMS) NextCallbackHandler(ctx context.Context) error {
 	total, err := c.Storage.GetTotalCallbacks(ctx)
 	if err != nil {
 		c.Logger.Error("error getting total callbacks: %s", err.Error())
-		response := broker.NewMessage("error getting total callbacks", "error")
+		response := c.Broker.NewMessage("error getting total callbacks", "error")
 		return c.Broker.Publish(response)
 	}
 
@@ -121,19 +120,19 @@ func (c *CMS) NextCallbackHandler(ctx context.Context) error {
 	callback, err := c.Storage.GetCallback(ctx, database.Limit, database.Offset)
 	if err != nil {
 		c.Logger.Error("error fetching next callback: %s", err.Error())
-		response := broker.NewMessage("error fetching next callback", "error")
+		response := c.Broker.NewMessage("error fetching next callback", "error")
 		return c.Broker.Publish(response)
 	}
 
 	callbackJSON, err := json.Marshal(callback)
 	if err != nil {
 		c.Logger.Error("error marshalling callback: %s", err.Error())
-		response := broker.NewMessage("error marshalling callback", "error")
+		response := c.Broker.NewMessage("error marshalling callback", "error")
 		return c.Broker.Publish(response)
 	}
 
 	c.Logger.Info("got next callback: %s", callback)
-	response := broker.NewMessage(string(callbackJSON), "success")
+	response := c.Broker.NewMessage(string(callbackJSON), "success")
 	return c.Broker.Publish(response)
 }
 
@@ -146,19 +145,19 @@ func (c *CMS) PreviousCallbackHandler(ctx context.Context) error {
 	callback, err := c.Storage.GetCallback(ctx, database.Limit, database.Offset)
 	if err != nil {
 		c.Logger.Error("error fetching previous callback: %s", err.Error())
-		response := broker.NewMessage("error fetching previous callback", "error")
+		response := c.Broker.NewMessage("error fetching previous callback", "error")
 		return c.Broker.Publish(response)
 	}
 
 	callbackJSON, err := json.Marshal(callback)
 	if err != nil {
 		c.Logger.Error("error marshalling callback: %s", err.Error())
-		response := broker.NewMessage("error marshalling callback", "error")
+		response := c.Broker.NewMessage("error marshalling callback", "error")
 		return c.Broker.Publish(response)
 	}
 
 	c.Logger.Info("got previous callback: %s", callback)
-	response := broker.NewMessage(string(callbackJSON), "success")
+	response := c.Broker.NewMessage(string(callbackJSON), "success")
 	return c.Broker.Publish(response)
 }
 
@@ -168,14 +167,14 @@ func (c *CMS) DeleteCallbackHandler(ctx context.Context, delivery amqp.Delivery)
 	err := json.Unmarshal(delivery.Body, &body)
 	if err != nil {
 		c.Logger.Error("error unmarshalling message body: %s", err.Error())
-		response := broker.NewMessage("error unmarshalling delete message", "error")
+		response := c.Broker.NewMessage("error unmarshalling delete message", "error")
 		return c.Broker.Publish(response)
 	}
 
 	err = c.Storage.DeleteCallbackByID(ctx, body.ID)
 	if err != nil {
 		c.Logger.Error("error deleting callback: %s", err.Error())
-		response := broker.NewMessage("error deleting callback", "error")
+		response := c.Broker.NewMessage("error deleting callback", "error")
 		return c.Broker.Publish(response)
 	}
 
@@ -184,6 +183,6 @@ func (c *CMS) DeleteCallbackHandler(ctx context.Context, delivery amqp.Delivery)
 	}
 
 	c.Logger.Info("deleted callback: %s", body.ID)
-	response := broker.NewMessage("deleted callback", "success")
+	response := c.Broker.NewMessage("deleted callback", "success")
 	return c.Broker.Publish(response)
 }

@@ -15,15 +15,18 @@ type DatabaseConfig struct {
 	URL string `yaml:"postgresql_url"`
 }
 
-// MsgBrokerConfig is a structure to store broker config
-type MsgBrokerConfig struct {
-	URL string `yaml:"rabbitmq_url"`
+// BrokerConfig is a structure to store broker config
+type BrokerConfig struct {
+	URL        string
+	Exchange   string
+	RoutingKey string
+	Queue      string
 }
 
 // Config is a structure to store db and broker configs
 type Config struct {
-	Database  DatabaseConfig  `yaml:"db"`
-	MsgBroker MsgBrokerConfig `yaml:"msgBroker"`
+	Database DatabaseConfig `yaml:"db"`
+	Broker   BrokerConfig   `yaml:"broker"`
 }
 
 // Load is a function to load config from file

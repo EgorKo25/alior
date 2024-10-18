@@ -21,7 +21,7 @@ func TestLoad(t *testing.T) {
 				config.ReadConfig = func(path string, cfg interface{}) error {
 					c := cfg.(*config.Config)
 					c.Database.URL = "postgresql://user:password@localhost:5432/dbname"
-					c.MsgBroker.URL = "amqp://guest:guest@localhost:5672/"
+					c.Broker.URL = "amqp://guest:guest@localhost:5672/"
 					return nil
 				}
 			},
@@ -29,7 +29,7 @@ func TestLoad(t *testing.T) {
 				Database: config.DatabaseConfig{
 					URL: "postgresql://user:password@localhost:5432/dbname",
 				},
-				MsgBroker: config.MsgBrokerConfig{
+				Broker: config.BrokerConfig{
 					URL: "amqp://guest:guest@localhost:5672/",
 				},
 			},
